@@ -1,0 +1,2 @@
+// category service
+export default {};
