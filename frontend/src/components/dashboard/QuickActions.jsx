@@ -66,7 +66,7 @@ export default function QuickActions() {
 
               <Icon
                 size={24}
-                className="text-purple-700"
+                className="text-[#6C1D5F]"
               />
 
               <span>

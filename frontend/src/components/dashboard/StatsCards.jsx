@@ -6,7 +6,7 @@ export default function StatCard({
   value,
   icon: Icon,
   trend = "+0",
-  color = "text-purple-700",
+  color = "text-[#6C1D5F]",
 }) {
   return (
     <Card className="rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
@@ -41,7 +41,7 @@ export default function StatCard({
 
           </div>
 
-          <div className="rounded-xl bg-purple-100 p-3">
+          <div className="rounded-xl bg-[#F0DAEA] p-3">
 
             <Icon
               size={24}

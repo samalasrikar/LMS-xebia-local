@@ -1,6 +1,7 @@
 package com.lms.backend.learning.submodule;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -35,7 +36,6 @@ public class SubModuleService {
     }
 
     public List<SubModuleResponse> getAllSubModules() {
-
         return repository.findAll()
                 .stream()
                 .map(mapper::toResponse)
@@ -44,18 +44,18 @@ public class SubModuleService {
 
     public SubModuleResponse createSubModule(SubModuleRequest request) {
 
-        if (repository.existsByTitle(request.getTitle())) {
-            throw new ResourceAlreadyExistsException("SubModule already exists");
+        if (repository.existsByTitleAndModule_Id(request.getTitle(), request.getModuleId())) {
+            throw new ResourceAlreadyExistsException("Submodule with this title already exists in this module");
         }
 
-        Module module = moduleRepository.findById(request.getModuleId())
+        Module module = moduleRepository.findById(Objects.requireNonNull(request.getModuleId()))
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Module not found"));
 
         log.info("Creating submodule {}", request.getTitle());
 
-        SubModule saved = repository.save(
-                mapper.toEntity(request, module));
+        SubModule entity = mapper.toEntity(request, module);
+        SubModule saved = repository.save(Objects.requireNonNull(entity));
 
         return mapper.toResponse(saved);
     }
@@ -68,13 +68,14 @@ public class SubModuleService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("SubModule not found"));
 
-        Module module = moduleRepository.findById(request.getModuleId())
+        Module module = moduleRepository.findById(Objects.requireNonNull(request.getModuleId()))
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Module not found"));
 
         mapper.updateEntity(existing, request, module);
 
-        return mapper.toResponse(repository.save(existing));
+        SubModule updated = repository.save(Objects.requireNonNull(existing));
+        return mapper.toResponse(updated);
     }
 
     public void deleteSubModule(@NonNull Long id) {

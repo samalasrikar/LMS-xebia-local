@@ -2,10 +2,8 @@ import {
   Bell,
   ChevronDown,
   Menu,
-  Search,
 } from "lucide-react";
-
-import { Input } from "../ui/input";
+import { useLocation } from "react-router-dom";
 import {
   Avatar,
   AvatarFallback,
@@ -22,6 +20,18 @@ import {
 import adminProfileIcon from "../../assets/admin_profile_icon.svg";
 
 export default function Navbar() {
+  const location = useLocation();
+
+  const formatPath = (path) => {
+    if (path === "/") return "Welcome back, Admin! 👋";
+    return path
+      .split("/")
+      .filter(Boolean)
+      .filter((segment) => isNaN(segment)) // Filter out numeric IDs
+      .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+      .join(" / ");
+  };
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/90 px-8 backdrop-blur">
 
@@ -34,36 +44,14 @@ export default function Navbar() {
         </button>
 
         <div>
-          <p className="text-xs text-slate-500">
-            Home / Dashboard
-          </p>
-
-          <h1 className="text-xl font-semibold text-slate-900">
-            Dashboard
+          <h1 className="text-lg font-bold text-[#6C1D5F]">
+            {formatPath(location.pathname)}
           </h1>
         </div>
 
       </div>
 
-      {/* Search */}
 
-      <div className="hidden w-full max-w-md lg:block">
-
-        <div className="relative">
-
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-          />
-
-          <Input
-            placeholder="Search courses, modules..."
-            className="pl-10"
-          />
-
-        </div>
-
-      </div>
 
       {/* Right */}
 
@@ -85,7 +73,7 @@ export default function Navbar() {
 
               <Avatar className="h-9 w-9">
                 <AvatarImage src={adminProfileIcon} alt="Admin" />
-                <AvatarFallback className="bg-purple-700 text-white">
+                <AvatarFallback className="bg-[#6C1D5F] text-white">
                   A
                 </AvatarFallback>
               </Avatar>

@@ -4,8 +4,6 @@ import {
   FolderTree,
   GraduationCap,
   BookOpen,
-  GitBranch,
-  FileText,
   Settings,
   HelpCircle,
 } from "lucide-react";
@@ -28,21 +26,6 @@ const menu = [
     title: "Courses",
     path: "/courses",
     icon: GraduationCap,
-  },
-  {
-    title: "Modules",
-    path: "/modules",
-    icon: BookOpen,
-  },
-  {
-    title: "Sub Modules",
-    path: "/submodules",
-    icon: GitBranch,
-  },
-  {
-    title: "Content",
-    path: "/content",
-    icon: FileText,
   },
 ];
 
@@ -83,7 +66,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-slate-100 text-purple-700"
+                    ? "bg-[#6C1D5F]/10 text-[#6C1D5F] font-semibold"
                     : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                 }`
               }
@@ -107,7 +90,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 `mb-1 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-slate-100 text-purple-700"
+                    ? "bg-[#6C1D5F]/10 text-[#6C1D5F] font-semibold"
                     : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                 }`
               }

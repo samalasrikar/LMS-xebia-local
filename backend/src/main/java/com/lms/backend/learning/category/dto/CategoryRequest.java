@@ -12,8 +12,6 @@ public class CategoryRequest {
     @Size(max = 500, message = "Description cannot exceed 500 characters")
     private String description;
 
-    private String image;
-
     private String status;
 
     public CategoryRequest() {
@@ -33,14 +31,6 @@ public class CategoryRequest {
 
     public void setDescription(String description) {
         this.description = description == null ? null : description.trim();
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image == null ? null : image.trim();
     }
 
     public String getStatus() {

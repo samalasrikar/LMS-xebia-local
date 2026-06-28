@@ -19,7 +19,13 @@ public class CourseMapper {
         course.setTitle(request.getTitle());
         course.setDescription(request.getDescription());
         course.setThumbnail(request.getThumbnail());
+        course.setCurriculum(request.getCurriculum());
+        course.setDifficulty(request.getDifficulty());
+        course.setDuration(request.getDuration());
         course.setCategory(category);
+        if (request.getStatus() != null && !request.getStatus().isBlank()) {
+            course.setStatus(request.getStatus());
+        }
 
         return course;
     }
@@ -35,8 +41,12 @@ public class CourseMapper {
                 course.getTitle(),
                 course.getDescription(),
                 course.getThumbnail(),
+                course.getCurriculum(),
+                course.getDifficulty(),
+                course.getDuration(),
                 course.getCategory().getId(),
-                course.getCategory().getName()
+                course.getCategory().getName(),
+                course.getStatus()
         );
     }
 
@@ -48,6 +58,12 @@ public class CourseMapper {
         course.setTitle(request.getTitle());
         course.setDescription(request.getDescription());
         course.setThumbnail(request.getThumbnail());
+        course.setCurriculum(request.getCurriculum());
+        course.setDifficulty(request.getDifficulty());
+        course.setDuration(request.getDuration());
         course.setCategory(category);
+        if (request.getStatus() != null && !request.getStatus().isBlank()) {
+            course.setStatus(request.getStatus());
+        }
     }
 }

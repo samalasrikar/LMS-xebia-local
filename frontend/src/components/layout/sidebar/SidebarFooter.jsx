@@ -19,8 +19,8 @@ export default function SidebarFooter() {
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${
                   isActive
-                    ? "bg-purple-100 text-purple-700 font-semibold"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-purple-700"
+                    ? "bg-[#F0DAEA] text-[#6C1D5F] font-semibold"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-[#6C1D5F]"
                 }`
               }
             >
@@ -35,7 +35,7 @@ export default function SidebarFooter() {
 
       <div className="flex items-center gap-3 rounded-xl p-3 hover:bg-gray-100 transition-colors cursor-pointer">
         <Avatar>
-          <AvatarFallback className="bg-purple-700 text-white">
+          <AvatarFallback className="bg-[#6C1D5F] text-white">
             A
           </AvatarFallback>
         </Avatar>

@@ -35,8 +35,8 @@ export default function RecentCategories() {
             className="flex items-center justify-between rounded-xl border p-4 hover:bg-gray-50"
           >
             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-purple-100 p-3">
-                <FolderTree className="text-purple-700" size={20} />
+              <div className="rounded-full bg-[#F0DAEA] p-3">
+                <FolderTree className="text-[#6C1D5F]" size={20} />
               </div>
 
               <div>

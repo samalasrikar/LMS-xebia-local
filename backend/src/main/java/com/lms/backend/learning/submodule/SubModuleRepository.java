@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SubModuleRepository extends JpaRepository<SubModule, Long> {
 
-    boolean existsByTitle(String title);
+    boolean existsByTitleAndModule_Id(String title, Long moduleId);
 
 }

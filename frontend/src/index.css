@@ -30,9 +30,7 @@
     --color-muted-foreground: var(--muted-foreground);
     --color-muted: var(--muted);
     --color-secondary-foreground: var(--secondary-foreground);
-    --color-secondary: #9e2e93;
     --color-primary-foreground: var(--primary-foreground);
-    --color-primary: #510047;
     --color-popover-foreground: var(--popover-foreground);
     --color-popover: var(--popover);
     --color-card-foreground: var(--card-foreground);
@@ -47,53 +45,105 @@
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
 
-    /* Stitch custom colors */
-    --color-on-secondary-fixed-variant: #800b79;
-    --color-secondary-fixed: #ffd7f3;
-    --color-on-tertiary-container: #2ebdaf;
-    --color-secondary-fixed-dim: #ffabed;
-    --color-surface-container: #efeded;
-    --color-surface-container-low: #f5f3f3;
-    --color-outline-variant: #d5c1cc;
-    --color-on-surface: #1b1c1c;
-    --color-on-primary: #ffffff;
-    --color-surface-dim: #dbdad9;
-    --color-on-primary-fixed-variant: #762668;
+    /* ── Xebia Brand Palette ─────────────────────────────────── */
+
+    /* Main */
+    --color-brand:           #6C1D5F;   /* Tranquil Velvet         */
+    --color-brand-dark:      #4A1E47;   /* Tranquil Velvet Dark    */
+    --color-brand-secondary: #84117C;   /* Bright Tr. Velvet       */
+
+    /* Chart (dark row) */
+    --color-chart-brand-1:   #5C4F61;
+    --color-chart-brand-2:   #533754;
+    --color-chart-brand-3:   #4A1E47;
+    --color-chart-brand-4:   #5B1E53;
+    --color-chart-brand-5:   #6C1D5F;
+    --color-chart-brand-6:   #793B74;
+
+    /* Chart (light row) */
+    --color-chart-brand-7:   #855889;
+    --color-chart-brand-8:   #91759E;
+    --color-chart-brand-9:   #9D92B2;
+    --color-chart-brand-10:  #88AFCF;
+    --color-chart-brand-11:  #D3CC8C;
+
+    /* Tertiary */
+    --color-blueish-grey:    #F7F8FC;
+    --color-medium-bl-grey:  #DADCEA;
+
+    /* Neutral */
+    --color-light-grey:      #DEDEDE;
+    --color-dark-grey:       #5A5A5A;
+
+    /* Link / CTA */
+    --color-emerald:         #01AC9F;
+    --color-cta-orange:      #FF6200;
+
+    /* Semantic aliases (used across components) */
+    --color-primary:         #6C1D5F;   /* = brand                 */
+    --color-primary-dark:    #4A1E47;   /* = brand-dark            */
+    --color-primary-light:   #F7F8FC;   /* = blueish-grey          */
+    --color-secondary:       #84117C;   /* = bright tr. velvet     */
+    --color-on-primary:      #ffffff;
+
+    /* Surface / outline tokens (kept from Stitch system) */
+    --color-surface:                  #fbf9f8;
+    --color-surface-bright:           #fbf9f8;
+    --color-surface-container:        #efeded;
+    --color-surface-container-low:    #f5f3f3;
+    --color-surface-container-high:   #eae8e7;
+    --color-surface-container-highest:#e4e2e2;
     --color-surface-container-lowest: #ffffff;
-    --color-secondary-container: #ff83ec;
-    --color-on-error-container: #93000a;
-    --color-on-secondary-container: #7c0475;
-    --color-primary-container: #6c1d5f;
-    --color-tertiary: #002f2a;
-    --color-inverse-on-surface: #f2f0f0;
-    --color-error: #ba1a1a;
-    --color-on-tertiary-fixed-variant: #005049;
-    --color-on-tertiary-fixed: #00201d;
-    --color-on-secondary-fixed: #390035;
+    --color-surface-dim:              #dbdad9;
+    --color-surface-variant:          #e4e2e2;
+    --color-on-surface:               #1b1c1c;
+    --color-on-surface-variant:       #51434c;
+    --color-outline:                  #83727c;
+    --color-outline-variant:          #d5c1cc;
+    --color-inverse-surface:          #303030;
+    --color-inverse-on-surface:       #f2f0f0;
+    --color-inverse-primary:          #fface8;
+
+    /* Primary container tokens */
+    --color-primary-container:        #6c1d5f;
+    --color-on-primary-container:     #e98ad1;
+    --color-primary-fixed:            #ffd7f0;
+    --color-primary-fixed-dim:        #fface8;
+    --color-on-primary-fixed:         #3a0032;
+    --color-on-primary-fixed-variant: #762668;
+    --color-surface-tint:             #923f81;
+
+    /* Secondary container tokens */
+    --color-secondary-container:         #ff83ec;
+    --color-on-secondary:                #ffffff;
+    --color-on-secondary-container:      #7c0475;
+    --color-secondary-fixed:             #ffd7f3;
+    --color-secondary-fixed-dim:         #ffabed;
+    --color-on-secondary-fixed:          #390035;
+    --color-on-secondary-fixed-variant:  #800b79;
+
+    /* Tertiary container tokens */
+    --color-tertiary:                    #002f2a;
+    --color-tertiary-container:          #004741;
+    --color-on-tertiary:                 #ffffff;
+    --color-on-tertiary-container:       #2ebdaf;
+    --color-tertiary-fixed:              #76f7e8;
+    --color-tertiary-fixed-dim:          #56dacc;
+    --color-on-tertiary-fixed:           #00201d;
+    --color-on-tertiary-fixed-variant:   #005049;
+
+    /* Error tokens */
+    --color-error:           #ba1a1a;
     --color-error-container: #ffdad6;
-    --color-surface-container-highest: #e4e2e2;
-    --color-surface-bright: #fbf9f8;
-    --color-on-tertiary: #ffffff;
-    --color-on-primary-fixed: #3a0032;
-    --color-primary-fixed-dim: #fface8;
-    --color-on-secondary: #ffffff;
-    --color-surface-container-high: #eae8e7;
-    --color-surface: #fbf9f8;
-    --color-on-surface-variant: #51434c;
-    --color-inverse-surface: #303030;
-    --color-surface-variant: #e4e2e2;
-    --color-tertiary-container: #004741;
-    --color-on-error: #ffffff;
-    --color-tertiary-fixed: #76f7e8;
-    --color-primary-fixed: #ffd7f0;
-    --color-inverse-primary: #fface8;
-    --color-surface-tint: #923f81;
-    --color-on-primary-container: #e98ad1;
-    --color-outline: #83727c;
+    --color-on-error:        #ffffff;
+    --color-on-error-container: #93000a;
+
+    /* Background */
     --color-on-background: #1b1c1c;
-    --color-tertiary-fixed-dim: #56dacc;
-    --color-sidebar-bg: #4A1E47;
-    --color-button-primary: #6C1D5F;
+
+    /* Sidebar */
+    --color-sidebar-bg:      #4A1E47;
+    --color-button-primary:  #6C1D5F;
 
     /* Stitch custom spacing */
     --spacing-container-margin: 32px;
@@ -188,3 +238,23 @@
     @apply font-sans;
     }
 }
+
+/* ── Custom Animations ──────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fadeIn  { animation: fadeIn  0.15s ease-out both; }
+.animate-scaleUp { animation: scaleUp 0.15s ease-out both; }
+.animate-slideIn { animation: slideIn 0.2s  ease-out both; }

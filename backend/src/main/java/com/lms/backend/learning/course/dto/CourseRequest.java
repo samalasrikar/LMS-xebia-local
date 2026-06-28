@@ -15,8 +15,16 @@ public class CourseRequest {
 
     private String thumbnail;
 
+    private String curriculum;
+
+    private String difficulty;
+
+    private String duration;
+
     @NotNull(message = "Category is required")
     private Long categoryId;
+
+    private String status;
 
     public CourseRequest() {
     }
@@ -51,5 +59,37 @@ public class CourseRequest {
 
     public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public String getCurriculum() {
+        return curriculum;
+    }
+
+    public void setCurriculum(String curriculum) {
+        this.curriculum = curriculum;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

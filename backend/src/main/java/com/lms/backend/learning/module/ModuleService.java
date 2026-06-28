@@ -1,6 +1,7 @@
 package com.lms.backend.learning.module;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -43,16 +44,17 @@ public class ModuleService {
 
     public ModuleResponse createModule(ModuleRequest request) {
 
-        if (repository.existsByTitle(request.getTitle())) {
-            throw new ResourceAlreadyExistsException("Module already exists");
+        if (repository.existsByTitleAndCourse_Id(request.getTitle(), request.getCourseId())) {
+            throw new ResourceAlreadyExistsException("Module with this title already exists in this course");
         }
 
-        Course course = courseRepository.findById(request.getCourseId())
+        Course course = courseRepository.findById(Objects.requireNonNull(request.getCourseId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         log.info("Creating module {}", request.getTitle());
 
-        Module saved = repository.save(mapper.toEntity(request, course));
+        Module entity = mapper.toEntity(request, course);
+        Module saved = repository.save(Objects.requireNonNull(entity));
 
         return mapper.toResponse(saved);
     }
@@ -64,12 +66,13 @@ public class ModuleService {
         Module existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Module not found"));
 
-        Course course = courseRepository.findById(request.getCourseId())
+        Course course = courseRepository.findById(Objects.requireNonNull(request.getCourseId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         mapper.updateEntity(existing, request, course);
 
-        return mapper.toResponse(repository.save(existing));
+        Module updated = repository.save(Objects.requireNonNull(existing));
+        return mapper.toResponse(updated);
     }
 
     public void deleteModule(@NonNull Long id) {

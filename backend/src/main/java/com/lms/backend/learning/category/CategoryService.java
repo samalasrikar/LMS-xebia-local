@@ -1,12 +1,14 @@
 package com.lms.backend.learning.category;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.lms.backend.exception.ResourceAlreadyExistsException;
 import com.lms.backend.exception.ResourceNotFoundException;
@@ -21,45 +23,66 @@ public class CategoryService {
     private final CategoryMapper mapper;
     private static final Logger log = LoggerFactory.getLogger(CategoryService.class);
 
-    public CategoryService(CategoryRepository repository,CategoryMapper mapper) {
-            this.repository = repository;
-            this.mapper = mapper;
+    public CategoryService(CategoryRepository repository, CategoryMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
     }
 
     public List<CategoryResponse> getAllCategories() {
-
-    return repository.findAll()
-            .stream()
-            .map(mapper::toResponse)
-            .collect(Collectors.toList());
+        return repository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public CategoryResponse createCategory(CategoryRequest request) {
+    public CategoryResponse createCategory(CategoryRequest request, MultipartFile imageFile) {
 
         if (repository.existsByName(request.getName())) {
             throw new ResourceAlreadyExistsException("Category already exists");
         }
-            Category category = mapper.toEntity(request);
-            log.info("Creating category: {}", request.getName());
-            Category savedCategory = repository.save(category);
-            log.info("Category created with ID: {}", savedCategory.getId());
-        return mapper.toResponse(savedCategory);
+
+        byte[] imageBytes = extractBytes(imageFile);
+        Category category = mapper.toEntity(request, imageBytes);
+        log.info("Creating category: {}", request.getName());
+        Category saved = repository.save(Objects.requireNonNull(category));
+        log.info("Category created with ID: {}", saved.getId());
+
+        return mapper.toResponse(saved);
     }
 
-    public CategoryResponse updateCategory(Long id, CategoryRequest request) {
+    public CategoryResponse updateCategory(@NonNull Long id, CategoryRequest request, MultipartFile imageFile) {
+
         log.info("Updating category {}", id);
         Category existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        mapper.updateEntity(existing, request);
-        Category updated = repository.save(existing);
+
+        byte[] imageBytes = extractBytes(imageFile);
+        mapper.updateEntity(existing, request, imageBytes);
+        Category updated = repository.save(Objects.requireNonNull(existing));
         log.info("Category {} updated successfully", id);
 
-    return mapper.toResponse(updated);
+        return mapper.toResponse(updated);
     }
 
     public void deleteCategory(@NonNull Long id) {
         log.info("Deleting category {}", id);
-        repository.deleteById(id);
+        Category category = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+        repository.delete(Objects.requireNonNull(category));
         log.info("Category {} deleted successfully", id);
+    }
+
+    // ─── helpers ───────────────────────────────────────────────────────────────
+
+    private byte[] extractBytes(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+        try {
+            return file.getBytes();
+        } catch (Exception e) {
+            log.warn("Failed to read image bytes: {}", e.getMessage());
+            return null;
+        }
     }
 }

@@ -6,6 +6,11 @@ const courseService = {
     return response.data.data;
   },
 
+  getCourseById: async (id) => {
+    const response = await api.get(`/courses/${id}`);
+    return response.data.data;
+  },
+
   createCourse: async (courseData) => {
     const response = await api.post("/courses", courseData);
     return response.data.data;

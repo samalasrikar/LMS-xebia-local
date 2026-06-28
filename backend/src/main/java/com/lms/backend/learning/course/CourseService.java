@@ -1,6 +1,7 @@
 package com.lms.backend.learning.course;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -35,11 +36,18 @@ public class CourseService {
     }
 
     public List<CourseResponse> getAllCourses() {
-
         return repository.findAll()
                 .stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    public CourseResponse getCourseById(@NonNull Long id) {
+
+        Course course = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Course not found"));
+        return mapper.toResponse(course);
     }
 
     public CourseResponse createCourse(CourseRequest request) {
@@ -48,14 +56,14 @@ public class CourseService {
             throw new ResourceAlreadyExistsException("Course already exists");
         }
 
-        Category category = categoryRepository.findById(request.getCategoryId())
+        Category category = categoryRepository.findById(Objects.requireNonNull(request.getCategoryId()))
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Category not found"));
 
         log.info("Creating course {}", request.getTitle());
 
-        Course saved = repository.save(
-                mapper.toEntity(request, category));
+        Course entity = mapper.toEntity(request, category);
+        Course saved = repository.save(Objects.requireNonNull(entity));
 
         return mapper.toResponse(saved);
     }
@@ -68,13 +76,13 @@ public class CourseService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Course not found"));
 
-        Category category = categoryRepository.findById(request.getCategoryId())
+        Category category = categoryRepository.findById(Objects.requireNonNull(request.getCategoryId()))
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Category not found"));
 
         mapper.updateEntity(existing, request, category);
 
-        Course updated = repository.save(existing);
+        Course updated = repository.save(Objects.requireNonNull(existing));
 
         return mapper.toResponse(updated);
     }

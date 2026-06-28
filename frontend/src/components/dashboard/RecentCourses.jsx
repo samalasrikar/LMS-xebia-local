@@ -38,8 +38,8 @@ export default function RecentCourses() {
             className="flex items-center justify-between rounded-xl border p-4 hover:bg-gray-50"
           >
             <div className="flex items-center gap-4">
-              <div className="rounded-lg bg-purple-100 p-3">
-                <BookOpen className="text-purple-700" size={20} />
+              <div className="rounded-lg bg-[#F0DAEA] p-3">
+                <BookOpen className="text-[#6C1D5F]" size={20} />
               </div>
 
               <div>

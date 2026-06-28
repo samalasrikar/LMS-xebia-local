@@ -14,7 +14,7 @@ export default function SidebarMenu() {
             className={({ isActive }) =>
               `flex items-center gap-3 rounded-xl px-4 py-3 transition ${
                 isActive
-                  ? "bg-purple-100 text-purple-700 font-semibold"
+                  ? "bg-[#F0DAEA] text-[#6C1D5F] font-semibold"
                   : "text-gray-600 hover:bg-gray-100"
               }`
             }

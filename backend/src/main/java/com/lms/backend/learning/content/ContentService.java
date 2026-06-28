@@ -1,6 +1,7 @@
 package com.lms.backend.learning.content;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -43,16 +44,17 @@ public class ContentService {
 
     public ContentResponse createContent(ContentRequest request) {
 
-        if (repository.existsByTitle(request.getTitle())) {
-            throw new ResourceAlreadyExistsException("Content already exists");
+        if (repository.existsByTitleAndSubModule_Id(request.getTitle(), request.getSubModuleId())) {
+            throw new ResourceAlreadyExistsException("Content with this title already exists in this submodule");
         }
 
-        SubModule subModule = subModuleRepository.findById(request.getSubModuleId())
+        SubModule subModule = subModuleRepository.findById(Objects.requireNonNull(request.getSubModuleId()))
                 .orElseThrow(() -> new ResourceNotFoundException("SubModule not found"));
 
         log.info("Creating content {}", request.getTitle());
 
-        Content saved = repository.save(mapper.toEntity(request, subModule));
+        Content entity = mapper.toEntity(request, subModule);
+        Content saved = repository.save(Objects.requireNonNull(entity));
 
         return mapper.toResponse(saved);
     }
@@ -64,12 +66,13 @@ public class ContentService {
         Content existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Content not found"));
 
-        SubModule subModule = subModuleRepository.findById(request.getSubModuleId())
+        SubModule subModule = subModuleRepository.findById(Objects.requireNonNull(request.getSubModuleId()))
                 .orElseThrow(() -> new ResourceNotFoundException("SubModule not found"));
 
         mapper.updateEntity(existing, request, subModule);
 
-        return mapper.toResponse(repository.save(existing));
+        Content updated = repository.save(Objects.requireNonNull(existing));
+        return mapper.toResponse(updated);
     }
 
     public void deleteContent(@NonNull Long id) {

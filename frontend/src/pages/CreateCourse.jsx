@@ -1,83 +1,149 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
 import courseService from "../services/courseService";
 import categoryService from "../services/categoryService";
-import { 
-  Info, 
-  BookOpen, 
-  ChevronRight, 
-  ChevronDown, 
-  PlayCircle, 
-  FileText, 
-  Edit, 
-  Trash2, 
-  Plus, 
-  UploadCloud, 
-  Video 
+import {
+  Info,
+  ChevronRight,
+  ChevronDown,
+  Trash2,
+  CloudUpload,
 } from "lucide-react";
+import { Button } from "../components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from "../components/ui/dropdown-menu";
 
 export default function CreateCourse() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = !!id;
 
   // Form states
   const [title, setTitle] = useState("");
-  const [subtitle, setSubtitle] = useState("");
   const [description, setDescription] = useState("");
+  const [difficulty, setDifficulty] = useState("Beginner");
+  const [duration, setDuration] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [thumbnail, setThumbnail] = useState("");
-  const [price, setPrice] = useState("");
-  const [discountPrice, setDiscountPrice] = useState("");
-  const [freeEnrollment, setFreeEnrollment] = useState(false);
+  const [status, setStatus] = useState("Published");
 
-  // UI/API states
+  // UI / API states
   const [categories, setCategories] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const [module1Open, setModule1Open] = useState(true);
-  const [module2Open, setModule2Open] = useState(false);
+  const [loadingCourse, setLoadingCourse] = useState(false);
 
-  // Load categories on mount
   useEffect(() => {
-    async function fetchCategories() {
+    async function fetchData() {
       try {
         const data = await categoryService.getAllCategories();
-        if (data) {
-          setCategories(data);
-        }
+        if (data) setCategories(data);
       } catch (err) {
         console.error("Failed to load categories:", err);
       }
+
+      // If editing, fetch existing course data
+      if (isEditMode) {
+        setLoadingCourse(true);
+        try {
+          const course = await courseService.getCourseById(id);
+          if (course) {
+            setTitle(course.title || "");
+            setDescription(course.description || "");
+            setDifficulty(course.difficulty || "Beginner");
+            setDuration(course.duration || "");
+            setCategoryId(course.categoryId ? String(course.categoryId) : "");
+            setThumbnail(course.thumbnail || "");
+            setStatus(course.status || "Published");
+          }
+        } catch (err) {
+          console.error("Failed to load course:", err);
+          alert("Failed to load course data: " + (err.response?.data?.message || err.message));
+        } finally {
+          setLoadingCourse(false);
+        }
+      }
     }
-    fetchCategories();
-  }, []);
+    fetchData();
+  }, [id, isEditMode]);
+
+  const handleThumbnailFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setThumbnail(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handlePublishCourse = async (e) => {
     if (e) e.preventDefault();
-
-    if (!title.trim()) {
-      alert("Course title is required");
-      return;
-    }
-    if (!categoryId) {
-      alert("Please select a category");
-      return;
-    }
+    if (!title.trim()) { alert("Course title is required"); return; }
+    if (!categoryId)    { alert("Please select a category");  return; }
 
     setSubmitting(true);
     try {
       const courseData = {
         title: title.trim(),
         description: description.trim(),
-        thumbnail: thumbnail.trim() || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=60",
-        categoryId: Number(categoryId)
+        difficulty: difficulty,
+        duration: duration.trim() || "10h 00m",
+        thumbnail:
+          thumbnail.trim() ||
+          "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=60",
+        categoryId: Number(categoryId),
+        status: "Published",
       };
 
-      await courseService.createCourse(courseData);
-      alert("Course published successfully!");
+      if (isEditMode) {
+        await courseService.updateCourse(id, courseData);
+      } else {
+        await courseService.createCourse(courseData);
+      }
       navigate("/courses");
     } catch (err) {
-      console.error("Failed to create course:", err);
-      alert("Failed to publish course: " + (err.response?.data?.message || err.message));
+      console.error(`Failed to ${isEditMode ? "update" : "create"} course:`, err);
+      alert(`Failed to ${isEditMode ? "update" : "publish"} course: ` + (err.response?.data?.message || err.message));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSaveDraft = async (e) => {
+    if (e) e.preventDefault();
+    if (!title.trim()) { alert("Course title is required"); return; }
+    if (!categoryId)    { alert("Please select a category");  return; }
+
+    setSubmitting(true);
+    try {
+      const courseData = {
+        title: title.trim(),
+        description: description.trim(),
+        difficulty: difficulty,
+        duration: duration.trim() || "10h 00m",
+        thumbnail:
+          thumbnail.trim() ||
+          "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=60",
+        categoryId: Number(categoryId),
+        status: "Draft",
+      };
+
+      if (isEditMode) {
+        await courseService.updateCourse(id, courseData);
+      } else {
+        await courseService.createCourse(courseData);
+      }
+      navigate("/courses");
+    } catch (err) {
+      console.error(`Failed to save draft:`, err);
+      alert(`Failed to save draft: ` + (err.response?.data?.message || err.message));
     } finally {
       setSubmitting(false);
     }
@@ -85,295 +151,246 @@ export default function CreateCourse() {
 
   return (
     <AppLayout>
-      <form onSubmit={handlePublishCourse} className="mx-auto max-w-6xl space-y-8">
+      <form onSubmit={handlePublishCourse} className="max-w-7xl mx-auto pb-32">
+
         {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-sm font-medium text-slate-500">
-          <span>Courses</span>
+        <nav className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-6">
+          <span
+            className="hover:text-[#6C1D5F] cursor-pointer transition-colors"
+            onClick={() => navigate("/courses")}
+          >
+            Courses
+          </span>
           <ChevronRight size={14} className="text-slate-400" />
-          <span className="text-purple-700 font-semibold">New Course</span>
+          <span className="text-[#6C1D5F] font-bold">{isEditMode ? "Edit Course" : "New Course"}</span>
         </nav>
 
-        <div className="grid grid-cols-12 gap-6">
-          {/* Left Column: Form Sections */}
+        <div className="grid grid-cols-12 gap-6 items-start">
+
+          {/* ── Left Column ────────────────────────────────────────── */}
           <div className="col-span-12 lg:col-span-8 space-y-6">
-            
-            {/* General Info */}
-            <section className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+
+            {/* General Information */}
+            <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-10 h-10 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center">
-                  <Info size={20} />
+                <div className="w-12 h-12 rounded-xl bg-[#6C1D5F] text-white flex items-center justify-center shadow-sm">
+                  <Info size={22} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-slate-900">General Information</h2>
-                  <p className="text-slate-500 text-xs mt-0.5">Provide basic details about your new course offering.</p>
+                  <h2 className="text-base font-bold text-slate-900">General Information</h2>
+                  <p className="text-slate-500 text-xs mt-0.5">
+                    Define the core identity of your learning experience.
+                  </p>
                 </div>
               </div>
+
               <div className="space-y-4">
+                {/* Title */}
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-600">Course Title *</label>
-                  <input 
-                    type="text" 
+                  <label className="text-sm font-semibold text-slate-700">Course Title *</label>
+                  <input
+                    type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 bg-slate-50/50 h-12 px-4 text-sm outline-none transition-all" 
-                    placeholder="e.g. Advanced UX Strategy 2024" 
+                    className="w-full rounded-xl border border-slate-200 focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F]/20 bg-slate-50/50 h-12 px-4 text-sm outline-none transition-all"
+                    placeholder="e.g. Advanced UX Strategy 2024"
                     required
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-600">Category *</label>
-                  <select 
-                    value={categoryId}
-                    onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 bg-slate-50/50 h-12 px-4 text-sm outline-none transition-all"
-                    required
-                  >
-                    <option value="">Select a Category</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.dbId || cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
+                {/* Category */}
+                <div className="space-y-1.5 flex flex-col">
+                  <label className="text-sm font-semibold text-slate-700">Category *</label>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-between h-12 px-4 rounded-xl border border-slate-200 font-normal text-slate-700 text-sm bg-slate-50/50 hover:bg-slate-100 transition-all text-left"
+                      >
+                        {categoryId
+                          ? categories.find((cat) => String(cat.dbId || cat.id) === String(categoryId))?.name || "Select a Category"
+                          : "Select a Category"}
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-white border border-slate-200 shadow-lg rounded-xl max-h-60 overflow-y-auto z-50">
+                      <DropdownMenuRadioGroup value={String(categoryId)} onValueChange={(val) => setCategoryId(val)}>
+                        {categories.map((cat) => (
+                          <DropdownMenuRadioItem
+                            key={cat.id}
+                            value={String(cat.dbId || cat.id)}
+                            className="text-slate-700 text-sm hover:bg-slate-50 py-2 px-3 rounded-lg cursor-pointer"
+                          >
+                            {cat.name}
+                          </DropdownMenuRadioItem>
+                        ))}
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-600">Subtitle</label>
-                  <input 
-                    type="text" 
-                    value={subtitle}
-                    onChange={(e) => setSubtitle(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 bg-slate-50/50 h-12 px-4 text-sm outline-none transition-all" 
-                    placeholder="Short catchphrase or summary" 
-                  />
+                {/* Difficulty and Duration Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Difficulty */}
+                  <div className="space-y-1.5 flex flex-col">
+                    <label className="text-sm font-semibold text-slate-700">Difficulty</label>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-between h-12 px-4 rounded-xl border border-slate-200 font-normal text-slate-700 text-sm bg-slate-50/50 hover:bg-slate-100 transition-all text-left"
+                        >
+                          {difficulty}
+                          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="bg-white border border-slate-200 shadow-lg rounded-xl z-50">
+                        <DropdownMenuRadioGroup value={difficulty} onValueChange={(val) => setDifficulty(val)}>
+                          {["Beginner", "Intermediate", "Advanced"].map((level) => (
+                            <DropdownMenuRadioItem
+                              key={level}
+                              value={level}
+                              className="text-slate-700 text-sm hover:bg-slate-50 py-2 px-3 rounded-lg cursor-pointer"
+                            >
+                              {level}
+                            </DropdownMenuRadioItem>
+                          ))}
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  {/* Duration */}
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-slate-700">Duration</label>
+                    <input
+                      type="text"
+                      value={duration}
+                      onChange={(e) => setDuration(e.target.value)}
+                      className="w-full rounded-xl border border-slate-200 focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F]/20 bg-slate-50/50 h-12 px-4 text-sm outline-none transition-all"
+                      placeholder="e.g., 10h 30m"
+                    />
+                  </div>
                 </div>
 
+                {/* Description */}
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-600">Description</label>
-                  <textarea 
+                  <label className="text-sm font-semibold text-slate-700">Description</label>
+                  <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 bg-slate-50/50 p-4 text-sm outline-none transition-all" 
-                    placeholder="Describe the course outcomes, target audience, and key learnings..." 
-                    rows={4}
+                    className="w-full rounded-xl border border-slate-200 focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F]/20 bg-slate-50/50 p-4 text-sm outline-none transition-all min-h-[160px]"
+                    placeholder="Describe outcomes, target audience, and key learnings..."
+                    rows={5}
                   />
                 </div>
-              </div>
-            </section>
 
-            {/* Curriculum Builder */}
-            <section className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
-                    <BookOpen size={20} />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-slate-900">Curriculum Builder</h2>
-                    <p className="text-slate-500 text-xs mt-0.5">Structure your course into modules and lessons.</p>
-                  </div>
-                </div>
-                <button type="button" className="flex items-center gap-1.5 px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-semibold shadow-sm transition-all">
-                  <Plus size={16} />
-                  Add Module
-                </button>
-              </div>
 
-              {/* Accordion Items */}
-              <div className="space-y-4">
-                {/* Module 1 */}
-                <div className="border border-slate-200 rounded-xl overflow-hidden">
-                  <div 
-                    className="bg-slate-50/50 px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors"
-                    onClick={() => setModule1Open(!module1Open)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="cursor-grab text-slate-400">
-                        <span className="material-symbols-outlined align-middle select-none">drag_indicator</span>
-                      </div>
-                      <h3 className="text-sm font-semibold text-slate-800">Module 1: Introduction to Visual Theory</h3>
-                    </div>
-                    <div className="flex items-center gap-3 text-slate-500">
-                      <span className="text-xs">4 Lessons</span>
-                      <ChevronDown size={18} className={`transition-transform duration-200 ${module1Open ? "rotate-180" : ""}`} />
-                    </div>
-                  </div>
-                  
-                  {module1Open && (
-                    <div className="border-t border-slate-200 p-4 space-y-3 bg-white">
-                      <div className="flex items-center justify-between p-3 hover:bg-slate-50 transition-colors rounded-lg group border border-transparent hover:border-slate-100">
-                        <div className="flex items-center gap-3">
-                          <PlayCircle size={18} className="text-slate-400" />
-                          <span className="text-sm font-medium text-slate-700">Welcome to the Course</span>
-                        </div>
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button type="button" className="text-slate-400 hover:text-purple-700 p-1"><Edit size={14} /></button>
-                          <button type="button" className="text-slate-400 hover:text-red-500 p-1"><Trash2 size={14} /></button>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between p-3 hover:bg-slate-50 transition-colors rounded-lg group border border-transparent hover:border-slate-100 border-t border-slate-100">
-                        <div className="flex items-center gap-3">
-                          <FileText size={18} className="text-slate-400" />
-                          <span className="text-sm font-medium text-slate-700">Understanding Color Harmonies</span>
-                        </div>
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button type="button" className="text-slate-400 hover:text-purple-700 p-1"><Edit size={14} /></button>
-                          <button type="button" className="text-slate-400 hover:text-red-500 p-1"><Trash2 size={14} /></button>
-                        </div>
-                      </div>
-                      <button type="button" className="w-full mt-2 py-2.5 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-semibold text-xs hover:border-purple-600 hover:text-purple-700 transition-all flex items-center justify-center gap-1.5">
-                        <Plus size={14} />
-                        Add Lesson
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Module 2 */}
-                <div className="border border-slate-200 rounded-xl overflow-hidden">
-                  <div 
-                    className="bg-slate-50/50 px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors"
-                    onClick={() => setModule2Open(!module2Open)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="cursor-grab text-slate-400">
-                        <span className="material-symbols-outlined align-middle select-none">drag_indicator</span>
-                      </div>
-                      <h3 className="text-sm font-semibold text-slate-800">Module 2: Typography Systems</h3>
-                    </div>
-                    <div className="flex items-center gap-3 text-slate-500">
-                      <span className="text-xs">2 Lessons</span>
-                      <ChevronDown size={18} className={`transition-transform duration-200 ${module2Open ? "rotate-180" : ""}`} />
-                    </div>
-                  </div>
-                  
-                  {module2Open && (
-                    <div className="border-t border-slate-200 p-4 bg-white">
-                      <div className="text-slate-500 text-sm italic">Loading module content...</div>
-                    </div>
-                  )}
-                </div>
               </div>
             </section>
           </div>
 
-          {/* Right Column: Sidebar Options */}
-          <div className="col-span-12 lg:col-span-4 space-y-6">
-            
-            {/* Media / Uploads */}
-            <section className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-              <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Course Media</h2>
+          {/* ── Right Column (sticky) ───────────────────────────────── */}
+          <div className="col-span-12 lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+
+            {/* Course Media */}
+            <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-5">
+                Course Media
+              </h2>
+
               <div className="space-y-5">
+                {/* Thumbnail */}
                 <div>
-                  <label className="text-xs font-medium text-slate-500 mb-1.5 block">Course Thumbnail URL</label>
+                  <label className="text-xs font-semibold text-slate-600 mb-2 block">
+                    Thumbnail Image
+                  </label>
+                  <label htmlFor="thumbnail-file-input" className="relative w-full h-44 rounded-2xl overflow-hidden border-2 border-dashed border-slate-200 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer group block">
+                    {thumbnail ? (
+                      <>
+                        <div
+                          className="absolute inset-0 bg-cover bg-center"
+                          style={{ backgroundImage: `url('${thumbnail}')` }}
+                        />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setThumbnail("");
+                          }}
+                          className="absolute top-3 right-3 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all z-20 shadow-md flex items-center justify-center"
+                          title="Remove Image"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </>
+                    ) : (
+                      <div className="relative z-10 flex flex-col items-center p-4 bg-white/80 backdrop-blur-sm rounded-xl mx-4">
+                        <CloudUpload size={28} className="text-[#6C1D5F] mb-2" />
+                        <span className="font-semibold text-xs text-slate-700">
+                          Click to upload
+                        </span>
+                        <span className="text-[10px] text-slate-400 mt-1 uppercase tracking-wide">
+                          Recommended: 1600×900
+                        </span>
+                      </div>
+                    )}
+                  </label>
+                  <input
+                    type="file"
+                    id="thumbnail-file-input"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleThumbnailFileChange}
+                  />
                   <input
                     type="text"
                     value={thumbnail}
                     onChange={(e) => setThumbnail(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 bg-slate-50/50 h-10 px-3 text-xs outline-none transition-all mb-2"
-                    placeholder="https://example.com/image.jpg (Optional)"
+                    className="w-full mt-2 rounded-xl border border-slate-200 focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F]/20 bg-slate-50/50 h-9 px-3 text-xs outline-none transition-all"
+                    placeholder="Or paste image URL..."
                   />
-                  <div className="group relative w-full h-40 rounded-xl overflow-hidden border-2 border-dashed border-slate-200 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer">
-                    {thumbnail ? (
-                      <div 
-                        className="absolute inset-0 bg-cover bg-center"
-                        style={{ backgroundImage: `url('${thumbnail}')` }}
-                      />
-                    ) : (
-                      <div className="relative z-10 flex flex-col items-center text-center p-4">
-                        <UploadCloud size={28} className="text-purple-700 mb-2" />
-                        <span className="font-semibold text-xs text-slate-600">Thumbnail Preview</span>
-                        <span className="text-[10px] text-slate-400 mt-1">Image URL loads automatically</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-slate-500 mb-1.5 block">Promo Video</label>
-                  <div className="w-full h-24 rounded-xl border border-slate-200 flex items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer gap-2">
-                    <Video size={18} className="text-purple-700" />
-                    <span className="font-semibold text-xs text-slate-600">Upload Video URL</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Pricing Section */}
-            <section className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-              <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Pricing & Access</h2>
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-500 block">Base Price (USD)</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">$</span>
-                    <input 
-                      type="number" 
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      className="w-full pl-7 rounded-xl border border-slate-200 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 h-11 text-sm outline-none px-3" 
-                      placeholder="0.00" 
-                    />
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-500 block">Discounted Price (Optional)</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">$</span>
-                    <input 
-                      type="number" 
-                      value={discountPrice}
-                      onChange={(e) => setDiscountPrice(e.target.value)}
-                      className="w-full pl-7 rounded-xl border border-slate-200 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 h-11 text-sm outline-none px-3" 
-                      placeholder="0.00" 
-                    />
-                  </div>
-                </div>
-                <div className="pt-2">
-                  <label className="flex items-center gap-3 cursor-pointer group">
-                    <div className="relative">
-                      <input 
-                        type="checkbox" 
-                        className="sr-only peer" 
-                        checked={freeEnrollment}
-                        onChange={() => setFreeEnrollment(!freeEnrollment)}
-                      />
-                      <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:bg-purple-700 transition-colors" />
-                      <div className={`absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform duration-200 ${freeEnrollment ? "translate-x-4" : ""}`} />
-                    </div>
-                    <span className="text-xs font-medium text-slate-600">Allow Free Enrollment</span>
-                  </label>
                 </div>
               </div>
             </section>
           </div>
         </div>
 
-        {/* Sticky Publish Bar */}
-        <footer className="bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200 p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg sticky bottom-4 z-40">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-purple-700 rounded-full animate-pulse" />
-              <span className="text-xs font-medium text-slate-600">Unsaved Changes Detected</span>
+        {/* ── Sticky Footer Bar ─────────────────────────────────────── */}
+        <footer className="fixed bottom-6 left-[calc(260px+24px)] right-6 z-50">
+          <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-slate-200 px-5 py-3.5 flex items-center justify-between shadow-2xl">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 bg-[#793B74] rounded-full animate-pulse shadow-[0_0_8px_rgba(109,40,217,0.5)]" />
+                <span className="text-xs font-semibold text-slate-700">Course Editor</span>
+              </div>
             </div>
-            <div className="h-4 w-[1px] bg-slate-200 hidden md:block" />
-            <p className="text-xs text-slate-400 hidden md:block italic">Draft last saved: Recently</p>
-          </div>
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <button 
-              type="button" 
-              onClick={() => navigate("/courses")}
-              className="flex-1 md:flex-none px-6 h-11 rounded-xl border border-purple-700 text-purple-700 text-xs font-semibold hover:bg-purple-50 transition-all cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit"
-              disabled={submitting}
-              className="flex-1 md:flex-none px-6 h-11 rounded-xl bg-purple-700 text-white text-xs font-semibold hover:bg-purple-800 shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer animate-[pulse_2s_infinite]"
-            >
-              {submitting ? "Publishing..." : "Publish Course"}
-            </button>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => navigate("/courses")}
+                className="px-6 h-10 rounded-xl border-2 border-slate-200 text-slate-500 text-xs font-bold hover:bg-[#F7F8FC] transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveDraft}
+                disabled={submitting}
+                className="px-6 h-10 rounded-xl border-2 border-[#6C1D5F] text-[#6C1D5F] text-xs font-bold hover:bg-[#6C1D5F]/5 transition-all cursor-pointer"
+              >
+                {submitting ? "Saving..." : "Save Draft"}
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="px-8 h-10 rounded-xl bg-[#6C1D5F] hover:bg-[#4A1E47] text-white text-xs font-bold shadow-lg shadow-[#6C1D5F]/20 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+              >
+                {submitting ? (isEditMode ? "Updating..." : "Publishing...") : (isEditMode ? (status === "Draft" ? "Publish Course" : "Update Course") : "Publish Course")}
+              </button>
+            </div>
           </div>
         </footer>
       </form>

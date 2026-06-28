@@ -6,9 +6,13 @@ public class CourseResponse {
     private String title;
     private String description;
     private String thumbnail;
+    private String curriculum;
+    private String difficulty;
+    private String duration;
 
     private Long categoryId;
     private String categoryName;
+    private String status;
 
     public CourseResponse() {
     }
@@ -18,15 +22,23 @@ public class CourseResponse {
             String title,
             String description,
             String thumbnail,
+            String curriculum,
+            String difficulty,
+            String duration,
             Long categoryId,
-            String categoryName) {
+            String categoryName,
+            String status) {
 
         this.id = id;
         this.title = title;
         this.description = description;
         this.thumbnail = thumbnail;
+        this.curriculum = curriculum;
+        this.difficulty = difficulty;
+        this.duration = duration;
         this.categoryId = categoryId;
         this.categoryName = categoryName;
+        this.status = status;
     }
 
     public Long getId() {
@@ -75,5 +87,37 @@ public class CourseResponse {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public String getCurriculum() {
+        return curriculum;
+    }
+
+    public void setCurriculum(String curriculum) {
+        this.curriculum = curriculum;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

@@ -26,11 +26,24 @@ public class Course {
     @Column(length = 1000)
     private String description;
 
+    @Column(columnDefinition = "LONGTEXT")
     private String thumbnail;
+
+    @Column(length = 2000)
+    private String curriculum;
+
+    @Column(length = 50)
+    private String difficulty;
+
+    @Column(length = 50)
+    private String duration;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @Column(length = 20, nullable = false)
+    private String status = "Published";
 
     public Course() {
     }
@@ -73,5 +86,37 @@ public class Course {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public String getCurriculum() {
+        return curriculum;
+    }
+
+    public void setCurriculum(String curriculum) {
+        this.curriculum = curriculum;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

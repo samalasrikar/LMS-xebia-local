@@ -47,6 +47,18 @@ public class CourseController {
                         HttpStatus.OK.value()));
     }
 
+    @Operation(summary = "Get course by ID")
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<CourseResponse>> getCourseById(
+            @PathVariable @NonNull Long id) {
+
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Course fetched successfully",
+                        service.getCourseById(id),
+                        HttpStatus.OK.value()));
+    }
+
     @Operation(summary = "Create course")
     @PostMapping
     public ResponseEntity<ApiResponse<CourseResponse>> createCourse(

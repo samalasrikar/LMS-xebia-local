@@ -87,10 +87,10 @@ export default function RecentCoursesTable() {
                 >
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-4">
-                      <div className="rounded-lg bg-purple-100 p-2">
+                      <div className="rounded-lg bg-[#F0DAEA] p-2">
                         <BookOpen
                           size={18}
-                          className="text-purple-700"
+                          className="text-[#6C1D5F]"
                         />
                       </div>
                       <div>
