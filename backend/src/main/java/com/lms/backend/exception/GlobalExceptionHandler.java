@@ -18,6 +18,16 @@ public class GlobalExceptionHandler {
         private static final Logger log =
                 LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleNoResourceFound(
+            org.springframework.web.servlet.resource.NoResourceFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ResponseBuilder.error(
+                        "Resource not found: /" + ex.getResourcePath(),
+                        HttpStatus.NOT_FOUND.value()
+                ));
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<Object>> handleNotFound(
             ResourceNotFoundException ex) {

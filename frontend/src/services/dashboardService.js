@@ -12,11 +12,11 @@ const dashboardService = {
       ]);
 
     return {
-      categories: categories.data.length,
-      courses: courses.data.length,
-      modules: modules.data.length,
-      subModules: subModules.data.length,
-      contents: contents.data.length,
+      categories: categories.data.data ? categories.data.data.length : 0,
+      courses: courses.data.data ? courses.data.data.length : 0,
+      modules: modules.data.data ? modules.data.data.length : 0,
+      subModules: subModules.data.data ? subModules.data.data.length : 0,
+      contents: contents.data.data ? contents.data.data.length : 0,
     };
   },
 };

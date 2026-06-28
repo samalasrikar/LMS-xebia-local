@@ -8,7 +8,7 @@ import {
   FileText,
 } from "lucide-react";
 
-import StatCard from "./StatCard";
+import StatCard from "./StatsCards";
 import dashboardService from "../../services/dashboardService";
 
 export default function StatsGrid() {

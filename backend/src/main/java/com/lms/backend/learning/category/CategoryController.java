@@ -3,7 +3,6 @@ package com.lms.backend.learning.category;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,7 +59,7 @@ public class CategoryController {
     @Operation(summary = "Update category")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
-            @PathVariable @NonNull Long id,
+            @PathVariable Long id,
             @Valid @RequestBody CategoryRequest request) {
 
         return ResponseEntity.ok(
@@ -73,7 +72,7 @@ public class CategoryController {
     }
     @Operation(summary = "Delete category")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable @NonNull Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long id) {
 
         service.deleteCategory(id);
 

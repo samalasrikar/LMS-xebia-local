@@ -9,6 +9,7 @@ import { Input } from "../ui/input";
 import {
   Avatar,
   AvatarFallback,
+  AvatarImage,
 } from "../ui/avatar";
 
 import {
@@ -17,6 +18,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+
+import adminProfileIcon from "../../assets/admin_profile_icon.svg";
 
 export default function Navbar() {
   return (
@@ -81,11 +84,10 @@ export default function Navbar() {
             <button className="flex items-center gap-2 rounded-full hover:bg-slate-100 p-1 pr-2">
 
               <Avatar className="h-9 w-9">
-
+                <AvatarImage src={adminProfileIcon} alt="Admin" />
                 <AvatarFallback className="bg-purple-700 text-white">
                   A
                 </AvatarFallback>
-
               </Avatar>
 
               <ChevronDown size={16} />

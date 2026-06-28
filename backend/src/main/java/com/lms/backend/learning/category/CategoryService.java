@@ -46,7 +46,7 @@ public class CategoryService {
         return mapper.toResponse(savedCategory);
     }
 
-    public CategoryResponse updateCategory(@NonNull Long id, CategoryRequest request) {
+    public CategoryResponse updateCategory(Long id, CategoryRequest request) {
         log.info("Updating category {}", id);
         Category existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));

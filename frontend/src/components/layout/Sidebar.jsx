@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import logo from "../../assets/xebia-logo.png";
+import adminProfileIcon from "../../assets/admin_profile_icon.svg";
 
 const menu = [
   {
@@ -118,10 +119,7 @@ export default function Sidebar() {
         })}
 
         <div className="mt-6 flex items-center gap-3 rounded-xl border border-slate-200 p-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-700 text-sm font-semibold text-white">
-            A
-          </div>
-
+          <img src={adminProfileIcon} alt="Admin" className="h-10 w-10 rounded-full" />
           <div>
             <p className="text-sm font-semibold text-slate-900">
               Admin
