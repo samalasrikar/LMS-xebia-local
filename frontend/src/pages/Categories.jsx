@@ -148,8 +148,9 @@ export default function Categories() {
       fetchCategories();
     } catch (err) {
       console.error(`Failed to ${modalMode} category:`, err);
+      const serverMsg = err.response?.data?.message;
       setErrorMsg(
-        "Error processing category. Please check your connection or unique name."
+        serverMsg || "Error processing category. Please check your connection or unique name."
       );
     } finally {
       setSubmitting(false);

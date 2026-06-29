@@ -8,14 +8,14 @@ const categoryService = {
 
   createCategory: async (formData) => {
     const response = await api.post("/categories", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: { "Content-Type": undefined },
     });
     return response.data.data;
   },
 
   updateCategory: async (id, formData) => {
     const response = await api.put(`/categories/${id}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: { "Content-Type": undefined },
     });
     return response.data.data;
   },

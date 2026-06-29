@@ -84,8 +84,17 @@ public class GlobalExceptionHandler {
             .map(error -> error.getDefaultMessage())
             .orElse("Validation failed");
 
-    return ResponseEntity.badRequest()
+        return ResponseEntity.badRequest()
             .body(ResponseBuilder.error(message, 400));
-}
+    }
 
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMaxUploadSizeExceeded(
+            org.springframework.web.multipart.MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ResponseBuilder.error(
+                        "File size exceeds the maximum limit of 10MB.",
+                        HttpStatus.BAD_REQUEST.value()
+                ));
+    }
 }
