@@ -75,20 +75,6 @@ export default function StatCard({ title, value, icon: Icon, trend = "+0%" }) {
         </p>
       </div>
 
-      {/* Sparkline */}
-      <div className="mt-auto pt-1">
-        <svg
-          className="w-full h-8 opacity-40 group-hover:opacity-100 transition-opacity"
-          viewBox="0 0 100 20"
-        >
-          <path
-            d={cfg.spark}
-            fill="none"
-            stroke={cfg.sparkColor}
-            strokeWidth="2"
-          />
-        </svg>
-      </div>
     </div>
   );
 }
