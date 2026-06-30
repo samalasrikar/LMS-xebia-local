@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import {
   FolderTree,
   GraduationCap,
@@ -11,65 +10,49 @@ import {
 import StatCard from "./StatsCards";
 import dashboardService from "../../services/dashboardService";
 
+/* ─── Cards config ─────────────────────────────────────────────────── */
+const CARDS_CONFIG = [
+  { key: "categories",  title: "Categories",  icon: FolderTree,    trend: "+4%"  },
+  { key: "courses",     title: "Courses",     icon: GraduationCap, trend: "+12%" },
+  { key: "modules",     title: "Modules",     icon: BookOpen,      trend: "+8%"  },
+  { key: "subModules",  title: "Sub Modules", icon: GitBranch,     trend: "-2%"  },
+  { key: "contents",   title: "Content",     icon: FileText,      trend: "+5%"  },
+];
+
 export default function StatsGrid() {
   const [stats, setStats] = useState({
     categories: 0,
-    courses: 0,
-    modules: 0,
+    courses:    0,
+    modules:    0,
     subModules: 0,
-    contents: 0,
+    contents:   0,
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadDashboard();
+    async function load() {
+      try {
+        const data = await dashboardService.getDashboardStats();
+        setStats(data);
+      } catch (err) {
+        console.error("Failed to load dashboard stats:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
   }, []);
 
-  async function loadDashboard() {
-    try {
-      const data = await dashboardService.getDashboardStats();
-      setStats(data);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  const cards = [
-    {
-      title: "Categories",
-      value: stats.categories,
-      trend: "+0",
-      icon: FolderTree,
-    },
-    {
-      title: "Courses",
-      value: stats.courses,
-      trend: "+0",
-      icon: GraduationCap,
-    },
-    {
-      title: "Modules",
-      value: stats.modules,
-      trend: "+0",
-      icon: BookOpen,
-    },
-    {
-      title: "Sub Modules",
-      value: stats.subModules,
-      trend: "+0",
-      icon: GitBranch,
-    },
-    {
-      title: "Content",
-      value: stats.contents,
-      trend: "+0",
-      icon: FileText,
-    },
-  ];
-
   return (
-    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
-      {cards.map((card) => (
-        <StatCard key={card.title} {...card} />
+    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+      {CARDS_CONFIG.map((cfg) => (
+        <StatCard
+          key={cfg.title}
+          title={cfg.title}
+          value={loading ? "—" : stats[cfg.key]}
+          icon={cfg.icon}
+          trend={cfg.trend}
+        />
       ))}
     </div>
   );
