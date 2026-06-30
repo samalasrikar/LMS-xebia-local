@@ -19,6 +19,23 @@ const dashboardService = {
       contents: contents.data.data ? contents.data.data.length : 0,
     };
   },
+
+  async getRecentCourses() {
+    const response = await api.get("/dashboard/recent-courses");
+
+    return response.data.data;
+  },
+
+  async getEnrollmentAnalytics(period) {
+    const response = await api.get(
+      `/dashboard/analytics/enrollments`,
+      {
+        params: { period },
+      }
+    );
+
+    return response.data.data;
+  },
 };
 
 export default dashboardService;
