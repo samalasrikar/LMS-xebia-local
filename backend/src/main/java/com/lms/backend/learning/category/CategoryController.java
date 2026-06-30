@@ -41,6 +41,20 @@ public class CategoryController {
             ResponseBuilder.success("Categories fetched successfully", service.getAllCategories(), 200)
         );
     }
+    @Operation(
+        summary = "Get category by ID",
+        description = "Fetches a category using its unique ID"
+    )
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable Long id) {
+    return ResponseEntity.ok(
+        ResponseBuilder.success(
+            "Category fetched successfully",
+            service.getCategoryById(id),
+            HttpStatus.OK.value()
+        )
+        );
+    }
 
     @Operation(summary = "Create category")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
