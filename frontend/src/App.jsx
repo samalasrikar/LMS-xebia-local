@@ -3,6 +3,8 @@ import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
 import Courses from "./pages/Courses";
 import CreateCourse from "./pages/CreateCourse";
+import CreateCategory from "./pages/CreateCategory";
+import CategoryDetail from "./pages/CategoryDetail";
 import CurriculumBuilder from "./pages/CurriculumBuilder";
 
 function App() {
@@ -10,6 +12,8 @@ function App() {
     <Routes>
       <Route path="/" element={<Dashboard />} />
       <Route path="/categories" element={<Categories />} />
+      <Route path="/categories/create" element={<CreateCategory />} />
+      <Route path="/categories/:id" element={<CategoryDetail />} />
       <Route path="/courses" element={<Courses />} />
       <Route path="/courses/create" element={<CreateCourse />} />
       <Route path="/courses/:id/edit" element={<CreateCourse />} />

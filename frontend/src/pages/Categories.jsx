@@ -190,7 +190,7 @@ export default function Categories() {
   return (
     <AppLayout>
       <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
-        <CategoryHeader onAddCategory={openAdd} />
+        <CategoryHeader />
 
         <CategoryToolbar
           filterText={filterText}

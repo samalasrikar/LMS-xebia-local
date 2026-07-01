@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { Eye, Edit, Trash2, GraduationCap } from "lucide-react";
 
 export default function CategoryRow({ cat, onView, onEdit, onDelete }) {
+  const navigate = useNavigate();
+
   return (
     <tr className="hover:bg-slate-50/50 transition-colors group">
       {/* Image */}
@@ -16,10 +19,15 @@ export default function CategoryRow({ cat, onView, onEdit, onDelete }) {
         </div>
       </td>
 
-      {/* Name */}
+      {/* Name — clickable → detail page */}
       <td className="px-6 py-4">
-        <span className="font-bold text-xs text-slate-800 block">{cat.name}</span>
-        <span className="text-[10px] text-slate-400 mt-0.5">ID: {cat.id}</span>
+        <button
+          onClick={() => navigate(`/categories/${cat.dbId}`)}
+          className="text-left hover:text-[#6C1D5F] transition-colors"
+        >
+          <span className="font-bold text-xs text-slate-800 block hover:text-[#6C1D5F]">{cat.name}</span>
+          <span className="text-[10px] text-slate-400 mt-0.5">ID: {cat.id}</span>
+        </button>
       </td>
 
       {/* Description */}
@@ -61,8 +69,9 @@ export default function CategoryRow({ cat, onView, onEdit, onDelete }) {
         <div className="flex justify-end gap-1">
           <button
             type="button"
-            onClick={() => onView(cat)}
+            onClick={() => navigate(`/categories/${cat.dbId}`)}
             className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-[#6C1D5F] cursor-pointer"
+            title="View detail"
           >
             <Eye size={14} />
           </button>

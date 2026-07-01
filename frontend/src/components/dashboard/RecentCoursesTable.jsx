@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
-import { MoreHorizontal, BookOpen } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Button } from "../ui/button";
+import { MoreHorizontal, BookOpen, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import courseService from "../../services/courseService";
 
 /* ─── Category colour mapping ──────────────────────────────────────── */
 const CATEGORY_COLORS = {
-  Design:      { bg: "bg-[#ff83ec]/10", text: "text-[#9e2e93]" },
-  Development: { bg: "bg-[#6C1D5F]/10", text: "text-[#6C1D5F]" },
-  Dev:         { bg: "bg-[#6C1D5F]/10", text: "text-[#6C1D5F]" },
-  Business:    { bg: "bg-[#56dacc]/10", text: "text-[#2ebdaf]"  },
-  Marketing:   { bg: "bg-[#ff83ec]/10", text: "text-[#9e2e93]" },
-  General:     { bg: "bg-[#f5f3f3]",    text: "text-[#51434c]"  },
+  Design:      { bg: "bg-[#f5f3ff]", text: "text-[#7c3aed]", border: "border-[#ddd6fe]" },
+  Development: { bg: "bg-[#eef2ff]", text: "text-[#6C1D5F]", border: "border-[#c7d2fe]" },
+  Frontend:    { bg: "bg-[#eef2ff]", text: "text-[#6C1D5F]", border: "border-[#c7d2fe]" },
+  DevOps:      { bg: "bg-[#eff6ff]", text: "text-[#2563eb]", border: "border-[#bfdbfe]" },
+  Cloud:       { bg: "bg-[#eff6ff]", text: "text-[#2563eb]", border: "border-[#bfdbfe]" },
+  "AI/ML":     { bg: "bg-[#f5f3ff]", text: "text-[#7c3aed]", border: "border-[#ddd6fe]" },
+  Business:    { bg: "bg-[#f0fdfa]", text: "text-[#0d9488]", border: "border-[#99f6e4]" },
+  General:     { bg: "bg-slate-50",  text: "text-slate-500",  border: "border-slate-200" },
 };
 
 function getCatColor(name) {
@@ -21,17 +22,22 @@ function getCatColor(name) {
   return CATEGORY_COLORS[match ?? "General"];
 }
 
+const STATUS_MAP = {
+  published: { label: "Published", dot: "bg-emerald-500", text: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200" },
+  draft:     { label: "Draft",     dot: "bg-amber-500",   text: "text-amber-700",   bg: "bg-amber-50",   border: "border-amber-200" },
+  archived:  { label: "Archived",  dot: "bg-red-500",     text: "text-red-700",     bg: "bg-red-50",     border: "border-red-200" },
+};
+
 export default function RecentCoursesTable() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function load() {
       try {
         const data = await courseService.getAllCourses();
-        if (data) {
-          setCourses(data.slice(-5).reverse());
-        }
+        if (data) setCourses(data.slice(-5).reverse());
       } catch (err) {
         console.error("Failed to load recent courses:", err);
       } finally {
@@ -42,92 +48,102 @@ export default function RecentCoursesTable() {
   }, []);
 
   return (
-    <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-[#d5c1cc] overflow-hidden">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <h3 className="text-lg font-bold text-[#6C1D5F]">Recent Courses</h3>
-        <button className="text-[#6C1D5F] text-sm font-bold hover:underline underline-offset-4 cursor-pointer">
-          Browse Catalog
+    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+      {/* Card header */}
+      <div className="flex items-center justify-between px-[18px] py-3.5 border-b border-slate-200">
+        <div>
+          <div className="text-[13px] font-bold text-slate-900 tracking-tight">Recent Courses</div>
+          <div className="text-[11px] text-slate-400 mt-0.5">Latest published and updated content</div>
+        </div>
+        <button
+          onClick={() => navigate("/courses")}
+          className="flex items-center gap-1 text-[12px] font-medium text-slate-500 border border-slate-200 rounded-md px-2.5 py-1 hover:bg-slate-50 transition-colors"
+        >
+          View all <ArrowRight size={11} />
         </button>
       </div>
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="text-[11px] font-bold text-[#83727c] border-b border-[#d5c1cc]/40 uppercase tracking-widest">
-              <th className="pb-4">Course Details</th>
-              <th className="pb-4">Category</th>
-              <th className="pb-4">Status</th>
-              <th className="pb-4 text-right">Action</th>
+        <table className="w-full border-collapse">
+          <thead className="bg-slate-50 border-b border-slate-200">
+            <tr>
+              {["Course", "Category", "Difficulty", "Status", "Learners", ""].map((h) => (
+                <th
+                  key={h}
+                  className="px-3.5 py-2.5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wide whitespace-nowrap"
+                >
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
-
-          <tbody className="divide-y divide-[#d5c1cc]/30">
+          <tbody className="divide-y divide-slate-100">
             {loading ? (
               <tr>
-                <td colSpan={4} className="py-8 text-center text-sm text-[#51434c]">
+                <td colSpan={6} className="py-8 text-center text-[13px] text-slate-400">
                   Loading courses…
                 </td>
               </tr>
             ) : courses.length === 0 ? (
               <tr>
-                <td colSpan={4} className="py-8 text-center text-sm text-[#51434c]">
+                <td colSpan={6} className="py-8 text-center text-[13px] text-slate-400">
                   No courses found.
                 </td>
               </tr>
             ) : (
               courses.map((course) => {
                 const cat = getCatColor(course.categoryName);
+                const statusKey = (course.status ?? "published").toLowerCase();
+                const status = STATUS_MAP[statusKey] ?? STATUS_MAP.published;
                 return (
-                  <tr
-                    key={course.id}
-                    className="group hover:bg-[#f5f3f3]/50 transition-colors"
-                  >
-                    {/* Course name + description */}
-                    <td className="py-4">
-                      <div className="flex items-center gap-4">
-                        <div
-                          className="
-                            w-12 h-12 rounded-xl bg-[#efeded] flex-shrink-0
-                            flex items-center justify-center border border-[#d5c1cc]/30
-                            group-hover:scale-105 transition-transform
-                          "
-                        >
-                          <BookOpen size={20} className="text-[#6C1D5F]" />
+                  <tr key={course.id} className="hover:bg-slate-50/60 transition-colors">
+                    {/* Course name cell */}
+                    <td className="px-3.5 py-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-[38px] h-[26px] rounded-[4px] bg-slate-100 flex-shrink-0 flex items-center justify-center border border-slate-200">
+                          <BookOpen size={12} className="text-[#6C1D5F]" />
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-bold text-[#6C1D5F] truncate max-w-[200px]">
+                        <div>
+                          <div className="text-[13px] font-semibold text-slate-900 whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]">
                             {course.title}
-                          </p>
-                          <p className="text-[10px] text-[#83727c] mt-0.5 truncate max-w-[200px]">
-                            {course.description || "No description provided."}
-                          </p>
+                          </div>
+                          <div className="text-[11px] text-slate-400 mt-px">Updated recently</div>
                         </div>
                       </div>
                     </td>
 
                     {/* Category badge */}
-                    <td className="py-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-[11px] font-bold ${cat.bg} ${cat.text}`}
-                      >
+                    <td className="px-3.5 py-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${cat.bg} ${cat.text} ${cat.border}`}>
                         {course.categoryName || "General"}
                       </span>
                     </td>
 
+                    {/* Difficulty */}
+                    <td className="px-3.5 py-3">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                        Intermediate
+                      </span>
+                    </td>
+
                     {/* Status */}
-                    <td className="py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#002f2a]" />
-                        <span className="text-[11px] font-bold text-[#002f2a]">Active</span>
-                      </div>
+                    <td className="px-3.5 py-3">
+                      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border ${status.bg} ${status.text} ${status.border}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${status.dot}`} />
+                        {status.label}
+                      </span>
+                    </td>
+
+                    {/* Learners */}
+                    <td className="px-3.5 py-3 text-[13px] font-bold text-slate-900">
+                      —
                     </td>
 
                     {/* Action */}
-                    <td className="py-4 text-right">
-                      <button className="p-2 rounded-xl hover:bg-[#eae8e7] transition-colors cursor-pointer">
-                        <MoreHorizontal size={18} className="text-[#83727c]" />
+                    <td className="px-3.5 py-3">
+                      <button className="w-[26px] h-[26px] rounded-[4px] bg-slate-100 border border-slate-200 flex items-center justify-center hover:bg-slate-200 transition-colors">
+                        <MoreHorizontal size={12} className="text-slate-500" />
                       </button>
                     </td>
                   </tr>
