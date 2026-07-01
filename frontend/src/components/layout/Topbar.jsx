@@ -1,4 +1,4 @@
-import { Bell, Search, HelpCircle, Download, Plus } from "lucide-react";
+import { Bell, Search, HelpCircle } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import adminProfileIcon from "../../assets/admin_profile_icon.svg";
 
@@ -7,8 +7,8 @@ const PATH_LABELS = {
   "/analytics": "Analytics",
   "/categories": "Categories",
   "/courses": "Courses",
-  "/modules": "Modules",
-  "/curriculum": "Content Builder",
+  "/module-management": "Module Management",
+  "/content-library": "Content Library",
   "/learners": "Learners",
   "/certifications": "Certifications",
   "/assessments": "Assessments",
@@ -28,10 +28,9 @@ function getBreadcrumb(pathname) {
   return label ? label[1] : "Page";
 }
 
-export default function Topbar({ showPageActions = false }) {
+export default function Topbar() {
   const location = useLocation();
   const pageLabel = getBreadcrumb(location.pathname);
-  const isDashboard = location.pathname === "/";
 
   return (
     <header className="sticky top-0 z-30 flex h-[52px] items-center justify-between border-b border-slate-200 bg-white px-8 flex-shrink-0">

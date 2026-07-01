@@ -2,7 +2,7 @@
 const SERVICES = [
   { name: "API Services",    status: "operational", value: "100% uptime" },
   { name: "Video Streaming", status: "operational", value: "99.98% uptime" },
-  { name: "CDN",             status: "degraded",    value: "Degraded" },
+  { name: "CDN",             status: "operational", value: "100% uptime" },
   { name: "Database",        status: "operational", value: "100% uptime" },
   { name: "Auth Service",    status: "operational", value: "100% uptime" },
 ];

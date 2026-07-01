@@ -26,8 +26,8 @@ const menuItems = [
     icon: BookOpen,
   },
   {
-    title: "Modules",
-    path: "/modules",
+    title: "Module Management",
+    path: "/module-management",
     icon: Boxes,
   },
   {

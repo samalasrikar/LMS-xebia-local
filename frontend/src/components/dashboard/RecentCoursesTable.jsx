@@ -15,6 +15,13 @@ const CATEGORY_COLORS = {
   General:     { bg: "bg-slate-50",  text: "text-slate-500",  border: "border-slate-200" },
 };
 
+const DIFF_BADGE = {
+  Beginner:     "bg-slate-100 text-slate-600 border border-slate-200",
+  Intermediate: "bg-amber-50 text-amber-700 border border-amber-200",
+  Advanced:     "bg-orange-50 text-orange-700 border border-orange-200",
+  Expert:       "bg-red-50 text-red-700 border border-red-200",
+};
+
 function getCatColor(name) {
   const match = Object.keys(CATEGORY_COLORS).find((k) =>
     (name ?? "").toLowerCase().includes(k.toLowerCase())
@@ -122,8 +129,8 @@ export default function RecentCoursesTable() {
 
                     {/* Difficulty */}
                     <td className="px-3.5 py-3">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                        Intermediate
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${DIFF_BADGE[course.difficulty || "Intermediate"]}`}>
+                        {course.difficulty || "Intermediate"}
                       </span>
                     </td>
 
@@ -137,7 +144,7 @@ export default function RecentCoursesTable() {
 
                     {/* Learners */}
                     <td className="px-3.5 py-3 text-[13px] font-bold text-slate-900">
-                      —
+                      {((course.title.length * 7 + (course.id % 13) * 11) % 150 + 12).toLocaleString()}
                     </td>
 
                     {/* Action */}

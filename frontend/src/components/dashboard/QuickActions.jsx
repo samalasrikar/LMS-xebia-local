@@ -5,7 +5,7 @@ const ACTIONS = [
   { label: "Create Course",    icon: BookOpen,   path: "/courses/create",  iconBg: "bg-[#eef2ff]", iconColor: "text-[#6C1D5F]" },
   { label: "Add Learner",      icon: Users,      path: "/learners",        iconBg: "bg-emerald-50", iconColor: "text-emerald-600" },
   { label: "New Category",     icon: FolderOpen, path: "/categories",      iconBg: "bg-amber-50",   iconColor: "text-amber-600" },
-  { label: "Content Builder",  icon: FileText,   path: "/curriculum",      iconBg: "bg-blue-50",    iconColor: "text-blue-600" },
+  { label: "Content Library",  icon: FileText,   path: "/content-library",      iconBg: "bg-blue-50",    iconColor: "text-blue-600" },
 ];
 
 export default function QuickActions() {

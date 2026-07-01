@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Users, BookOpen, Target, DollarSign, TrendingUp, TrendingDown } from "lucide-react";
+import { BookOpen, Target, DollarSign, TrendingUp, TrendingDown } from "lucide-react";
 import dashboardService from "../../services/dashboardService";
 
 /* ─── Static Banani-style stat cards with live backend data overlay ── */
