@@ -1,49 +1,87 @@
-import { Layers, CheckCircle, BookOpen } from "lucide-react";
+import { Layers, CheckCircle, BookOpen, Users } from "lucide-react";
 
-export default function CategoryStats({ categories }) {
+function TrendArrow({ positive }) {
+  return (
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+      <path
+        d={positive ? "M1 8 L5 2 L9 8" : "M1 2 L5 8 L9 2"}
+        stroke={positive ? "#01AC9F" : "#e11d48"}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export default function CategoryStats({ categories, totalCourses }) {
   const total = categories.length;
-  const active = categories.filter((c) => c.status === "Active").length;
+  const published = categories.filter((c) => c.status === "Active").length;
+  const totalLearners = categories.reduce((sum, c) => sum + (c.learners ?? 0), 0);
+
+  const stats = [
+    {
+      label: "Total Categories",
+      value: total,
+      change: "0% this quarter",
+      positive: true,
+      Icon: Layers,
+      bg: "bg-[#6C1D5F]/8",
+      color: "text-[#6C1D5F]",
+    },
+    {
+      label: "Published",
+      value: published,
+      change: "0% this week",
+      positive: true,
+      Icon: CheckCircle,
+      bg: "bg-[#01AC9F]/10",
+      color: "text-[#01AC9F]",
+    },
+    {
+      label: "Total Courses",
+      value: totalCourses ?? 0,
+      change: "0% this month",
+      positive: true,
+      Icon: BookOpen,
+      bg: "bg-amber-50",
+      color: "text-amber-600",
+    },
+    {
+      label: "Total Learners",
+      value: totalLearners > 0 ? (totalLearners >= 1000 ? `${(totalLearners / 1000).toFixed(1)}k` : totalLearners) : "0",
+      change: "0% vs last month",
+      positive: true,
+      Icon: Users,
+      bg: "bg-[#ff83ec]/15",
+      color: "text-[#9e2e93]",
+    },
+  ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {/* Total */}
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-[#F7F8FC] flex items-center justify-center text-[#6C1D5F]">
-          <Layers size={22} />
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {stats.map(({ label, value, change, positive, Icon, bg, color }) => (
+        <div
+          key={label}
+          className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 flex items-center gap-4 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
+        >
+          <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center flex-shrink-0`}>
+            <Icon size={20} className={color} />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">
+              {label}
+            </p>
+            <p className="text-xl font-bold text-slate-900 mt-0.5 tabular-nums">{value}</p>
+            <div className="flex items-center gap-1 mt-0.5">
+              <TrendArrow positive={positive} />
+              <p className={`text-[10px] font-medium ${positive ? "text-[#01AC9F]" : "text-red-500"}`}>
+                {change}
+              </p>
+            </div>
+          </div>
         </div>
-        <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            Total Categories
-          </p>
-          <p className="text-lg font-bold text-slate-800">{total}</p>
-        </div>
-      </div>
-
-      {/* Active */}
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-[#01AC9F]/10 flex items-center justify-center text-[#01AC9F]">
-          <CheckCircle size={22} />
-        </div>
-        <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            Active
-          </p>
-          <p className="text-lg font-bold text-slate-800">{active}</p>
-        </div>
-      </div>
-
-      {/* Avg courses */}
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600">
-          <BookOpen size={22} />
-        </div>
-        <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            Avg. Courses/Cat
-          </p>
-          <p className="text-lg font-bold text-slate-800">8.4</p>
-        </div>
-      </div>
+      ))}
     </div>
   );
 }

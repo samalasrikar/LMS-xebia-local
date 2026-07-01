@@ -17,7 +17,11 @@ import {
   GripVertical, 
   Save,
   ChevronRight,
-  ChevronDown
+  ChevronDown,
+  ExternalLink,
+  Play,
+  HelpCircle,
+  Link2
 } from "lucide-react";
 import {
   Dialog,
@@ -63,34 +67,27 @@ export default function CurriculumBuilder() {
   const [parentModuleId, setParentModuleId] = useState(null);
   const [subModuleTitle, setSubModuleTitle] = useState("");
   const [subModuleDescription, setSubModuleDescription] = useState("");
-  const [contentType, setContentType] = useState("video"); // video or pdf
-  const [videoUrl, setVideoUrl] = useState("");
+  
+  // Content Types: "Video", "PDF", "Document", "Quiz", "External Link"
+  const [contentType, setContentType] = useState("Video"); 
+  const [youtubeUrl, setYoutubeUrl] = useState("");
   const [pdfUrl, setPdfUrl] = useState("");
   const [textContent, setTextContent] = useState("");
+  const [externalLink, setExternalLink] = useState("");
   const [uploadedFileName, setUploadedFileName] = useState("");
   const [submittingSubModule, setSubmittingSubModule] = useState(false);
 
   // Video URL Validation and Preview States
-  const [videoUrlError, setVideoUrlError] = useState("");
+  const [youtubeUrlError, setYoutubeUrlError] = useState("");
   const [showVideoPreview, setShowVideoPreview] = useState(false);
 
+  // Live Iframe Preview Modal State
+  const [previewVideoUrl, setPreviewVideoUrl] = useState(null);
+
   // Refs for local file selection
-  const videoInputRef = useRef(null);
   const pdfInputRef = useRef(null);
 
-  // Local file change handlers
-  const handleVideoFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setUploadedFileName(file.name);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setVideoUrl(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
+  // Local file change handler
   const handlePdfFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -103,71 +100,35 @@ export default function CurriculumBuilder() {
     }
   };
 
-  // Video URL Validation and embed utilities
-  const validateUrlFormat = (url) => {
-    if (!url.trim()) {
-      setVideoUrlError("");
-      return false;
-    }
-    try {
-      new URL(url);
-      setVideoUrlError("");
-      return true;
-    } catch (_) {
-      setVideoUrlError("Please enter a valid, fully-formatted URL (e.g., https://...)");
-      return false;
-    }
-  };
-
-  const handleVideoUrlChange = (val) => {
-    setVideoUrl(val);
-    setShowVideoPreview(false); // Reset preview on edit
-    validateUrlFormat(val);
-  };
-
-  const getEmbedInfo = (url) => {
+  // Helper to extract YouTube ID
+  const getYouTubeId = (url) => {
     if (!url) return null;
-    try {
-      const parsedUrl = new URL(url);
-      const host = parsedUrl.hostname.toLowerCase();
-      
-      // YouTube
-      if (host.includes("youtube.com") || host.includes("youtu.be")) {
-        let videoId = "";
-        if (host.includes("youtu.be")) {
-          videoId = parsedUrl.pathname.substring(1);
-        } else if (parsedUrl.pathname.startsWith("/embed/")) {
-          videoId = parsedUrl.pathname.substring(7);
-        } else {
-          videoId = parsedUrl.searchParams.get("v");
-        }
-        if (videoId) {
-          return { type: "youtube", url: `https://www.youtube.com/embed/${videoId}` };
-        }
-      }
-      
-      // Vimeo
-      if (host.includes("vimeo.com")) {
-        let videoId = "";
-        if (host.includes("player.vimeo.com")) {
-          videoId = parsedUrl.pathname.substring(15);
-        } else {
-          videoId = parsedUrl.pathname.substring(1);
-        }
-        if (videoId) {
-          return { type: "vimeo", url: `https://player.vimeo.com/video/${videoId}` };
-        }
-      }
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
 
-      // Direct MP4 / Cloud storage or default direct player
-      return { type: "direct", url };
-    } catch (_) {
-      return null;
+  // Validate YouTube Link
+  const validateYouTubeUrl = (url) => {
+    if (!url.trim()) {
+      setYoutubeUrlError("");
+      return false;
+    }
+    const ytId = getYouTubeId(url);
+    if (ytId) {
+      setYoutubeUrlError("");
+      return true;
+    } else {
+      setYoutubeUrlError("Please enter a valid YouTube link (e.g., https://www.youtube.com/watch?v=...)");
+      return false;
     }
   };
 
-  // Delete Confirm State
-  const [deleteTarget, setDeleteTarget] = useState(null); // { type: 'module'|'submodule', id, title }
+  const handleYoutubeUrlChange = (val) => {
+    setYoutubeUrl(val);
+    setShowVideoPreview(false);
+    validateYouTubeUrl(val);
+  };
 
   useEffect(() => {
     if (id) {
@@ -176,16 +137,6 @@ export default function CurriculumBuilder() {
     }
   }, [id]);
 
-  const showSuccess = (msg) => {
-    setSuccessMessage(msg);
-    setTimeout(() => setSuccessMessage(""), 4000);
-  };
-
-  const showError = (msg) => {
-    setErrorMessage(msg);
-    setTimeout(() => setErrorMessage(""), 5000);
-  };
-
   const loadCourseData = async () => {
     setLoadingCourse(true);
     try {
@@ -193,7 +144,7 @@ export default function CurriculumBuilder() {
       setCourse(data);
     } catch (err) {
       console.error("Failed to load course details:", err);
-      showError("Could not retrieve course details.");
+      showError("Failed to load course details.");
     } finally {
       setLoadingCourse(false);
     }
@@ -205,22 +156,19 @@ export default function CurriculumBuilder() {
       const [allModules, allSubModules, allContents] = await Promise.all([
         moduleService.getAllModules(),
         subModuleService.getAllSubModules(),
-        contentService.getAllContents(),
+        contentService.getAllContents()
       ]);
 
       // Filter modules for this specific course
       const courseModules = allModules.filter(m => m.courseId === Number(id));
 
-      // Populated structure
+      // Populate sub-modules and contents
       const populated = courseModules.map(mod => {
         const subMods = allSubModules
-          .filter(sm => sm.moduleId === mod.id)
-          .map(sm => {
-            const content = allContents.find(c => c.subModuleId === sm.id);
-            return {
-              ...sm,
-              content,
-            };
+          .filter(sub => sub.moduleId === mod.id)
+          .map(sub => {
+            const content = allContents.find(c => c.subModuleId === sub.id);
+            return { ...sub, content };
           });
 
         return {
@@ -229,6 +177,8 @@ export default function CurriculumBuilder() {
         };
       });
 
+      // Sort modules by sortOrder if available
+      populated.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
       setModules(populated);
 
       // Auto-expand all modules initially
@@ -239,10 +189,22 @@ export default function CurriculumBuilder() {
       setExpandedModules(prev => ({ ...expandMap, ...prev }));
     } catch (err) {
       console.error("Failed to load curriculum:", err);
-      showError("Failed to fetch curriculum structure.");
+      showError("Failed to load modules and contents.");
     } finally {
       setLoadingCurriculum(false);
     }
+  };
+
+  const showSuccess = (msg) => {
+    setSuccessMessage(msg);
+    setErrorMessage("");
+    setTimeout(() => setSuccessMessage(""), 4000);
+  };
+
+  const showError = (msg) => {
+    setErrorMessage(msg);
+    setSuccessMessage("");
+    setTimeout(() => setErrorMessage(""), 5000);
   };
 
   const toggleModuleExpand = (moduleId) => {
@@ -278,19 +240,19 @@ export default function CurriculumBuilder() {
     setSubmittingModule(true);
     try {
       if (editingModule) {
-        // Edit Mode
         await moduleService.updateModule(editingModule.id, {
           title: moduleTitle.trim(),
           description: moduleDescription.trim(),
-          courseId: Number(id)
+          courseId: Number(id),
+          sortOrder: editingModule.sortOrder || 1
         });
         showSuccess("Module updated successfully!");
       } else {
-        // Create Mode
         await moduleService.createModule({
           title: moduleTitle.trim(),
           description: moduleDescription.trim(),
-          courseId: Number(id)
+          courseId: Number(id),
+          sortOrder: modules.length + 1
         });
         showSuccess("Module created successfully!");
       }
@@ -311,11 +273,14 @@ export default function CurriculumBuilder() {
     setParentModuleId(moduleId);
     setSubModuleTitle("");
     setSubModuleDescription("");
-    setContentType("video");
-    setVideoUrl("");
+    setContentType("Video");
+    setYoutubeUrl("");
     setPdfUrl("");
     setTextContent("");
+    setExternalLink("");
     setUploadedFileName("");
+    setYoutubeUrlError("");
+    setShowVideoPreview(false);
     setIsDrawerOpen(true);
   };
 
@@ -324,32 +289,50 @@ export default function CurriculumBuilder() {
     setParentModuleId(subMod.moduleId);
     setSubModuleTitle(subMod.title);
     setSubModuleDescription(subMod.description || "");
+    setYoutubeUrlError("");
+    setShowVideoPreview(false);
     
     if (subMod.content) {
-      if (subMod.content.pdfUrl) {
-        setContentType("pdf");
+      // Determine content type based on stored fields
+      if (subMod.content.youtubeUrl) {
+        setContentType("Video");
+        setYoutubeUrl(subMod.content.youtubeUrl);
+        setPdfUrl("");
+        setTextContent("");
+        setExternalLink("");
+      } else if (subMod.content.pdfUrl) {
+        setContentType("PDF");
         setPdfUrl(subMod.content.pdfUrl);
-        setVideoUrl("");
+        setYoutubeUrl("");
         setTextContent("");
+        setExternalLink("");
         setUploadedFileName("document_simulated.pdf");
-      } else if (subMod.content.videoUrl) {
-        setContentType("video");
-        setVideoUrl(subMod.content.videoUrl);
+      } else if (subMod.content.videoUrl && (subMod.content.videoUrl.startsWith("http") && !subMod.content.videoUrl.includes("youtu"))) {
+        // Fallback for non-youtube links
+        setContentType("External Link");
+        setExternalLink(subMod.content.videoUrl);
+        setYoutubeUrl("");
         setPdfUrl("");
         setTextContent("");
-        setUploadedFileName("video_lesson_simulated.mp4");
-      } else {
-        setContentType("text");
-        setTextContent(subMod.content.content || "");
-        setVideoUrl("");
+      } else if (subMod.content.content && subMod.content.content.startsWith("QUIZ:")) {
+        setContentType("Quiz");
+        setTextContent(subMod.content.content.replace("QUIZ:", ""));
+        setYoutubeUrl("");
         setPdfUrl("");
-        setUploadedFileName("");
+        setExternalLink("");
+      } else {
+        setContentType("Document");
+        setTextContent(subMod.content.content || "");
+        setYoutubeUrl("");
+        setPdfUrl("");
+        setExternalLink("");
       }
     } else {
-      setContentType("video");
-      setVideoUrl("");
+      setContentType("Video");
+      setYoutubeUrl("");
       setPdfUrl("");
       setTextContent("");
+      setExternalLink("");
       setUploadedFileName("");
     }
     setIsDrawerOpen(true);
@@ -360,6 +343,14 @@ export default function CurriculumBuilder() {
     if (!subModuleTitle.trim()) {
       showError("Sub-module title is required.");
       return;
+    }
+
+    if (contentType === "Video") {
+      const ytId = getYouTubeId(youtubeUrl);
+      if (!ytId) {
+        showError("A valid YouTube URL is required for Video content.");
+        return;
+      }
     }
 
     setSubmittingSubModule(true);
@@ -373,10 +364,23 @@ export default function CurriculumBuilder() {
           moduleId: parentModuleId
         });
 
-        // Update or Create Content
-        const targetVideoUrl = contentType === "video" ? videoUrl.trim() : "";
-        const targetPdfUrl = contentType === "pdf" ? pdfUrl.trim() : "";
-        const targetTextContent = contentType === "text" ? textContent.trim() : `Content details for ${subModuleTitle.trim()}`;
+        // Map UI values to Content schema
+        const targetYoutubeUrl = contentType === "Video" ? youtubeUrl.trim() : "";
+        const targetPdfUrl = contentType === "PDF" ? pdfUrl.trim() : "";
+        
+        let targetTextContent = "";
+        let targetVideoUrl = ""; // Used for external links
+
+        if (contentType === "Document") {
+          targetTextContent = textContent.trim();
+        } else if (contentType === "Quiz") {
+          targetTextContent = `QUIZ:${textContent.trim()}`;
+        } else if (contentType === "External Link") {
+          targetVideoUrl = externalLink.trim();
+          targetTextContent = `External resource link: ${externalLink.trim()}`;
+        } else {
+          targetTextContent = `Content details for ${subModuleTitle.trim()}`;
+        }
 
         if (editingSubModule.content) {
           await contentService.updateContent(editingSubModule.content.id, {
@@ -384,14 +388,16 @@ export default function CurriculumBuilder() {
             content: targetTextContent,
             videoUrl: targetVideoUrl,
             pdfUrl: targetPdfUrl,
+            youtubeUrl: targetYoutubeUrl,
             subModuleId: editingSubModule.id
           });
-        } else if (targetVideoUrl || targetPdfUrl || contentType === "text") {
+        } else {
           await contentService.createContent({
             title: `${subModuleTitle.trim()} Content`,
             content: targetTextContent,
             videoUrl: targetVideoUrl,
             pdfUrl: targetPdfUrl,
+            youtubeUrl: targetYoutubeUrl,
             subModuleId: editingSubModule.id
           });
         }
@@ -404,20 +410,32 @@ export default function CurriculumBuilder() {
           moduleId: parentModuleId
         });
 
-        // Create associated Content if URL exists or is text content
-        const targetVideoUrl = contentType === "video" ? videoUrl.trim() : "";
-        const targetPdfUrl = contentType === "pdf" ? pdfUrl.trim() : "";
-        const targetTextContent = contentType === "text" ? textContent.trim() : `Content details for ${subModuleTitle.trim()}`;
+        const targetYoutubeUrl = contentType === "Video" ? youtubeUrl.trim() : "";
+        const targetPdfUrl = contentType === "PDF" ? pdfUrl.trim() : "";
+        
+        let targetTextContent = "";
+        let targetVideoUrl = "";
 
-        if (targetVideoUrl || targetPdfUrl || contentType === "text") {
-          await contentService.createContent({
-            title: `${subModuleTitle.trim()} Content`,
-            content: targetTextContent,
-            videoUrl: targetVideoUrl,
-            pdfUrl: targetPdfUrl,
-            subModuleId: savedSubModule.id
-          });
+        if (contentType === "Document") {
+          targetTextContent = textContent.trim();
+        } else if (contentType === "Quiz") {
+          targetTextContent = `QUIZ:${textContent.trim()}`;
+        } else if (contentType === "External Link") {
+          targetVideoUrl = externalLink.trim();
+          targetTextContent = `External resource link: ${externalLink.trim()}`;
+        } else {
+          targetTextContent = `Content details for ${subModuleTitle.trim()}`;
         }
+
+        await contentService.createContent({
+          title: `${subModuleTitle.trim()} Content`,
+          content: targetTextContent,
+          videoUrl: targetVideoUrl,
+          pdfUrl: targetPdfUrl,
+          youtubeUrl: targetYoutubeUrl,
+          subModuleId: savedSubModule.id
+        });
+        
         showSuccess("Sub-module created successfully!");
       }
 
@@ -433,6 +451,8 @@ export default function CurriculumBuilder() {
 
   // ─── DELETIONS ─────────────────────────────────────────────────────────────
 
+  const [deleteTarget, setDeleteTarget] = useState(null); // { type: 'module'|'submodule', id, title }
+
   const requestDelete = (type, target) => {
     setDeleteTarget({
       type,
@@ -447,296 +467,225 @@ export default function CurriculumBuilder() {
     try {
       if (deleteTarget.type === "module") {
         await moduleService.deleteModule(deleteTarget.id);
-        showSuccess("Module deleted successfully.");
-      } else if (deleteTarget.type === "submodule") {
+        showSuccess("Module deleted successfully!");
+      } else {
         await subModuleService.deleteSubModule(deleteTarget.id);
-        showSuccess("Sub-module deleted successfully.");
+        showSuccess("Sub-module deleted successfully!");
       }
+      setDeleteTarget(null);
       loadCurriculumData();
     } catch (err) {
       console.error("Failed to delete:", err);
-      showError("Deletion failed. Make sure the entity is empty and try again.");
-    } finally {
-      setDeleteTarget(null);
-    }
-  };
-
-  const handlePublishCourse = async () => {
-    if (!course) return;
-    try {
-      await courseService.updateCourse(course.id, {
-        ...course,
-        status: "Published"
-      });
-      showSuccess("Course published successfully!");
-      loadCourseData();
-    } catch (err) {
-      console.error("Publish failed:", err);
-      showError("Failed to publish course.");
+      showError("Failed to delete the selected item.");
     }
   };
 
   return (
-    <>
-      <AppLayout>
-        <div className="max-w-6xl mx-auto space-y-6">
+    <AppLayout>
+      <div className="space-y-6 max-w-[1000px] mx-auto w-full pb-12 animate-[fadeIn_0.5s_ease-out]">
         
-        {/* Navigation & Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-              <Link to="/" className="hover:text-primary transition-colors">Dashboard</Link>
-              <ChevronRight size={12} />
-              <Link to="/courses" className="hover:text-primary transition-colors">Courses</Link>
-              {course && (
-                <>
-                  <ChevronRight size={12} />
-                  <span className="truncate max-w-[200px]">{course.title}</span>
-                </>
-              )}
-              <ChevronRight size={12} />
-              <span className="text-primary font-semibold">Curriculum Builder</span>
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900">Curriculum Builder</h1>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/curriculum")}
-              className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <ArrowLeft size={14} /> Back to Courses
-            </button>
-            <button
-              onClick={handlePublishCourse}
-              disabled={course?.status === "Published"}
-              className="px-4 py-2 bg-[#6C1D5F] text-white hover:bg-[#4A1E47] disabled:bg-slate-200 disabled:text-slate-400 rounded-lg text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer disabled:cursor-not-allowed"
-            >
-              Publish Course
-            </button>
-          </div>
-        </div>
-
-        {/* Notifications */}
+        {/* Alerts */}
         {successMessage && (
-          <div className="p-3 bg-green-50 text-green-800 border border-green-200 rounded-xl text-xs font-medium animate-fadeIn">
-            {successMessage}
+          <div className="px-4 py-3 bg-green-50 border border-green-200 text-green-800 rounded-xl text-xs font-semibold flex items-center gap-2 animate-fadeIn shadow-sm">
+            <Play className="w-3.5 h-3.5 rotate-90 fill-green-800" /> {successMessage}
           </div>
         )}
         {errorMessage && (
-          <div className="p-3 bg-red-50 text-red-800 border border-red-200 rounded-xl text-xs font-medium animate-fadeIn">
-            {errorMessage}
+          <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs font-semibold flex items-center gap-2 animate-fadeIn shadow-sm">
+            <X className="w-3.5 h-3.5" /> {errorMessage}
           </div>
         )}
 
-        {/* Course Information Section */}
-        {loadingCourse ? (
-          <div className="p-8 bg-white border border-slate-200 rounded-2xl animate-pulse space-y-4">
-            <div className="h-4 bg-slate-200 rounded w-1/4"></div>
-            <div className="h-8 bg-slate-200 rounded w-1/2"></div>
-          </div>
-        ) : course ? (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6 flex flex-col md:flex-row justify-between items-start gap-4">
-            <div className="space-y-4 flex-1">
-              <h2 className="text-base font-bold text-slate-800">Course Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Course Title</span>
-                  <span className="text-sm font-semibold text-slate-700">{course.title}</span>
-                </div>
-                <div>
-                  <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Category</span>
-                  <span className="text-sm font-semibold text-slate-700">{course.categoryName || "General"}</span>
-                </div>
-                <div>
-                  <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Level</span>
-                  <span className="text-sm font-semibold text-slate-700">{course.difficulty || "Intermediate"}</span>
-                </div>
-              </div>
-              <div className="pt-2">
-                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Description</span>
-                <p className="text-xs text-slate-500 leading-relaxed max-w-3xl">{course.description || "No description provided."}</p>
-              </div>
+        {/* Top Navigation Row */}
+        <div className="flex items-center justify-between border-b border-slate-100 pb-5">
+          <div className="flex items-center gap-3">
+            <Link 
+              to="/courses"
+              className="p-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-colors"
+            >
+              <ArrowLeft size={16} />
+            </Link>
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Courses / Curriculum</span>
+              <h1 className="text-lg font-bold text-slate-800 mt-0.5 truncate max-w-[400px]">
+                {loadingCourse ? "Loading course..." : course?.title}
+              </h1>
             </div>
-
-            <button
-              onClick={() => navigate(`/courses/${course.id}/edit`)}
-              className="px-3.5 py-1.5 border border-[#6C1D5F] text-[#6C1D5F] hover:bg-[#F7F8FC] rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors whitespace-nowrap cursor-pointer"
-            >
-              <Edit size={14} /> Edit Course Details
-            </button>
           </div>
-        ) : null}
+          
+          <button
+            onClick={openAddModuleModal}
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-[#6C1D5F] hover:bg-[#57174C] text-white text-xs font-bold rounded-xl shadow-sm hover:shadow transition-all cursor-pointer"
+          >
+            <Plus size={14} /> Add Module
+          </button>
+        </div>
 
-        {/* Curriculum Structure Section */}
+        {/* Modules & Submodules Outline */}
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-base font-bold text-slate-800">Curriculum Structure</h2>
-            <button
-              onClick={openAddModuleModal}
-              className="px-3.5 py-1.5 bg-[#6C1D5F] text-white hover:bg-[#4A1E47] rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-            >
-              <Plus size={16} /> Add Module
-            </button>
-          </div>
-
           {loadingCurriculum ? (
-            <div className="text-center py-12 text-slate-400 text-sm">
-              Loading curriculum details...
+            <div className="py-16 text-center">
+              <div className="w-8 h-8 border-2 border-[#6C1D5F] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-xs text-slate-400">Loading curriculum builder...</p>
             </div>
           ) : modules.length === 0 ? (
-            <div className="space-y-4">
-              <div className="text-center py-12 bg-white border border-slate-200 rounded-2xl text-slate-400 text-sm">
+            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-md mx-auto shadow-sm">
+              <Folder className="text-slate-350 mx-auto mb-4" size={40} />
+              <h3 className="font-bold text-slate-800 text-sm">Create Modules</h3>
+              <p className="text-xs text-slate-400 mt-1">
                 No modules created yet. Click "Add Module" to start structuring your course.
-              </div>
-              <button
-                onClick={openAddModuleModal}
-                className="w-full flex items-center justify-center gap-1.5 py-3 border-2 border-dashed border-[#6C1D5F]/30 hover:border-[#6C1D5F] rounded-xl text-[#6C1D5F] hover:bg-[#6C1D5F]/5 font-semibold text-xs transition-all cursor-pointer"
-              >
-                <Plus size={16} /> Add Module
-              </button>
+              </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {modules.map((mod) => (
-                <Card key={mod.id} className="border border-slate-200 shadow-sm bg-white overflow-hidden">
-                  
-                  {/* Module Header Container */}
-                  <div className="p-4 flex items-center gap-3 hover:bg-slate-50/50 transition-colors">
-                    {/* Drag handle */}
-                    <GripVertical size={16} className="text-slate-400 cursor-grab opacity-60 hover:opacity-100 shrink-0" />
-                    
-                    {/* Expand/Collapse Chevron */}
-                    <button 
-                      onClick={() => toggleModuleExpand(mod.id)}
-                      className="p-1 text-slate-400 hover:text-slate-600 rounded cursor-pointer shrink-0"
-                    >
+            modules.map((mod) => (
+              <Card key={mod.id} className="overflow-hidden border border-slate-200 shadow-sm">
+                
+                {/* Module Header */}
+                <div className="flex items-center justify-between p-4 bg-slate-50 border-b border-slate-100">
+                  <div className="flex items-center gap-3 cursor-pointer flex-1 min-w-0" onClick={() => toggleModuleExpand(mod.id)}>
+                    <div className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200/50 transition-colors">
                       {expandedModules[mod.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    </button>
-                    
-                    {/* Folder Icon */}
-                    <div className="p-2 bg-[#ffd7f3] rounded-lg text-[#800b79] shrink-0">
-                      <Folder size={18} fill="currentColor" className="opacity-80" />
                     </div>
-                    
-                    {/* Title and Description/Sub-module Count */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-bold text-slate-800 truncate">{mod.title}</h3>
-                      <p className="text-[10px] text-slate-400 font-medium">
-                        {mod.subModules?.length || 0} Sub-module{(mod.subModules?.length || 0) === 1 ? "" : "s"}
+                    <div className="p-2 bg-purple-50 text-purple-700 rounded-xl shrink-0">
+                      <Folder size={16} />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-xs text-slate-800 truncate">{mod.title}</h3>
+                      <p className="text-[10px] text-slate-400 mt-0.5">
+                        {mod.subModules?.length || 0} Lesson{(mod.subModules?.length || 0) === 1 ? "" : "s"}
                       </p>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => openAddSubModuleDrawer(mod.id)}
-                        className="px-2.5 py-1 bg-slate-100 text-slate-700 hover:bg-[#6C1D5F] hover:text-white rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer"
-                      >
-                        <Plus size={10} /> Add Sub-module
-                      </button>
-                      <button
-                        onClick={() => openEditModuleModal(mod)}
-                        className="p-1.5 text-slate-400 hover:text-[#6C1D5F] hover:bg-slate-50 rounded-lg transition-colors cursor-pointer"
-                        title="Edit Module"
-                      >
-                        <Edit size={14} />
-                      </button>
-                      <button
-                        onClick={() => requestDelete("module", mod)}
-                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer"
-                        title="Delete Module"
-                      >
-                        <Trash2 size={14} />
-                      </button>
                     </div>
                   </div>
 
-                  {/* Expanded Content Section */}
-                  {expandedModules[mod.id] && (
-                    <>
-                      <Separator />
-                      <div className="bg-slate-50/50 p-4 pl-12 space-y-3 border-t border-slate-100">
-                        {/* Sub-modules List */}
-                        {mod.subModules && mod.subModules.length > 0 ? (
-                          <div className="space-y-2">
-                            {mod.subModules.map((sub) => (
-                              <div 
-                                key={sub.id} 
-                                className="group bg-white rounded-xl border border-slate-150 p-3.5 flex items-center gap-3 hover:border-[#6C1D5F] hover:shadow-sm transition-all"
-                              >
-                                <GripVertical size={14} className="text-slate-350 cursor-grab opacity-40 hover:opacity-100 shrink-0" />
-                                <div className="p-1.5 bg-[#ffd7f3]/40 rounded-lg text-[#800b79] shrink-0">
+                  <div className="flex items-center gap-1.5 ml-4">
+                    <button
+                      onClick={() => openEditModuleModal(mod)}
+                      className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 rounded-lg transition-colors cursor-pointer"
+                      title="Edit Module"
+                    >
+                      <Edit size={14} />
+                    </button>
+                    <button
+                      onClick={() => requestDelete("module", mod)}
+                      className="p-1.5 text-slate-400 hover:text-red-650 hover:bg-slate-200/50 rounded-lg transition-colors cursor-pointer"
+                      title="Delete Module"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Sub-modules List Area */}
+                {expandedModules[mod.id] && (
+                  <div className="bg-slate-50/50 p-4 pl-12 space-y-3 border-t border-slate-100">
+                    {mod.subModules && mod.subModules.length > 0 ? (
+                      <div className="space-y-2">
+                        {mod.subModules.map((sub) => {
+                          const youtubeId = sub.content?.youtubeUrl ? getYouTubeId(sub.content.youtubeUrl) : null;
+                          return (
+                            <div 
+                              key={sub.id} 
+                              className="group bg-white rounded-xl border border-slate-200 p-3.5 flex items-center gap-4 hover:border-[#6C1D5F] hover:shadow-sm transition-all"
+                            >
+                              <GripVertical size={14} className="text-slate-350 cursor-grab opacity-40 hover:opacity-100 shrink-0" />
+                              
+                              {/* Left Icon or Thumbnail */}
+                              {youtubeId ? (
+                                <div className="relative w-16 h-10 rounded-lg overflow-hidden bg-slate-900 border border-slate-200 shrink-0 shadow-sm animate-fadeIn">
+                                  <img 
+                                    src={`https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`} 
+                                    alt="YouTube thumbnail"
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                    <div className="w-5 h-5 rounded-full bg-white/90 flex items-center justify-center text-red-600 shadow-sm">
+                                      <Play size={8} className="fill-red-600 ml-0.5" />
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="p-2 bg-[#ffd7f3]/40 rounded-lg text-[#800b79] shrink-0">
                                   {sub.content?.pdfUrl ? (
-                                    <FileText size={14} className="opacity-80" />
+                                    <FileText size={16} className="opacity-80" />
                                   ) : sub.content?.videoUrl ? (
-                                    <Video size={14} className="opacity-80" />
+                                    <Link2 size={16} className="opacity-80" />
                                   ) : (
-                                    <FileText size={14} className="opacity-80" />
+                                    <FileText size={16} className="opacity-80" />
                                   )}
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="text-xs font-bold text-slate-700 truncate">{sub.title}</h4>
-                                  <p className="text-[10px] text-slate-400 font-medium">
-                                    {sub.content?.pdfUrl ? "PDF Document" : sub.content?.videoUrl ? "Video Lesson" : sub.content?.content ? "Text Content" : "No content attached"}
+                              )}
+
+                              {/* Title & Info */}
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-xs font-bold text-slate-700 truncate">{sub.title}</h4>
+                                {youtubeId ? (
+                                  <p className="text-[10px] text-red-600 font-semibold mt-0.5 truncate flex items-center gap-1">
+                                    <Video size={10} /> {sub.content.youtubeUrl}
                                   </p>
-                                </div>
-
-                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <button
-                                    onClick={() => openEditSubModuleDrawer(sub)}
-                                    className="p-1.5 text-slate-400 hover:text-[#6C1D5F] hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                                    title="Edit Sub-module"
-                                  >
-                                    <Edit size={14} />
-                                  </button>
-                                  <button
-                                    onClick={() => requestDelete("submodule", sub)}
-                                    className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                                    title="Delete Sub-module"
-                                  >
-                                    <Trash2 size={14} />
-                                  </button>
-                                </div>
+                                ) : (
+                                  <p className="text-[10px] text-slate-400 font-medium mt-0.5">
+                                    {sub.content?.pdfUrl ? "PDF Document" : sub.content?.videoUrl ? "External Resource Link" : sub.content?.content?.startsWith("QUIZ:") ? "Quiz Content" : "Text Document"}
+                                  </p>
+                                )}
                               </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center py-6 text-slate-400 text-xs border border-dashed border-slate-200 rounded-xl bg-white">
-                            No sub-modules in this module yet.
-                          </div>
-                        )}
 
-                        {/* Add Sub-module Button */}
-                        <button
-                          onClick={() => openAddSubModuleDrawer(mod.id)}
-                          className="w-full flex items-center justify-center gap-1.5 py-2.5 border-2 border-dashed border-[#6C1D5F]/20 hover:border-[#6C1D5F] rounded-xl text-[#6C1D5F] hover:bg-[#6C1D5F]/5 font-semibold text-xs transition-all cursor-pointer bg-white"
-                        >
-                          <Plus size={14} /> Add Sub-module
-                        </button>
+                              {/* Action Items */}
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {youtubeId && (
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() => setPreviewVideoUrl(sub.content.youtubeUrl)}
+                                    className="p-1 h-7 text-xs font-bold hover:text-red-600 flex items-center gap-1 shrink-0 bg-transparent shadow-none"
+                                  >
+                                    <Play size={12} className="fill-red-600 text-red-650" /> Preview Video
+                                  </Button>
+                                )}
+                                <button
+                                  onClick={() => openEditSubModuleDrawer(sub)}
+                                  className="p-1.5 text-slate-400 hover:text-[#6C1D5F] hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                                  title="Edit Sub-module"
+                                >
+                                  <Edit size={14} />
+                                </button>
+                                <button
+                                  onClick={() => requestDelete("submodule", sub)}
+                                  className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                                  title="Delete Sub-module"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    </>
-                  )}
-                </Card>
-              ))}
+                    ) : (
+                      <div className="text-center py-6 text-slate-400 text-xs border border-dashed border-slate-200 rounded-xl bg-white">
+                        No sub-modules in this module yet.
+                      </div>
+                    )}
 
-              {/* Dashed Add Module button under all modules */}
-              <button
-                onClick={openAddModuleModal}
-                className="w-full flex items-center justify-center gap-1.5 py-3 border-2 border-dashed border-[#6C1D5F]/30 hover:border-[#6C1D5F] rounded-xl text-[#6C1D5F] hover:bg-[#6C1D5F]/5 font-semibold text-xs transition-all mt-4 mb-6 cursor-pointer"
-              >
-                <Plus size={16} /> Add Module
-              </button>
-            </div>
+                    {/* Add Sub-module Button */}
+                    <button
+                      onClick={() => openAddSubModuleDrawer(mod.id)}
+                      className="w-full flex items-center justify-center gap-1.5 py-2.5 border-2 border-dashed border-[#6C1D5F]/20 hover:border-[#6C1D5F] rounded-xl text-[#6C1D5F] hover:bg-[#6C1D5F]/5 font-semibold text-xs transition-all cursor-pointer bg-white"
+                    >
+                      <Plus size={14} /> Add Sub-module
+                    </button>
+                  </div>
+                )}
+              </Card>
+            ))
           )}
         </div>
-      </div>
-    </AppLayout>
 
-      {/* ─── MODULE FORM MODAL ───────────────────────────────────────────────── */}
+      </div>
+
+      {/* ─── MODULE MODAL ────────────────────────────────────────────────────── */}
       {isModuleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md min-w-[320px] md:w-[448px] border border-slate-200 flex flex-col animate-scaleUp">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-xl w-[95vw] sm:w-[448px] max-w-md shrink-0 border border-slate-200 flex flex-col my-8">
             <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
               <h3 className="font-bold text-slate-800 text-sm">
                 {editingModule ? "Edit Module" : "Add Module"}
@@ -750,26 +699,26 @@ export default function CurriculumBuilder() {
             </div>
             
             <form onSubmit={handleSaveModule} className="p-5 space-y-4 flex-1">
-              <div className="space-y-1">
-                <label className="block text-xs font-semibold text-slate-500">Module Title</label>
-                <input
+              <div className="space-y-1.5">
+                <Label htmlFor="modTitle">Module Title</Label>
+                <Input
+                  id="modTitle"
                   type="text"
                   value={moduleTitle}
                   onChange={(e) => setModuleTitle(e.target.value)}
                   placeholder="e.g. Module 1: Foundations of Design"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#6C1D5F] focus:border-[#6C1D5F] transition-all"
                   required
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="block text-xs font-semibold text-slate-500">Description (Optional)</label>
-                <textarea
+              <div className="space-y-1.5">
+                <Label htmlFor="modDesc">Description (Optional)</Label>
+                <Textarea
+                  id="modDesc"
                   value={moduleDescription}
                   onChange={(e) => setModuleDescription(e.target.value)}
                   placeholder="Provide a brief summary of what this module covers."
                   rows={4}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#6C1D5F] focus:border-[#6C1D5F] transition-all resize-none"
                 />
               </div>
 
@@ -777,16 +726,16 @@ export default function CurriculumBuilder() {
                 <button
                   type="button"
                   onClick={() => setIsModuleModalOpen(false)}
-                  className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="px-4 py-2.5 border border-slate-200 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingModule}
-                  className="px-4 py-2 bg-[#6C1D5F] text-white hover:bg-[#4A1E47] disabled:bg-slate-300 rounded-lg text-xs font-semibold shadow-sm transition-all flex items-center gap-1 cursor-pointer"
+                  className="px-4 py-2.5 bg-[#6C1D5F] text-white hover:bg-[#57174C] disabled:bg-slate-350 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1 cursor-pointer"
                 >
-                  <Save size={14} />
+                  <Save size={13} />
                   {submittingModule ? "Saving..." : "Save Module"}
                 </button>
               </div>
@@ -811,8 +760,8 @@ export default function CurriculumBuilder() {
           </DialogHeader>
 
           <form onSubmit={handleSaveSubModule} className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
-            <div className="space-y-1">
-              <Label htmlFor="subModuleTitle">Sub-module Title</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="subModuleTitle">Sub-module Title *</Label>
               <Input
                 id="subModuleTitle"
                 type="text"
@@ -823,7 +772,7 @@ export default function CurriculumBuilder() {
               />
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label htmlFor="subModuleDescription">Description (Optional)</Label>
               <Textarea
                 id="subModuleDescription"
@@ -834,121 +783,113 @@ export default function CurriculumBuilder() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>Content Type</Label>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setContentType("video")}
-                  className={`flex items-center justify-center gap-1 py-2.5 rounded-xl border text-[11px] font-semibold transition-all cursor-pointer ${
-                    contentType === "video"
-                      ? "border-2 border-[#6C1D5F] bg-[#ffd7f3]/40 text-[#800b79]"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  <Video size={12} /> Video
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setContentType("pdf")}
-                  className={`flex items-center justify-center gap-1 py-2.5 rounded-xl border text-[11px] font-semibold transition-all cursor-pointer ${
-                    contentType === "pdf"
-                      ? "border-2 border-[#6C1D5F] bg-[#ffd7f3]/40 text-[#800b79]"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  <FileText size={12} /> PDF
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setContentType("text")}
-                  className={`flex items-center justify-center gap-1 py-2.5 rounded-xl border text-[11px] font-semibold transition-all cursor-pointer ${
-                    contentType === "text"
-                      ? "border-2 border-[#6C1D5F] bg-[#ffd7f3]/40 text-[#800b79]"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  <FileText size={12} /> Text
-                </button>
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="subModuleContentType">Content Type *</Label>
+              <select
+                id="subModuleContentType"
+                value={contentType}
+                onChange={(e) => setContentType(e.target.value)}
+                className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#6C1D5F]/20 focus:border-[#6C1D5F] bg-white cursor-pointer transition-all"
+              >
+                <option value="Video">Video</option>
+                <option value="PDF">PDF</option>
+                <option value="Document">Document</option>
+                <option value="Quiz">Quiz</option>
+                <option value="External Link">External Link</option>
+              </select>
             </div>
 
-            {contentType === "video" ? (
+            {contentType === "Video" && (
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="videoUrl">Video URL</Label>
+                  <Label htmlFor="youtubeUrl">YouTube Video URL *</Label>
                   <div className="flex gap-2">
                     <div className="flex-1">
                       <Input
-                        id="videoUrl"
+                        id="youtubeUrl"
                         type="url"
-                        value={videoUrl}
-                        onChange={(e) => handleVideoUrlChange(e.target.value)}
-                        placeholder="e.g. https://www.youtube.com/watch?v=... or direct MP4 URL"
-                        className={videoUrlError ? "border-red-500 focus-visible:ring-red-200" : ""}
+                        value={youtubeUrl}
+                        onChange={(e) => handleYoutubeUrlChange(e.target.value)}
+                        placeholder="e.g. https://www.youtube.com/watch?v=..."
+                        className={youtubeUrlError ? "border-red-500 focus-visible:ring-red-200" : ""}
+                        required
                       />
                     </div>
-                    {videoUrl.trim() && !videoUrlError && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setShowVideoPreview(true)}
-                        className="cursor-pointer font-semibold border-slate-300 hover:bg-slate-50 shrink-0"
-                      >
-                        Preview
-                      </Button>
+                    {youtubeUrl.trim() && !youtubeUrlError && (
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => window.open(youtubeUrl, '_blank')}
+                          className="cursor-pointer font-bold border-slate-300 hover:text-red-650 hover:bg-slate-50 shrink-0 flex items-center gap-1.5"
+                        >
+                          <ExternalLink size={14} /> Open
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShowVideoPreview(true)}
+                          className="cursor-pointer font-bold border-slate-300 hover:bg-slate-50 shrink-0"
+                        >
+                          Preview
+                        </Button>
+                      </div>
                     )}
                   </div>
-                  {videoUrlError && (
-                    <p className="text-[11px] text-red-500 font-medium animate-fadeIn">{videoUrlError}</p>
+                  {youtubeUrlError && (
+                    <p className="text-[11px] text-red-500 font-semibold animate-fadeIn">{youtubeUrlError}</p>
                   )}
                 </div>
 
                 {/* Embedded Video Preview Area */}
-                {showVideoPreview && videoUrl.trim() && !videoUrlError && (
+                {showVideoPreview && youtubeUrl.trim() && !youtubeUrlError && (
                   <div className="space-y-1.5 animate-fadeIn">
-                    <Label>Video Preview</Label>
+                    <Label>Video Thumbnail & Preview</Label>
                     {(() => {
-                      const embedInfo = getEmbedInfo(videoUrl);
-                      if (!embedInfo) return <p className="text-xs text-slate-400">Preview not available for this URL format.</p>;
-                      
-                      if (embedInfo.type === "youtube" || embedInfo.type === "vimeo") {
-                        return (
-                          <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-900">
-                            <iframe
-                              src={embedInfo.url}
-                              className="absolute inset-0 w-full h-full"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                              title="Video Preview"
-                            />
-                          </div>
-                        );
-                      }
-                      
+                      const ytId = getYouTubeId(youtubeUrl);
+                      if (!ytId) return <p className="text-xs text-slate-400">Preview not available.</p>;
                       return (
-                        <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-900 flex items-center justify-center">
-                          <video
-                            controls
-                            src={embedInfo.url}
-                            className="w-full h-full object-contain"
-                          />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Thumbnail Image</span>
+                            <div className="aspect-video bg-slate-900 border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                              <img 
+                                src={`https://img.youtube.com/vi/${ytId}/mqdefault.jpg`}
+                                alt="Live Thumbnail"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Embed Video</span>
+                            <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-900">
+                              <iframe
+                                src={`https://www.youtube.com/embed/${ytId}`}
+                                className="absolute inset-0 w-full h-full"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                title="Video Preview"
+                              />
+                            </div>
+                          </div>
                         </div>
                       );
                     })()}
                   </div>
                 )}
               </div>
-            ) : contentType === "pdf" ? (
+            )}
+
+            {contentType === "PDF" && (
               <div className="space-y-3">
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <Label htmlFor="pdfUrl">PDF URL</Label>
                   <Input
                     id="pdfUrl"
                     type="url"
                     value={pdfUrl}
                     onChange={(e) => setPdfUrl(e.target.value)}
-                    placeholder="e.g. https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+                    placeholder="e.g. https://www.example.com/doc.pdf"
                   />
                 </div>
 
@@ -963,7 +904,7 @@ export default function CurriculumBuilder() {
                     className="hidden" 
                   />
                   {pdfUrl ? (
-                    <div className="border border-green-200 rounded-xl p-4 bg-green-50/50 flex items-center justify-between gap-3 animate-fadeIn">
+                    <div className="border border-green-250 rounded-xl p-4 bg-green-50/50 flex items-center justify-between gap-3 animate-fadeIn">
                       <div className="flex items-center gap-2">
                         <div className="p-2 bg-green-100 rounded-lg text-green-700">
                           <FileText size={16} />
@@ -972,7 +913,7 @@ export default function CurriculumBuilder() {
                           <p className="text-xs font-bold text-slate-800 truncate max-w-[200px]" title={uploadedFileName || "document_simulated.pdf"}>
                             {uploadedFileName || "document_simulated.pdf"}
                           </p>
-                          <p className="text-[10px] text-green-700 font-medium">Uploaded Successfully</p>
+                          <p className="text-[10px] text-green-700 font-bold">Uploaded Successfully</p>
                         </div>
                       </div>
                       <button
@@ -986,7 +927,7 @@ export default function CurriculumBuilder() {
                   ) : (
                     <div 
                       onClick={() => pdfInputRef.current?.click()}
-                      className="border border-dashed border-slate-300 hover:border-[#6C1D5F] rounded-xl p-6 text-center bg-slate-50/50 hover:bg-white transition-all cursor-pointer space-y-2 group"
+                      className="border border-dashed border-slate-350 hover:border-[#6C1D5F] rounded-xl p-6 text-center bg-slate-50/50 hover:bg-white transition-all cursor-pointer space-y-2 group"
                     >
                       <div className="w-10 h-10 rounded-full bg-[#ffd7f3]/50 flex items-center justify-center text-[#800b79] mx-auto group-hover:scale-105 transition-transform">
                         <FileText size={18} />
@@ -1000,16 +941,51 @@ export default function CurriculumBuilder() {
                   )}
                 </div>
               </div>
-            ) : (
+            )}
+
+            {contentType === "Document" && (
               <div className="space-y-3">
-                <div className="space-y-1">
-                  <Label htmlFor="textContent">Text Content</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="docText">Document Content</Label>
                   <Textarea
-                    id="textContent"
+                    id="docText"
                     value={textContent}
                     onChange={(e) => setTextContent(e.target.value)}
-                    placeholder="Enter the text content for this sub-module..."
+                    placeholder="Enter article text or markdown documentation..."
                     rows={8}
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
+            {contentType === "Quiz" && (
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="quizText">Quiz Instructions & Questions</Label>
+                  <Textarea
+                    id="quizText"
+                    value={textContent}
+                    onChange={(e) => setTextContent(e.target.value)}
+                    placeholder="Enter instructions or Quiz JSON config..."
+                    rows={8}
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
+            {contentType === "External Link" && (
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="extLink">External Website URL *</Label>
+                  <Input
+                    id="extLink"
+                    type="url"
+                    value={externalLink}
+                    onChange={(e) => setExternalLink(e.target.value)}
+                    placeholder="e.g. https://www.google.com"
+                    required
                   />
                 </div>
               </div>
@@ -1021,7 +997,7 @@ export default function CurriculumBuilder() {
               type="button"
               variant="outline"
               onClick={() => setIsDrawerOpen(false)}
-              className="cursor-pointer"
+              className="cursor-pointer font-bold"
             >
               Cancel
             </Button>
@@ -1029,7 +1005,7 @@ export default function CurriculumBuilder() {
               type="button"
               onClick={handleSaveSubModule}
               disabled={submittingSubModule}
-              className="bg-[#6C1D5F] hover:bg-[#4A1E47] text-white cursor-pointer"
+              className="bg-[#6C1D5F] hover:bg-[#57174C] text-white cursor-pointer font-bold"
             >
               <Save size={14} className="mr-1.5" />
               {submittingSubModule ? "Saving..." : "Save Sub-module"}
@@ -1038,10 +1014,45 @@ export default function CurriculumBuilder() {
         </DialogContent>
       </Dialog>
 
+      {/* ─── LIVE VIDEO PLAYOVER MODAL ────────────────────────────────────────── */}
+      {previewVideoUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-slate-900 rounded-2xl w-full max-w-[90vw] md:max-w-2xl overflow-hidden flex flex-col shrink-0 relative animate-scaleUp">
+            
+            <button 
+              onClick={() => setPreviewVideoUrl(null)}
+              className="absolute top-3 right-3 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors cursor-pointer z-10"
+            >
+              <X size={18} />
+            </button>
+            
+            <div className="relative aspect-video">
+              <iframe
+                src={`https://www.youtube.com/embed/${getYouTubeId(previewVideoUrl)}?autoplay=1`}
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title="YouTube Video Player"
+              />
+            </div>
+            <div className="p-4 bg-slate-950 flex justify-between items-center text-white">
+              <span className="text-xs truncate font-bold">{previewVideoUrl}</span>
+              <Button
+                variant="outline"
+                className="text-xs font-semibold text-slate-800 bg-white border-none hover:bg-slate-100 hover:text-black shrink-0"
+                onClick={() => window.open(previewVideoUrl, '_blank')}
+              >
+                Open in YouTube
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ─── DELETE CONFIRM DIALOG ───────────────────────────────────────────── */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm min-w-[300px] md:w-[380px] border border-slate-200 p-5 space-y-4 animate-scaleUp">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm min-w-[300px] md:w-[380px] border border-slate-200 p-5 space-y-4 shrink-0 animate-scaleUp">
             <h3 className="font-bold text-slate-800 text-sm">Delete {deleteTarget.type === "module" ? "Module" : "Sub-module"}</h3>
             <p className="text-xs text-slate-500 leading-relaxed">
               Are you sure you want to delete <span className="font-semibold text-slate-700">"{deleteTarget.title}"</span>? 
@@ -1050,13 +1061,13 @@ export default function CurriculumBuilder() {
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="px-3.5 py-1.5 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+                className="px-4 py-2.5 border border-slate-200 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-3.5 py-1.5 bg-red-600 text-white hover:bg-red-700 rounded-lg text-xs font-semibold shadow-sm transition-colors cursor-pointer"
+                className="px-4 py-2.5 bg-red-500 hover:bg-red-650 text-white rounded-xl text-xs font-bold shadow-sm transition-colors cursor-pointer"
               >
                 Delete
               </button>
@@ -1064,7 +1075,8 @@ export default function CurriculumBuilder() {
           </div>
         </div>
       )}
-
-    </>
+    </AppLayout>
   );
-}
+};
+
+

@@ -3,15 +3,15 @@ import Navbar from "./Navbar";
 
 export default function AppLayout({ children }) {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#F7F8FC]">
 
       <Sidebar />
 
-      <div className="md:ml-[250px]">
+      <div className="md:ml-[220px]">
 
         <Navbar />
 
-        <main className="p-8">
+        <main className="p-6">
 
           {children}
 

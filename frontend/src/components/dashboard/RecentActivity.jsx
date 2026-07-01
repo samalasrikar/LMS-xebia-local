@@ -38,22 +38,11 @@ export default function RecentActivity() {
         if (courses && courses.length) {
           const recent = courses.slice(-3).reverse();
           const items = recent.map((c, i) => {
-            const types = ["course_created", "student_enrolled", "payment_received"];
             return {
               id: c.id ?? i,
-              type: types[i % types.length],
-              title:
-                i === 0
-                  ? "New Course Created"
-                  : i === 1
-                    ? "Student Enrolled"
-                    : "Payment Received",
-              subtitle:
-                i === 0
-                  ? c.title
-                  : i === 1
-                    ? `Student joined '${c.title}'`
-                    : `Course subscription — ${c.title}`,
+              type: "course_created",
+              title: "New Course Created",
+              subtitle: c.title,
               time: c.updatedAt ?? c.createdAt ?? null,
             };
           });

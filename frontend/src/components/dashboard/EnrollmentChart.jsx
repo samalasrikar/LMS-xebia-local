@@ -1,16 +1,6 @@
 import { useEffect, useState } from "react";
 import dashboardService from "../../services/dashboardService";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-
 export default function EnrollmentChart() {
   const [period, setPeriod] = useState("Monthly");
   const [chartData, setChartData] = useState([]);
@@ -27,37 +17,30 @@ export default function EnrollmentChart() {
       const response =
         await dashboardService.getEnrollmentAnalytics(period);
 
-      console.log("Enrollment API Response:", response);
-
       setChartData(response || []);
     } catch (error) {
-      console.error(
-        "Failed to load enrollment analytics:",
-        error
-      );
-
+      console.error("Failed to load enrollment analytics:", error);
       setChartData([]);
     } finally {
       setLoading(false);
     }
   };
 
+  const labels = chartData.map((item) => item.label);
+
   return (
     <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-[#d5c1cc] flex flex-col">
-      
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
         <div>
           <h3 className="text-lg font-bold text-[#6C1D5F]">
             Enrollment Analytics
           </h3>
-
           <p className="text-sm text-[#51434c]">
             Tracking growth across all learning sectors
           </p>
         </div>
 
-        {/* Toggle Buttons */}
         <div className="bg-[#f5f3f3] p-1 rounded-xl flex gap-1">
           {["Weekly", "Monthly"].map((p) => (
             <button
@@ -75,76 +58,48 @@ export default function EnrollmentChart() {
         </div>
       </div>
 
-      {/* Chart Section */}
-      <div className="flex-1 min-h-[320px]">
+      <div className="flex-1 flex items-center justify-center min-h-[250px]">
         {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-[#83727c]">
-              Loading analytics...
-            </p>
-          </div>
+          <p className="text-[#83727c]">Loading analytics...</p>
         ) : chartData.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-[#83727c]">
-              No analytics data available
-            </p>
-          </div>
+          <p className="text-[#83727c]">No analytics data available</p>
         ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={chartData}
-              margin={{
-                top: 20,
-                right: 10,
-                left: -20,
-                bottom: 5,
-              }}
-            >
-              {/* Grid */}
-              <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke="#ece7eb"
-              />
-
-              {/* X Axis */}
-              <XAxis
-                dataKey="month"
-                tick={{
-                  fill: "#83727c",
-                  fontSize: 12,
-                  fontWeight: 600,
-                }}
-                axisLine={false}
-                tickLine={false}
-              />
-
-              {/* Y Axis */}
-              <YAxis
-                tick={{
-                  fill: "#83727c",
-                  fontSize: 12,
-                }}
-                axisLine={false}
-                tickLine={false}
-              />
-
-              {/* Tooltip */}
-              <Tooltip
-                cursor={{ fill: "rgba(108,29,95,0.08)" }}
-              />
-
-              {/* Bars */}
-              <Bar
-                dataKey="enrollments"
-                fill="#6C1D5F"
-                radius={[8, 8, 0, 0]}
-                barSize={40}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="w-full">
+            {/* Replace with Recharts/ApexCharts when API is ready */}
+            <div className="grid grid-cols-7 gap-3 items-end">
+              {chartData.map((item) => (
+                <div
+                  key={item.label}
+                  className="flex flex-col items-center gap-2 flex-1"
+                >
+                  <div
+                    className="w-full bg-gradient-to-t from-[#6C1D5F] to-[#84117C] rounded-t-lg transition-all duration-300 hover:scale-x-105 hover:brightness-110 shadow-sm relative group cursor-pointer"
+                    style={{
+                      height: `${Math.max(12, item.value)}px`,
+                    }}
+                  >
+                    {/* Tooltip on hover */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-800 text-white text-[10px] font-bold py-1 px-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-20">
+                      {item.value} Learners
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-400">
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
+
+      {labels.length > 0 && (
+        <div className="flex justify-between mt-3 px-2 text-[10px] text-[#83727c] font-bold uppercase tracking-widest">
+          {labels.map((label) => (
+            <span key={label}>{label}</span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

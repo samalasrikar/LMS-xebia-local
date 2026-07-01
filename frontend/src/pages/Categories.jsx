@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
 import categoryService from "../services/categoryService";
 import courseService from "../services/courseService";
@@ -6,31 +7,22 @@ import CategoryHeader from "../components/categories/CategoryHeader";
 import CategoryToolbar from "../components/categories/CategoryToolbar";
 import CategoryTable from "../components/categories/CategoryTable";
 import CategoryStats from "../components/categories/CategoryStats";
-import CategoryDialog from "../components/categories/CategoryDialog";
 import DeleteDialog from "../components/shared/DeleteDialog";
 
 export default function Categories() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
+  const [totalCourses, setTotalCourses] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  // Toolbar state
   const [filterText, setFilterText] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [sortBy, setSortBy] = useState("Most Popular");
+  const [viewMode, setViewMode] = useState("grid");
 
-  // Modal state
-  const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState("add"); // "add" | "edit" | "view"
-  const [selectedCatDbId, setSelectedCatDbId] = useState(null);
-
-  // Form fields
-  const [newCatName, setNewCatName] = useState("");
-  const [newCatDesc, setNewCatDesc] = useState("");
-  const [newCatImageFile, setNewCatImageFile] = useState(null);
-  const [newCatImagePreview, setNewCatImagePreview] = useState("");
-  const [newCatStatus, setNewCatStatus] = useState("Active");
-  const [submitting, setSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-
-  // Delete dialog state
-  const [deleteTarget, setDeleteTarget] = useState(null); // { dbId, name }
+  // Delete state
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -45,18 +37,24 @@ export default function Categories() {
         courseService.getAllCourses(),
       ]);
       const coursesList = coursesData || [];
+      setTotalCourses(coursesList.length);
 
       if (categoriesData && categoriesData.length > 0) {
         const mapped = categoriesData.map((cat) => {
-          const count = coursesList.filter((c) => Number(c.categoryId) === Number(cat.id)).length;
+          const courseCount = coursesList.filter(
+            (c) => Number(c.categoryId) === Number(cat.id)
+          ).length;
+
           return {
             id: `CAT-${1000 + cat.id}`,
             dbId: cat.id,
             name: cat.name,
             description: cat.description || "No description provided.",
-            courses: count,
+            courses: courseCount,
+            learners: cat.learnerCount ?? null,
+            completion: cat.completionRate ?? null,
             status: cat.status || "Active",
-            created: "Recently",
+            updatedAt: cat.updatedAt ?? cat.createdAt ?? null,
             image: cat.image || null,
           };
         });
@@ -72,96 +70,37 @@ export default function Categories() {
     }
   };
 
-  // ─── Helpers ──────────────────────────────────────────────────────────────
+  // ─── Sort logic ────────────────────────────────────────────────────────────
 
-  const resetForm = () => {
-    setNewCatName("");
-    setNewCatDesc("");
-    setNewCatImageFile(null);
-    setNewCatImagePreview("");
-    setNewCatStatus("Active");
-    setErrorMsg("");
-  };
+  const applySortAndFilter = (list) => {
+    let filtered = list
+      .filter((cat) => cat.name.toLowerCase().includes(filterText.toLowerCase()))
+      .filter((cat) => statusFilter === "All" || cat.status === statusFilter);
 
-  const handleImageFileChange = (file) => {
-    setNewCatImageFile(file);
-    setNewCatImagePreview(URL.createObjectURL(file));
-  };
-
-  const openAdd = () => {
-    resetForm();
-    setModalMode("add");
-    setShowModal(true);
-  };
-
-  const openView = (cat) => {
-    setNewCatName(cat.name);
-    setNewCatDesc(cat.description || "");
-    setNewCatImageFile(null);
-    setNewCatImagePreview(cat.image || "");
-    setNewCatStatus(cat.status || "Active");
-    setModalMode("view");
-    setErrorMsg("");
-    setShowModal(true);
-  };
-
-  const openEdit = (cat) => {
-    setNewCatName(cat.name);
-    setNewCatDesc(cat.description || "");
-    setNewCatImageFile(null);
-    setNewCatImagePreview(cat.image || "");
-    setNewCatStatus(cat.status || "Active");
-    setSelectedCatDbId(cat.dbId);
-    setModalMode("edit");
-    setErrorMsg("");
-    setShowModal(true);
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    if (modalMode === "view") {
-      setShowModal(false);
-      return;
-    }
-    if (!newCatName.trim()) {
-      setErrorMsg("Category name is required.");
-      return;
-    }
-    setSubmitting(true);
-    setErrorMsg("");
-    try {
-      const formData = new FormData();
-      formData.append("name", newCatName.trim());
-      formData.append("description", newCatDesc.trim());
-      formData.append("status", newCatStatus);
-      if (newCatImageFile) {
-        formData.append("image", newCatImageFile);
-      }
-
-      if (modalMode === "add") {
-        await categoryService.createCategory(formData);
-      } else if (modalMode === "edit") {
-        await categoryService.updateCategory(selectedCatDbId, formData);
-      }
-      resetForm();
-      setShowModal(false);
-      fetchCategories();
-    } catch (err) {
-      console.error(`Failed to ${modalMode} category:`, err);
-      const serverMsg = err.response?.data?.message;
-      setErrorMsg(
-        serverMsg || "Error processing category. Please check your connection or unique name."
-      );
-    } finally {
-      setSubmitting(false);
+    switch (sortBy) {
+      case "Most Popular":
+        return filtered.sort((a, b) => (b.courses ?? 0) - (a.courses ?? 0));
+      case "Newest First":
+        return filtered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      case "Oldest First":
+        return filtered.sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt));
+      case "A → Z":
+        return filtered.sort((a, b) => a.name.localeCompare(b.name));
+      case "Z → A":
+        return filtered.sort((a, b) => b.name.localeCompare(a.name));
+      default:
+        return filtered;
     }
   };
 
-  // ─── Delete ───────────────────────────────────────────────────────────────
+  const displayedCategories = applySortAndFilter([...categories]);
 
-  const requestDelete = (cat) => {
-    setDeleteTarget({ dbId: cat.dbId, name: cat.name });
-  };
+  // ─── Navigation handlers ────────────────────────────────────────────────────
+  const openView = (cat) => navigate(`/categories/${cat.dbId}/edit`);
+  const openEdit = (cat) => navigate(`/categories/${cat.dbId}/edit`);
+
+  // ─── Delete ────────────────────────────────────────────────────────────────
+  const requestDelete = (cat) => setDeleteTarget({ dbId: cat.dbId, name: cat.name });
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
@@ -177,53 +116,33 @@ export default function Categories() {
     }
   };
 
-  // ─── Derived data ──────────────────────────────────────────────────────────
-
-  const filteredCategories = categories
-    .filter((cat) =>
-      cat.name.toLowerCase().includes(filterText.toLowerCase())
-    )
-    .filter((cat) => statusFilter === "All" || cat.status === statusFilter);
-
-  // ─── Render ───────────────────────────────────────────────────────────────
-
   return (
     <AppLayout>
-      <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
-        <CategoryHeader onAddCategory={openAdd} />
+      <div className="space-y-5 animate-[fadeIn_0.5s_ease-out]">
+        <CategoryHeader />
+
+        <CategoryStats categories={categories} totalCourses={totalCourses} />
 
         <CategoryToolbar
           filterText={filterText}
           onFilterChange={setFilterText}
           statusFilter={statusFilter}
           onStatusChange={setStatusFilter}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          totalCount={displayedCategories.length}
+          totalAll={categories.length}
         />
 
         <CategoryTable
-          categories={filteredCategories}
+          categories={displayedCategories}
           loading={loading}
+          viewMode={viewMode}
           onView={openView}
           onEdit={openEdit}
           onDelete={requestDelete}
-        />
-
-        <CategoryStats categories={categories} />
-
-        <CategoryDialog
-          show={showModal}
-          mode={modalMode}
-          name={newCatName}
-          desc={newCatDesc}
-          imagePreview={newCatImagePreview}
-          status={newCatStatus}
-          errorMsg={errorMsg}
-          submitting={submitting}
-          onNameChange={setNewCatName}
-          onDescChange={setNewCatDesc}
-          onImageFileChange={handleImageFileChange}
-          onStatusChange={setNewCatStatus}
-          onClose={() => setShowModal(false)}
-          onSubmit={handleFormSubmit}
         />
 
         <DeleteDialog

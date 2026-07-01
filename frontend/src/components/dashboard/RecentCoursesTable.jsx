@@ -3,7 +3,7 @@ import { MoreHorizontal, BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import courseService from "../../services/courseService";
-import dashboardService from "../../services/dashboardService";
+
 /* ─── Category colour mapping ──────────────────────────────────────── */
 const CATEGORY_COLORS = {
   Design:      { bg: "bg-[#ff83ec]/10", text: "text-[#9e2e93]" },
@@ -28,12 +28,9 @@ export default function RecentCoursesTable() {
   useEffect(() => {
     async function load() {
       try {
-        const data = await dashboardService.getRecentCourses();
-
-        console.log(data);
-
+        const data = await courseService.getAllCourses();
         if (data) {
-          setCourses(data);
+          setCourses(data.slice(-5).reverse());
         }
       } catch (err) {
         console.error("Failed to load recent courses:", err);
@@ -80,9 +77,7 @@ export default function RecentCoursesTable() {
                 </td>
               </tr>
             ) : (
-              <>
-              {console.log(courses)}
-              {courses.map((course) => {
+              courses.map((course) => {
                 const cat = getCatColor(course.categoryName);
                 return (
                   <tr
@@ -137,8 +132,7 @@ export default function RecentCoursesTable() {
                     </td>
                   </tr>
                 );
-              })}
-              </>
+              })
             )}
           </tbody>
         </table>

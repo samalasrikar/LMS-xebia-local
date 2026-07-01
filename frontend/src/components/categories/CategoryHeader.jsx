@@ -1,23 +1,54 @@
-import { Plus } from "lucide-react";
+import { Plus, Download, Upload, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function CategoryHeader({ onAddCategory }) {
+  const navigate = useNavigate();
+
+  const handleCreate = () => {
+    // Navigate to full-page create form
+    navigate("/categories/create");
+  };
+
   return (
-    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-          Category Management
-        </h1>
-        <p className="text-slate-500 text-sm mt-1">
-          Organize and manage your learning curriculum buckets.
-        </p>
+    <div className="flex flex-col gap-3">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-1 text-[11px] text-slate-400 font-medium">
+        <span className="hover:text-[#6C1D5F] cursor-pointer transition-colors" onClick={() => navigate("/")}>
+          Xebia LMS
+        </span>
+        <ChevronRight size={12} className="text-slate-300" />
+        <span className="text-slate-400">Content</span>
+        <ChevronRight size={12} className="text-slate-300" />
+        <span className="text-slate-700 font-semibold">Categories</span>
+      </nav>
+
+      {/* Title row */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Categories</h1>
+          <p className="text-slate-500 text-sm mt-0.5">
+            Organize and manage all course categories on your LMS platform.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button className="flex items-center gap-1.5 px-3 py-2 border border-slate-200 bg-white rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
+            <Download size={13} />
+            Export
+          </button>
+          <button className="flex items-center gap-1.5 px-3 py-2 border border-slate-200 bg-white rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
+            <Upload size={13} />
+            Import
+          </button>
+          <button
+            onClick={handleCreate}
+            className="flex items-center gap-1.5 bg-[#6C1D5F] hover:bg-[#4A1E47] text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+          >
+            <Plus size={14} />
+            Create Category
+          </button>
+        </div>
       </div>
-      <button
-        onClick={onAddCategory}
-        className="flex items-center gap-1.5 bg-[#6C1D5F] hover:bg-[#4A1E47] text-white px-4 py-2.5 rounded-xl font-semibold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
-      >
-        <Plus size={14} />
-        Add Category
-      </button>
     </div>
   );
 }

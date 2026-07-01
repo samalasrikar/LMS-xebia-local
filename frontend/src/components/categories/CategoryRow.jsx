@@ -1,18 +1,38 @@
 import { Eye, Edit, Trash2, GraduationCap } from "lucide-react";
 
+function formatDate(dateStr) {
+  if (!dateStr) return "—";
+  try {
+    const d = new Date(dateStr);
+    const diff = Date.now() - d.getTime();
+    const days = Math.floor(diff / 86400000);
+    if (days === 0) return "Today";
+    if (days === 1) return "Yesterday";
+    if (days < 30) return `${days}d ago`;
+    const months = Math.floor(days / 30);
+    return `${months}mo ago`;
+  } catch {
+    return "—";
+  }
+}
+
 export default function CategoryRow({ cat, onView, onEdit, onDelete }) {
   return (
     <tr className="hover:bg-slate-50/50 transition-colors group">
       {/* Image */}
       <td className="px-6 py-4">
-        <div className="w-12 h-12 rounded-lg bg-[#F7F8FC] overflow-hidden border border-slate-100 shadow-sm">
-          <img
-            className={`w-full h-full object-cover ${
-              cat.status === "Inactive" ? "grayscale opacity-80" : ""
-            }`}
-            src={cat.image}
-            alt={cat.name}
-          />
+        <div className="w-12 h-12 rounded-xl bg-[#F7F8FC] overflow-hidden border border-slate-100 shadow-sm flex items-center justify-center">
+          {cat.image ? (
+            <img
+              className={`w-full h-full object-cover ${cat.status === "Inactive" ? "grayscale opacity-70" : ""}`}
+              src={cat.image}
+              alt={cat.name}
+            />
+          ) : (
+            <span className="text-slate-300 text-xs font-bold">
+              {cat.name?.charAt(0).toUpperCase()}
+            </span>
+          )}
         </div>
       </td>
 
@@ -31,7 +51,7 @@ export default function CategoryRow({ cat, onView, onEdit, onDelete }) {
       <td className="px-6 py-4">
         <div className="flex items-center gap-1.5 text-slate-700">
           <GraduationCap size={15} className="text-[#6C1D5F]" />
-          <span className="text-xs font-bold">{cat.courses}</span>
+          <span className="text-xs font-bold">{cat.courses ?? 0}</span>
         </div>
       </td>
 
@@ -53,8 +73,8 @@ export default function CategoryRow({ cat, onView, onEdit, onDelete }) {
         </span>
       </td>
 
-      {/* Created */}
-      <td className="px-6 py-4 text-xs text-slate-500">{cat.created}</td>
+      {/* Updated */}
+      <td className="px-6 py-4 text-xs text-slate-500">{formatDate(cat.updatedAt)}</td>
 
       {/* Actions */}
       <td className="px-6 py-4 text-right">
@@ -63,6 +83,7 @@ export default function CategoryRow({ cat, onView, onEdit, onDelete }) {
             type="button"
             onClick={() => onView(cat)}
             className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-[#6C1D5F] cursor-pointer"
+            title="View"
           >
             <Eye size={14} />
           </button>
@@ -70,6 +91,7 @@ export default function CategoryRow({ cat, onView, onEdit, onDelete }) {
             type="button"
             onClick={() => onEdit(cat)}
             className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-[#6C1D5F] cursor-pointer"
+            title="Edit"
           >
             <Edit size={14} />
           </button>
@@ -77,6 +99,7 @@ export default function CategoryRow({ cat, onView, onEdit, onDelete }) {
             type="button"
             onClick={() => onDelete(cat)}
             className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-red-500 cursor-pointer"
+            title="Delete"
           >
             <Trash2 size={14} />
           </button>
