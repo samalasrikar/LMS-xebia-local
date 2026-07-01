@@ -6,6 +6,9 @@ import {
   BookOpen,
   Settings,
   HelpCircle,
+  Brain,
+  Award,
+  Trophy,
 } from "lucide-react";
 
 import logo from "../../assets/xebia-logo.png";
@@ -26,6 +29,26 @@ const menu = [
     title: "Courses",
     path: "/courses",
     icon: GraduationCap,
+  },
+  {
+    title: "AI Transformation",
+    path: "/ai-transformation",
+    icon: Brain,
+  },
+  {
+    title: "Certifications",
+    path: "/certifications",
+    icon: Award,
+  },
+  {
+    title: "Flagship Programs",
+    path: "/flagship-programs",
+    icon: BookOpen,
+  },
+  {
+    title: "Learning Champions",
+    path: "/learning-champions",
+    icon: Trophy,
   },
 ];
 
