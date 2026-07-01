@@ -34,6 +34,16 @@ public class CategoryService {
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
+    /**
+     * @param id
+     * @return
+     */
+    public CategoryResponse getCategoryById(Long id) {
+
+        Category category = repository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+            return mapper.toResponse(category);
+    }
 
     public CategoryResponse createCategory(CategoryRequest request, MultipartFile imageFile) {
 
@@ -55,7 +65,10 @@ public class CategoryService {
         log.info("Updating category {}", id);
         Category existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-
+        if (!existing.getName().equals(request.getName())
+            && repository.existsByName(request.getName())) {
+                throw new ResourceAlreadyExistsException("Category already exists");
+            }
         byte[] imageBytes = extractBytes(imageFile);
         mapper.updateEntity(existing, request, imageBytes);
         Category updated = repository.save(Objects.requireNonNull(existing));

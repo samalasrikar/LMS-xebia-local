@@ -1,5 +1,7 @@
 package com.lms.backend.learning.course;
 
+import java.time.LocalDateTime;
+
 import com.lms.backend.learning.category.Category;
 
 import jakarta.persistence.Column;
@@ -10,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -44,7 +47,13 @@ public class Course {
 
     @Column(length = 20, nullable = false)
     private String status = "Published";
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
     public Course() {
     }
 

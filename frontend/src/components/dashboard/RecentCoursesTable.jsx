@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { MoreHorizontal, BookOpen, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import courseService from "../../services/courseService";
-
+import dashboardService from "../../services/dashboardService";
 /* ─── Category colour mapping ──────────────────────────────────────── */
 const CATEGORY_COLORS = {
   Design:      { bg: "bg-[#f5f3ff]", text: "text-[#7c3aed]", border: "border-[#ddd6fe]" },
@@ -43,8 +43,10 @@ export default function RecentCoursesTable() {
   useEffect(() => {
     async function load() {
       try {
-        const data = await courseService.getAllCourses();
-        if (data) setCourses(data.slice(-5).reverse());
+        const data = await dashboardService.getRecentCourses();
+        if (data) {
+          setCourses(data);
+        }
       } catch (err) {
         console.error("Failed to load recent courses:", err);
       } finally {
@@ -99,7 +101,9 @@ export default function RecentCoursesTable() {
                 </td>
               </tr>
             ) : (
-              courses.map((course) => {
+              <>
+              {console.log(courses)}
+              {courses.map((course) => {
                 const cat = getCatColor(course.categoryName);
                 const statusKey = (course.status ?? "published").toLowerCase();
                 const status = STATUS_MAP[statusKey] ?? STATUS_MAP.published;
@@ -155,7 +159,8 @@ export default function RecentCoursesTable() {
                     </td>
                   </tr>
                 );
-              })
+              })}
+              </>
             )}
           </tbody>
         </table>
