@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { MoreHorizontal, BookOpen, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import courseService from "../../services/courseService";
 import dashboardService from "../../services/dashboardService";
 /* ─── Category colour mapping ──────────────────────────────────────── */
 const CATEGORY_COLORS = {

@@ -15,12 +15,7 @@ export default function EnrollmentChart() {
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadAnalytics();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [period]);
-
-  const loadAnalytics = async () => {
+  async function loadAnalytics() {
     try {
       setLoading(true);
       const response = await dashboardService.getEnrollmentAnalytics(period);
@@ -31,7 +26,12 @@ export default function EnrollmentChart() {
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    loadAnalytics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [period]);
 
   return (
     <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 flex flex-col text-left">
