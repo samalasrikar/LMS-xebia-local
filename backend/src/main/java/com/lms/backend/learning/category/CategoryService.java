@@ -38,7 +38,7 @@ public class CategoryService {
      * @param id
      * @return
      */
-    public CategoryResponse getCategoryById(Long id) {
+    public CategoryResponse getCategoryById(@NonNull Long id) {
 
         Category category = repository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
