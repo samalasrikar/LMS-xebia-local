@@ -16,6 +16,11 @@ import Certification from "./modules/ai-certification/pages/Certification";
 import FlagshipPrograms from "./modules/ai-certification/pages/FlagshipPrograms";
 import LearningChampions from "./modules/ai-certification/pages/LearningChampions";
 
+// Learning Analytics Dashboard Pages
+import LearningHours from "./modules/learning-hours/pages/LearningHours";
+import LearningCategories from "./modules/learning-categories/pages/LearningCategories";
+import LearningTrends from "./modules/learning-trends/pages/LearningTrends";
+
 function App() {
   return (
     <Routes>
@@ -48,6 +53,20 @@ function App() {
       <Route
         path="/learning/coverage"
         element={<LearningCoverage />}
+      />
+
+      {/* Learning Analytics Dashboards */}
+      <Route
+        path="/learning/hours"
+        element={<LearningHours />}
+      />
+      <Route
+        path="/learning/categories"
+        element={<LearningCategories />}
+      />
+      <Route
+        path="/learning/trends"
+        element={<LearningTrends />}
       />
 
       {/* AI & Certification Analytics */}
