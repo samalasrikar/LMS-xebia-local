@@ -2,8 +2,10 @@ import {
   Minus, CheckCircle, ChevronsUpDown, BookOpen,
   ChevronLeft, ChevronRight,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import CoursesTableRow from "./CoursesTableRow";
 import CoursesBulkBar from "./CoursesBulkBar";
+import EmptyState from "../shared/EmptyState";
 
 const COLUMNS = [
   ["ID",       "w-16"],
@@ -36,10 +38,11 @@ export default function CoursesTableView({
   onDeleteTarget,
   onClearSelection,
   onBulkPublish,
-  onBulkFeature,
   onBulkArchive,
+  onBulkFeature,
   onBulkDelete,
 }) {
+  const navigate = useNavigate();
   return (
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
       {/* Bulk action bar */}
@@ -103,14 +106,16 @@ export default function CoursesTableView({
               </tr>
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={12} className="py-16 text-center">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
-                      <BookOpen size={20} className="text-slate-400" />
-                    </div>
-                    <div className="text-[14px] font-semibold text-slate-700">No courses found</div>
-                    <div className="text-[12px] text-slate-400">Try adjusting your filters or create a new course</div>
-                  </div>
+                <td colSpan={12} className="py-8 px-4 text-center">
+                  <EmptyState
+                    icon={BookOpen}
+                    title="No courses found"
+                    description="Try adjusting your filters or create a new course to get started."
+                    primaryAction={{
+                      label: "Create New Course",
+                      onClick: () => navigate("/courses/create"),
+                    }}
+                  />
                 </td>
               </tr>
             ) : (

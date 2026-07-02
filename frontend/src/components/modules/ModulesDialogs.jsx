@@ -162,7 +162,7 @@ export default function ModulesDialogs({
         </DialogContent>
       </Dialog>
 
-      {/* Content Library Confirmation Dialog */}
+      {/* Curriculum Confirmation Dialog */}
       <Dialog open={!!cbDialogTarget} onOpenChange={(open) => { if (!open) setCbDialogTarget(null); }}>
         <DialogContent className="max-w-[460px] rounded-xl shadow-xl bg-white border border-slate-200 p-6 text-left">
           <DialogHeader className="pb-4 border-b border-slate-100">
@@ -170,7 +170,7 @@ export default function ModulesDialogs({
               <div className="w-8 h-8 rounded-lg bg-[#6C1D5F]/5 text-[#6C1D5F] flex items-center justify-center shrink-0">
                 <FileEdit size={16} />
               </div>
-              <span>Open Content Library</span>
+              <span>Open Curriculum</span>
             </DialogTitle>
           </DialogHeader>
 
@@ -182,8 +182,8 @@ export default function ModulesDialogs({
               </div>
             )}
             <p className="text-[13px] text-slate-500 leading-relaxed">
-              You are about to open the <span className="font-semibold text-slate-700">Content Library</span> for this module.
-              Manage lesson content, videos, PDFs, quizzes, assignments, and other learning resources from there.
+              You are about to open the <span className="font-semibold text-slate-700">Curriculum Builder</span> for this module.
+              Manage modules, sub-modules, content blocks, videos, PDFs, articles, quizzes, assignments, and other learning resources from there.
             </p>
             {!selectedCourseId && (
               <p className="text-[12px] text-amber-600 font-medium bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
@@ -207,7 +207,7 @@ export default function ModulesDialogs({
               onClick={handleConfirmOpenContentLibrary}
               className="bg-[#6C1D5F] hover:bg-[#521347] text-white text-[12.5px] font-semibold px-5 shadow-sm shadow-[#6C1D5F]/10 flex items-center gap-1.5 disabled:bg-slate-200 disabled:text-slate-400 cursor-pointer"
             >
-              <ExternalLink size={13} /> Open Content Library
+              <ExternalLink size={13} /> Open Curriculum
             </Button>
           </DialogFooter>
         </DialogContent>

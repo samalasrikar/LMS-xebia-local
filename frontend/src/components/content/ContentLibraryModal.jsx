@@ -32,7 +32,7 @@ export default function ContentLibraryModal({
 }) {
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-      <DialogContent className="max-w-md text-left">
+      <DialogContent className="max-w-[450px] text-left">
         <DialogHeader>
           <DialogTitle className="text-base font-bold text-slate-800">
             {editingContent ? "Edit Content Block" : "Create New Content Block"}

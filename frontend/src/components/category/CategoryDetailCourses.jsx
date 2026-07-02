@@ -5,6 +5,8 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
 
+import EmptyState from "../shared/EmptyState";
+
 const LEVEL_CLS = {
   Beginner:     "bg-emerald-100 text-emerald-700 border-transparent",
   Intermediate: "bg-blue-100 text-blue-700 border-transparent",
@@ -96,8 +98,16 @@ export default function CategoryDetailCourses({
                 <tr><td colSpan={7} className="py-10 text-center text-[13px] text-slate-400">Loading…</td></tr>
               ) : paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-[13px] text-slate-400">
-                    No courses found in this category.
+                  <td colSpan={7} className="py-8 px-4 text-center">
+                    <EmptyState
+                      icon={BookOpen}
+                      title="No courses found"
+                      description="There are no courses in this category yet. Create a course to get started."
+                      primaryAction={{
+                        label: "Create Course",
+                        onClick: () => navigate("/courses/create"),
+                      }}
+                    />
                   </td>
                 </tr>
               ) : (
