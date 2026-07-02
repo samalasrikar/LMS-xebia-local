@@ -20,6 +20,8 @@ import {
   HelpCircle,
   TrendingUp,
   Brain,
+  Clock,
+  LineChart,
   X,
 } from "lucide-react";
 
@@ -55,6 +57,9 @@ const NAV_GROUPS = [
     items: [
       { title: "Learners", path: "/learners", icon: Users },
       { title: "Learning Coverage", path: "/learning/coverage", icon: TrendingUp },
+      { title: "Learning Hours", path: "/learning/hours", icon: Clock },
+      { title: "Learning Categories", path: "/learning/categories", icon: FolderOpen },
+      { title: "Learning Trends", path: "/learning/trends", icon: LineChart },
       { title: "AI Transformation", path: "/ai-transformation", icon: Brain },
       { title: "Certifications", path: "/certifications", icon: Award },
       { title: "Flagship Programs", path: "/flagship-programs", icon: BookOpen },
