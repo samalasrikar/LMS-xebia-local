@@ -38,8 +38,8 @@ export default function CategoryDialog({
     mode === "view"
       ? "Category Details"
       : mode === "edit"
-      ? "Edit Category"
-      : "Add New Category";
+        ? "Edit Category"
+        : "Add New Category";
 
   const isView = mode === "view";
 
@@ -53,7 +53,7 @@ export default function CategoryDialog({
   return (
     <Dialog open={show} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-[480px] rounded-xl shadow-xl bg-white border border-slate-200 p-6">
-        
+
         {/* Header */}
         <DialogHeader className="border-b border-slate-50 pb-4">
           <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
@@ -78,7 +78,7 @@ export default function CategoryDialog({
 
         {/* Form Body */}
         <form onSubmit={onSubmit} className="space-y-4 py-2">
-          
+
           {/* Name */}
           <div className="space-y-1.5">
             <Label htmlFor="catName" className="text-[12px] font-semibold text-slate-500">
@@ -114,7 +114,7 @@ export default function CategoryDialog({
 
           {/* Image & Status Side-by-Side */}
           <div className="grid grid-cols-2 gap-4">
-            
+
             {/* Image Upload */}
             <div className="space-y-1.5">
               <Label className="text-[12px] font-semibold text-slate-500">
@@ -226,7 +226,12 @@ export default function CategoryDialog({
                   disabled={submitting}
                   className="bg-[#6C1D5F] hover:bg-[#521347] text-white text-[12.5px] font-semibold px-6 shadow-sm shadow-[#6C1D5F]/10"
                 >
-                  {submitting ? "Saving..." : mode === "edit" ? "Save Changes" : "Create Category"}
+                  {submitting
+                    ? "Saving..."
+                    : mode === "edit"
+                      ? "Save Changes"
+                      : "Save Category"}
+
                 </Button>
               </>
             )}

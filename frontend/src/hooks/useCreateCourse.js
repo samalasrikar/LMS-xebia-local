@@ -83,6 +83,16 @@ export default function useCreateCourse() {
             setCategoryId(course.categoryId ? String(course.categoryId) : "");
             setThumbnail(course.thumbnail || "");
             setStatus(course.status || "Published");
+            setSlug(course.slug || (course.title ? generateSlug(course.title) : ""));
+            setLanguage(course.language || "English");
+            setTargetAudience(course.targetAudience || "");
+            setHasCertificate(!!course.hasCertificate);
+            setCurrency(course.currency || "USD ($)");
+            setPrice(course.price || "0.00");
+            setCourseCode(course.courseCode || "");
+            setTeaserVideoUrl(course.teaserVideoUrl || "");
+            setTakeaways(course.takeaways && course.takeaways.length > 0 ? course.takeaways : [""]);
+            setPrerequisites(course.prerequisites || "");
           }
         } catch (err) {
           console.error("Failed to load course:", err);
@@ -133,6 +143,16 @@ export default function useCreateCourse() {
           "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=60",
         categoryId: Number(categoryId),
         status: "Published",
+        slug: slug.trim(),
+        language: language,
+        targetAudience: targetAudience.trim(),
+        hasCertificate: hasCertificate,
+        currency: currency,
+        price: price,
+        courseCode: courseCode.trim(),
+        teaserVideoUrl: teaserVideoUrl.trim(),
+        takeaways: takeaways.filter(t => t.trim() !== ""),
+        prerequisites: prerequisites.trim(),
       };
 
       if (isEditMode) {
@@ -167,6 +187,16 @@ export default function useCreateCourse() {
           "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=60",
         categoryId: Number(categoryId),
         status: "Draft",
+        slug: slug.trim(),
+        language: language,
+        targetAudience: targetAudience.trim(),
+        hasCertificate: hasCertificate,
+        currency: currency,
+        price: price,
+        courseCode: courseCode.trim(),
+        teaserVideoUrl: teaserVideoUrl.trim(),
+        takeaways: takeaways.filter(t => t.trim() !== ""),
+        prerequisites: prerequisites.trim(),
       };
 
       if (isEditMode) {
