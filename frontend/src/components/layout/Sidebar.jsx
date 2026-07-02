@@ -18,9 +18,8 @@ import {
   GraduationCap,
   ChevronsUpDown,
   HelpCircle,
+  TrendingUp,
   Brain,
-  Award,
-  Trophy,
   X,
 } from "lucide-react";
 
@@ -31,9 +30,16 @@ const NAV_GROUPS = [
     label: "Overview",
     items: [
       { title: "Dashboard", path: "/", icon: LayoutDashboard },
-      { title: "Analytics", path: "/analytics", icon: BarChart3, badge: "New", badgeAccent: true },
+      {
+        title: "Analytics",
+        path: "/analytics",
+        icon: BarChart3,
+        badge: "New",
+        badgeAccent: true,
+      },
     ],
   },
+
   {
     label: "Content",
     items: [
@@ -43,46 +49,20 @@ const NAV_GROUPS = [
       { title: "Content Library", path: "/content-library", icon: FileText },
     ],
   },
-  {
-    title: "Courses",
-    path: "/courses",
-    icon: GraduationCap,
-  },
-  {
-    title: "AI Transformation",
-    path: "/ai-transformation",
-    icon: Brain,
-  },
-  {
-    title: "Certifications",
-    path: "/certifications",
-    icon: Award,
-  },
-  {
-    title: "Flagship Programs",
-    path: "/flagship-programs",
-    icon: BookOpen,
-  },
-  {
-    title: "Learning Champions",
-    path: "/learning-champions",
-    icon: Trophy,
-  },
-];
 
-const footer = [
   {
-    title: "Settings",
-    path: "/settings",
-    icon: Settings,
     label: "Learning",
     items: [
       { title: "Learners", path: "/learners", icon: Users },
+      { title: "Learning Coverage", path: "/learning/coverage", icon: TrendingUp },
+      { title: "AI Transformation", path: "/ai-transformation", icon: Brain },
       { title: "Certifications", path: "/certifications", icon: Award },
-      { title: "Assessments", path: "/assessments", icon: Trophy },
+      { title: "Flagship Programs", path: "/flagship-programs", icon: BookOpen },
+      { title: "Learning Champions", path: "/learning-champions", icon: Trophy },
       { title: "Schedule", path: "/schedule", icon: Calendar },
     ],
   },
+
   {
     label: "System",
     items: [
@@ -94,6 +74,9 @@ const footer = [
     ],
   },
 ];
+
+
+
 
 export default function Sidebar() {
   const location = useLocation();
@@ -186,10 +169,9 @@ export default function Sidebar() {
                     to={item.path}
                     onClick={() => setSearchQuery("")}
                     className={() =>
-                      `flex items-center gap-2.5 mx-1.5 px-3 py-1.5 my-px rounded-md text-[13px] font-medium transition-all ${
-                        active
-                          ? "bg-[#6C1D5F]/10 text-[#6C1D5F] font-semibold"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      `flex items-center gap-2.5 mx-1.5 px-3 py-1.5 my-px rounded-md text-[13px] font-medium transition-all ${active
+                        ? "bg-[#6C1D5F]/10 text-[#6C1D5F] font-semibold"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                       }`
                     }
                   >
@@ -202,11 +184,10 @@ export default function Sidebar() {
                     </span>
                     {item.badge && (
                       <span
-                        className={`text-[10px] font-semibold px-1.5 py-px rounded-full border ${
-                          item.badgeAccent
-                            ? "bg-[#6C1D5F] text-white border-[#6C1D5F]"
-                            : "bg-slate-100 text-slate-500 border-slate-200"
-                        }`}
+                        className={`text-[10px] font-semibold px-1.5 py-px rounded-full border ${item.badgeAccent
+                          ? "bg-[#6C1D5F] text-white border-[#6C1D5F]"
+                          : "bg-slate-100 text-slate-500 border-slate-200"
+                          }`}
                       >
                         {item.badge}
                       </span>
