@@ -20,8 +20,6 @@ import {
   HelpCircle,
   TrendingUp,
   Brain,
-  Award,
-  Trophy,
   X,
 } from "lucide-react";
 
