@@ -74,7 +74,6 @@ export default function StatCard({ title, value, icon: Icon, trend = "+0%" }) {
           {typeof value === "number" ? value.toLocaleString() : value ?? 0}
         </p>
       </div>
-
     </div>
   );
 }

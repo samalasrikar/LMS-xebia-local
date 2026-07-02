@@ -3,6 +3,9 @@ import { Layers, CheckCircle, BookOpen } from "lucide-react";
 export default function CategoryStats({ categories }) {
   const total = categories.length;
   const active = categories.filter((c) => c.status === "Active").length;
+  const avg = total > 0 
+    ? (categories.reduce((acc, c) => acc + (c.courses || 0), 0) / total).toFixed(1) 
+    : 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -41,7 +44,7 @@ export default function CategoryStats({ categories }) {
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
             Avg. Courses/Cat
           </p>
-          <p className="text-lg font-bold text-slate-800">8.4</p>
+          <p className="text-lg font-bold text-slate-800">{avg}</p>
         </div>
       </div>
     </div>

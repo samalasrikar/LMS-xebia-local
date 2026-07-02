@@ -15,6 +15,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.CollectionTable;
+import java.util.List;
+
 @Entity
 @Table(name = "courses")
 public class Course {
@@ -40,6 +44,38 @@ public class Course {
 
     @Column(length = 50)
     private String duration;
+
+    @Column(length = 200)
+    private String slug;
+
+    @Column(length = 50)
+    private String language = "English";
+
+    @Column(name = "target_audience", length = 500)
+    private String targetAudience;
+
+    @Column(name = "has_certificate", nullable = false)
+    private boolean hasCertificate = false;
+
+    @Column(length = 20)
+    private String currency;
+
+    @Column(length = 20)
+    private String price;
+
+    @Column(name = "course_code", length = 50)
+    private String courseCode;
+
+    @Column(name = "teaser_video_url", length = 500)
+    private String teaserVideoUrl;
+
+    @Column(length = 1000)
+    private String prerequisites;
+
+    @ElementCollection
+    @CollectionTable(name = "course_takeaways", joinColumns = @JoinColumn(name = "course_id"))
+    @Column(name = "takeaway")
+    private List<String> takeaways;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
@@ -127,5 +163,85 @@ public class Course {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getTargetAudience() {
+        return targetAudience;
+    }
+
+    public void setTargetAudience(String targetAudience) {
+        this.targetAudience = targetAudience;
+    }
+
+    public boolean isHasCertificate() {
+        return hasCertificate;
+    }
+
+    public void setHasCertificate(boolean hasCertificate) {
+        this.hasCertificate = hasCertificate;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getCourseCode() {
+        return courseCode;
+    }
+
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
+    public String getTeaserVideoUrl() {
+        return teaserVideoUrl;
+    }
+
+    public void setTeaserVideoUrl(String teaserVideoUrl) {
+        this.teaserVideoUrl = teaserVideoUrl;
+    }
+
+    public String getPrerequisites() {
+        return prerequisites;
+    }
+
+    public void setPrerequisites(String prerequisites) {
+        this.prerequisites = prerequisites;
+    }
+
+    public List<String> getTakeaways() {
+        return takeaways;
+    }
+
+    public void setTakeaways(List<String> takeaways) {
+        this.takeaways = takeaways;
     }
 }

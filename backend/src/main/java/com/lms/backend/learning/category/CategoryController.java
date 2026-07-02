@@ -20,6 +20,8 @@ import com.lms.backend.common.response.ApiResponse;
 import com.lms.backend.common.response.ResponseBuilder;
 import com.lms.backend.learning.category.dto.CategoryRequest;
 import com.lms.backend.learning.category.dto.CategoryResponse;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Category", description = "Category Management APIs")
@@ -46,7 +48,7 @@ public class CategoryController {
         description = "Fetches a category using its unique ID"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable @NonNull Long id) {
     return ResponseEntity.ok(
         ResponseBuilder.success(
             "Category fetched successfully",
@@ -59,12 +61,9 @@ public class CategoryController {
     @Operation(summary = "Create category")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
-            @RequestParam("name") String name,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "status", required = false, defaultValue = "Active") String status,
+            @ModelAttribute @Valid CategoryRequest request,
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
 
-        CategoryRequest request = buildRequest(name, description, status);
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ResponseBuilder.success(
                 "Category created successfully",
@@ -77,12 +76,9 @@ public class CategoryController {
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
             @PathVariable @NonNull Long id,
-            @RequestParam("name") String name,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "status", required = false) String status,
+            @ModelAttribute @Valid CategoryRequest request,
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
 
-        CategoryRequest request = buildRequest(name, description, status);
         return ResponseEntity.ok(
             ResponseBuilder.success(
                 "Category updated successfully",
@@ -99,15 +95,5 @@ public class CategoryController {
         return ResponseEntity.ok(
             ResponseBuilder.success("Category deleted successfully", null, HttpStatus.OK.value())
         );
-    }
-
-    // ─── helpers ───────────────────────────────────────────────────────────────
-
-    private CategoryRequest buildRequest(String name, String description, String status) {
-        CategoryRequest req = new CategoryRequest();
-        req.setName(name);
-        req.setDescription(description);
-        req.setStatus(status);
-        return req;
     }
 }

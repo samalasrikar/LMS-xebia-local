@@ -1,4 +1,12 @@
-import { AlertTriangle, X } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
 
 export default function DeleteDialog({
   show,
@@ -9,56 +17,53 @@ export default function DeleteDialog({
   onCancel,
   onConfirm,
 }) {
-  if (!show) return null;
-
   return (
-    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 animate-[fadeIn_0.2s_ease-out]">
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xl w-[400px] max-w-[95vw] mx-4 p-6 space-y-5">
+    <Dialog open={show} onOpenChange={(open) => !open && onCancel()}>
+      <DialogContent className="max-w-[420px] rounded-xl shadow-xl bg-white border border-slate-200 p-6">
+        
         {/* Header */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
-              <AlertTriangle size={20} className="text-red-500" />
+        <DialogHeader className="pb-2">
+          <DialogTitle className="text-base font-bold text-slate-800 flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shrink-0">
+              <AlertTriangle size={20} />
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">{title}</h3>
-              <p className="text-xs text-slate-500 mt-1 leading-relaxed">{message}</p>
+            <div className="flex flex-col text-left">
+              <span className="leading-tight">{title}</span>
+              <span className="text-[12px] text-slate-500 font-medium mt-1 normal-case leading-relaxed">
+                {message}
+              </span>
             </div>
-          </div>
-          <button
-            onClick={onCancel}
-            className="text-slate-400 hover:text-slate-600 cursor-pointer flex-shrink-0"
-          >
-            <X size={18} />
-          </button>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
         {/* Item name highlight */}
         {itemName && (
-          <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
-            <p className="text-xs text-slate-500">You are about to delete:</p>
-            <p className="text-sm font-bold text-slate-800 mt-0.5">{itemName}</p>
+          <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 animate-fadeIn">
+            <p className="text-[11px] font-bold text-red-700/70 uppercase tracking-wider">Item Selected:</p>
+            <p className="text-[13px] font-bold text-slate-800 mt-0.5">{itemName}</p>
           </div>
         )}
 
         {/* Footer Buttons */}
-        <div className="flex items-center justify-end gap-2.5 pt-1">
-          <button
+        <DialogFooter className="pt-4 border-t border-slate-50 flex items-center justify-end gap-2.5">
+          <Button
+            variant="outline"
             onClick={onCancel}
             disabled={deleting}
-            className="px-5 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
+            className="text-[12.5px] font-semibold"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
             disabled={deleting}
-            className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg shadow-sm cursor-pointer disabled:opacity-50 transition-colors"
+            className="bg-red-500 hover:bg-red-600 text-white text-[12.5px] font-semibold px-6 shadow-sm shadow-red-500/10"
           >
             {deleting ? "Deleting..." : "Delete"}
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+
+      </DialogContent>
+    </Dialog>
   );
 }
