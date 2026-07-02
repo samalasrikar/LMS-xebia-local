@@ -13,6 +13,8 @@ import {
   DropdownMenuItem,
 } from "../ui/dropdown-menu";
 
+import EmptyState from "../shared/EmptyState";
+
 export default function CoursesGridView({
   loading,
   filtered,
@@ -55,15 +57,15 @@ export default function CoursesGridView({
           Loading courses…
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl py-16 text-center">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
-              <BookOpen size={20} className="text-slate-400" />
-            </div>
-            <div className="text-[14px] font-semibold text-slate-700">No courses found</div>
-            <div className="text-[12px] text-slate-400">Try adjusting your filters or create a new course</div>
-          </div>
-        </div>
+        <EmptyState
+          icon={BookOpen}
+          title="No courses found"
+          description="Try adjusting your filters or create a new course to get started."
+          primaryAction={{
+            label: "Create New Course",
+            onClick: () => navigate("/courses/create"),
+          }}
+        />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {filtered.map((course) => {

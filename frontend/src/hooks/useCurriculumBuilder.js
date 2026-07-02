@@ -15,8 +15,8 @@ export default function useCurriculumBuilder() {
   const { fromModuleManagement, preselectedModuleId, preselectedSubModuleId } = navState;
 
   /* ── Course & Curriculum ── */
-  const [loadingCourse, setLoadingCourse] = useState(true);
-  const [loadingCurriculum, setLoadingCurriculum] = useState(true);
+  const [loadingCourse, setLoadingCourse] = useState(!!id);
+  const [loadingCurriculum, setLoadingCurriculum] = useState(!!id);
 
   /* ── Multi-Course State ── */
   const [loadedCourses, setLoadedCourses] = useState([]);
@@ -101,9 +101,9 @@ export default function useCurriculumBuilder() {
     }
   };
 
-  const openCourseDialog = () => {
+  const openCourseDialog = (tab = "select") => {
     setCourseSearch("");
-    setCourseDialogTab("select");
+    setCourseDialogTab(tab);
     setNewCourseTitle("");
     setNewCourseDescription("");
     setNewCourseCategory("");
@@ -289,6 +289,9 @@ export default function useCurriculumBuilder() {
         }
       };
       initLoad();
+    } else {
+      setLoadingCourse(false);
+      setLoadingCurriculum(false);
     }
   }, [id, preselectedModuleId, preselectedSubModuleId, showToast]);
 
@@ -488,6 +491,132 @@ export default function useCurriculumBuilder() {
     }
   };
 
+  const handleDuplicateCourse = async (c) => {
+    try {
+      showToast("Duplicating course...");
+      const duplicatedCourse = await courseService.createCourse({
+        title: `${c.title} (Copy)`,
+        description: c.description || "",
+        category: c.category || "",
+        status: "Draft",
+      });
+
+      const [allModules, allSubModules, allContents] = await Promise.all([
+        moduleService.getAllModules(),
+        subModuleService.getAllSubModules(),
+        contentService.getAllContents(),
+      ]);
+
+      const courseModules = allModules.filter(m => m.courseId === c.id);
+
+      for (const mod of courseModules) {
+        const duplicatedMod = await moduleService.createModule({
+          courseId: duplicatedCourse.id,
+          title: mod.title,
+          description: mod.description || "",
+        });
+
+        const modSubModules = allSubModules.filter(sm => sm.moduleId === mod.id);
+        for (const sub of modSubModules) {
+          const duplicatedSub = await subModuleService.createSubModule({
+            moduleId: duplicatedMod.id,
+            title: sub.title,
+            description: sub.description || "",
+          });
+
+          const subContent = allContents.find(cont => cont.subModuleId === sub.id);
+          if (subContent) {
+            await contentService.createContent({
+              subModuleId: duplicatedSub.id,
+              type: subContent.type,
+              body: subContent.body || "",
+              videoUrl: subContent.videoUrl || "",
+              pdfUrl: subContent.pdfUrl || "",
+            });
+          }
+        }
+      }
+
+      showToast("Course duplicated successfully!");
+      await loadAllCourses();
+      await handleSelectCourse(duplicatedCourse);
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to duplicate course.", "error");
+    }
+  };
+
+  const handleDuplicateModule = async (mod) => {
+    try {
+      showToast("Duplicating module...");
+      const duplicatedMod = await moduleService.createModule({
+        courseId: mod.courseId,
+        title: `${mod.title} (Copy)`,
+        description: mod.description || "",
+      });
+
+      const [allSubModules, allContents] = await Promise.all([
+        subModuleService.getAllSubModules(),
+        contentService.getAllContents(),
+      ]);
+
+      const modSubModules = allSubModules.filter(sm => sm.moduleId === mod.id);
+      for (const sub of modSubModules) {
+        const duplicatedSub = await subModuleService.createSubModule({
+          moduleId: duplicatedMod.id,
+          title: sub.title,
+          description: sub.description || "",
+        });
+
+        const subContent = allContents.find(cont => cont.subModuleId === sub.id);
+        if (subContent) {
+          await contentService.createContent({
+            subModuleId: duplicatedSub.id,
+            type: subContent.type,
+            body: subContent.body || "",
+            videoUrl: subContent.videoUrl || "",
+            pdfUrl: subContent.pdfUrl || "",
+          });
+        }
+      }
+
+      showToast("Module duplicated successfully!");
+      await reloadAllLoadedCourses();
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to duplicate module.", "error");
+    }
+  };
+
+  const handleDuplicateSubModule = async (sub) => {
+    try {
+      showToast("Duplicating block...");
+      const duplicatedSub = await subModuleService.createSubModule({
+        moduleId: sub.moduleId,
+        title: `${sub.title} (Copy)`,
+        description: sub.description || "",
+      });
+
+      const allContents = await contentService.getAllContents();
+      const subContent = allContents.find(cont => cont.subModuleId === sub.id);
+      if (subContent) {
+        await contentService.createContent({
+          subModuleId: duplicatedSub.id,
+          type: subContent.type,
+          body: subContent.body || "",
+          videoUrl: subContent.videoUrl || "",
+          pdfUrl: subContent.pdfUrl || "",
+        });
+      }
+
+      showToast("Block duplicated successfully!");
+      await reloadAllLoadedCourses();
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to duplicate block.", "error");
+    }
+  };
+
   /* ── Video helpers ── */
   const handleVideoFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -622,6 +751,9 @@ export default function useCurriculumBuilder() {
     handleVideoFileChange,
     handlePdfFileChange,
     handleVideoUrlChange,
+    handleDuplicateCourse,
+    handleDuplicateModule,
+    handleDuplicateSubModule,
     // Multi course props
     loadedCourses,
     setLoadedCourses,

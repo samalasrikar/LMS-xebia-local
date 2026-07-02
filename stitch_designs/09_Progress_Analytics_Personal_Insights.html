@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumina Learning - Analytics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface-variant": "#50434c",
+                      "primary": "#470044",
+                      "outline": "#82737d",
+                      "surface-bright": "#f8f9ff",
+                      "on-secondary-fixed": "#002113",
+                      "on-tertiary-fixed-variant": "#4a4455",
+                      "surface-tint": "#8f4186",
+                      "tertiary-container": "#3c3748",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container": "#e5eeff",
+                      "surface": "#f8f9ff",
+                      "outline-variant": "#d4c1cd",
+                      "secondary-container": "#6cf8bb",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "on-secondary": "#ffffff",
+                      "on-surface": "#0b1c30",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-primary": "#ffffff",
+                      "on-background": "#0b1c30",
+                      "surface-container-highest": "#d3e4fe",
+                      "primary-fixed": "#ffd7f4",
+                      "tertiary-fixed": "#e8dff5",
+                      "surface-variant": "#d3e4fe",
+                      "streak-orange": "#F57C00",
+                      "on-secondary-fixed-variant": "#005236",
+                      "on-error": "#ffffff",
+                      "inverse-surface": "#213145",
+                      "surface-dim": "#cbdbf5",
+                      "secondary": "#006c49",
+                      "primary-fixed-dim": "#ffabf0",
+                      "error": "#ba1a1a",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed-variant": "#73286c",
+                      "secondary-fixed-dim": "#4edea3",
+                      "on-tertiary-fixed": "#1e1929",
+                      "primary-container": "#63195e",
+                      "streak-bg": "#FFF3E0",
+                      "background": "#f8f9ff",
+                      "surface-container-low": "#eff4ff",
+                      "on-primary-container": "#dd85d0",
+                      "inverse-primary": "#ffabf0",
+                      "tertiary": "#272232",
+                      "on-tertiary-container": "#a8a0b5",
+                      "on-secondary-container": "#00714d",
+                      "secondary-fixed": "#6ffbbe",
+                      "tertiary-fixed-dim": "#ccc3d8",
+                      "surface-container-high": "#dce9ff",
+                      "on-primary-fixed": "#390036"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-padding-mobile": "16px",
+                      "stack-sm": "12px",
+                      "container-padding-desktop": "32px",
+                      "stack-md": "24px",
+                      "gutter": "24px",
+                      "stack-lg": "48px",
+                      "base": "8px"
+              },
+              "fontFamily": {
+                      "label-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "display-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "title-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "label-sm": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg-mobile": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-lg": [
+                              "Hanken Grotesk"
+                      ]
+              },
+              "fontSize": {
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+        body {
+            background-color: theme('colors.surface');
+            color: theme('colors.on-surface');
+            font-family: 'Hanken Grotesk', sans-serif;
+        }
+        
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+        
+        .glass-card {
+            background: theme('colors.surface-container-lowest');
+            border: 1px solid theme('colors.outline-variant' / 30%);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden min-h-screen">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col gap-base py-stack-md fixed left-0 top-0 h-full w-[320px] backdrop-blur-xl bg-surface-container-lowest/90 border-r border-outline-variant/30 shadow-[4px_0_24px_-12px_rgba(0,0,0,0.1)] z-40">
+<div class="px-container-desktop mb-stack-md flex items-center gap-stack-sm">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary font-bold text-xl">L</div>
+<div>
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary">Lumina Learning</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Student Portal</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-container-desktop flex flex-col gap-base">
+<a class="flex items-center gap-stack-sm p-stack-sm rounded-lg text-on-surface-variant hover:bg-surface-variant/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-stack-sm p-stack-sm rounded-lg text-on-surface-variant hover:bg-surface-variant/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">school</span>
+<span class="font-label-md text-label-md">Courses</span>
+</a>
+<a class="flex items-center gap-stack-sm p-stack-sm rounded-lg text-on-surface-variant hover:bg-surface-variant/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">calendar_today</span>
+<span class="font-label-md text-label-md">Calendar</span>
+</a>
+<a class="flex items-center gap-stack-sm p-stack-sm rounded-lg text-on-surface-variant hover:bg-surface-variant/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">assignment</span>
+<span class="font-label-md text-label-md">Assignments</span>
+</a>
+<a class="flex items-center gap-stack-sm p-stack-sm rounded-lg text-on-surface-variant hover:bg-surface-variant/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">grade</span>
+<span class="font-label-md text-label-md">Grades</span>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-stack-sm p-stack-sm rounded-lg text-primary font-bold border-l-4 border-primary bg-primary/10 transition-transform scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center gap-stack-sm p-stack-sm rounded-lg text-on-surface-variant hover:bg-surface-variant/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+<a class="flex items-center gap-stack-sm p-stack-sm rounded-lg text-on-surface-variant hover:bg-surface-variant/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="md:ml-[320px] min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-container-desktop h-20 max-w-[1000px] mx-auto sticky top-0 z-50 w-full backdrop-blur-md bg-surface/90">
+<div class="flex-1 flex items-center gap-stack-sm">
+<div class="relative w-full max-w-md focus-within:ring-2 focus-within:ring-primary rounded-full">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/50 rounded-full py-2 pl-12 pr-4 text-body-md font-body-md focus:outline-none focus:border-primary/50 text-on-surface" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-variant/50">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-variant/50">
+<span class="material-symbols-outlined">chat_bubble</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-variant/50">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-high ml-stack-sm">
+<img alt="Student Profile Picture" class="w-full h-full object-cover" data-alt="A detailed portrait of a diverse university student in a modern academic setting, soft natural lighting, high resolution, professional corporate tech style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlaneDDHNtgJzzzjHzkXpyZt7VDKrRJConhgC_KiAc2Ruo7dfwvqrPmyf2vVayJTrJLOskn1vmjIZEfdmS8D1zuhQWPEtzao3zqz8ldkR8xOVQeTinIyu_TC45SRuZIHp0MLiOd2rbkbyaVUtGGAvx4ZXq2uyfTg0UfjUYN-yoxZGjdtx0AMzPvpD2Aq2sHAEvXEfbkQ2snukCKM_SJsB_Vgxv7T9MbTPyaGmvZMdSzEHqWIVxMw9KKPG9TQcMnvZ1bU4G1m_JUio"/>
+</div>
+</div>
+</header>
+<!-- Analytics Content -->
+<main class="flex-1 w-full max-w-[1000px] mx-auto px-container-desktop py-stack-lg flex flex-col gap-stack-lg">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-stack-md">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface">Analytics Overview</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2">Track your academic progress and skill development.</p>
+</div>
+<button class="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-sm">download</span>
+                    Export Report
+                </button>
+</div>
+<!-- Top Stats Row -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="glass-card rounded-xl p-stack-md flex flex-col gap-2 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-colors"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Current GPA</span>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-primary">3.8</span>
+<span class="font-body-md text-body-md text-on-surface-variant">/ 4.0</span>
+</div>
+<div class="flex items-center gap-1 text-secondary mt-2">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span class="font-label-sm text-label-sm">+0.2 from last term</span>
+</div>
+</div>
+<div class="glass-card rounded-xl p-stack-md flex flex-col gap-2 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-secondary/5 rounded-full blur-xl group-hover:bg-secondary/10 transition-colors"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Credits Earned</span>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface">84</span>
+<span class="font-body-md text-body-md text-on-surface-variant">/ 120</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full mt-4 overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 70%;"></div>
+</div>
+</div>
+<div class="glass-card rounded-xl p-stack-md flex flex-col gap-2 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-streak-orange/5 rounded-full blur-xl group-hover:bg-streak-orange/10 transition-colors"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Study Streak</span>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-streak-orange">14</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Days</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant mt-2">
+<span class="material-symbols-outlined text-sm text-streak-orange" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-label-sm text-label-sm">Keep it up!</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid for Charts -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter auto-rows-[minmax(300px,_auto)]">
+<!-- Performance Trend (Line Chart) - Span 2 col -->
+<div class="glass-card rounded-xl p-stack-md flex flex-col lg:col-span-2">
+<div class="flex justify-between items-center mb-stack-sm">
+<h3 class="font-title-md text-title-md text-on-surface">Performance Trend</h3>
+<select class="bg-surface-container-low border border-outline-variant/30 rounded-md px-3 py-1 font-label-sm text-label-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary">
+<option>Last 6 Months</option>
+<option>This Year</option>
+<option>All Time</option>
+</select>
+</div>
+<div class="flex-1 relative w-full h-full min-h-[250px]">
+<canvas id="trendChart"></canvas>
+</div>
+</div>
+<!-- Attendance (Donut Chart) -->
+<div class="glass-card rounded-xl p-stack-md flex flex-col">
+<h3 class="font-title-md text-title-md text-on-surface mb-stack-sm">Attendance Overview</h3>
+<div class="flex-1 relative w-full h-full min-h-[250px] flex items-center justify-center">
+<canvas id="attendanceChart"></canvas>
+<!-- Center text overlay for donut -->
+<div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+<span class="font-display-lg text-display-lg text-on-surface">92%</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Present</span>
+</div>
+</div>
+</div>
+<!-- Marks per Subject (Bar Chart) - Span 2 col -->
+<div class="glass-card rounded-xl p-stack-md flex flex-col lg:col-span-2">
+<h3 class="font-title-md text-title-md text-on-surface mb-stack-sm">Marks per Subject</h3>
+<div class="flex-1 relative w-full h-full min-h-[250px]">
+<canvas id="marksChart"></canvas>
+</div>
+</div>
+<!-- Skill Strength (Radar Chart) -->
+<div class="glass-card rounded-xl p-stack-md flex flex-col">
+<h3 class="font-title-md text-title-md text-on-surface mb-stack-sm">Skill Strength</h3>
+<div class="flex-1 relative w-full h-full min-h-[250px]">
+<canvas id="skillsChart"></canvas>
+</div>
+</div>
+</div>
+<!-- AI Insights Card -->
+<div class="rounded-xl p-[1px] bg-gradient-to-r from-primary/30 via-secondary/30 to-primary/30 mt-stack-md">
+<div class="bg-surface-container-lowest rounded-xl p-stack-md flex flex-col sm:flex-row items-start sm:items-center gap-stack-md h-full w-full">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="flex-1">
+<h4 class="font-title-md text-title-md text-on-surface mb-1">AI Performance Insight</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Your consistent performance in Computer Science and Math suggests a strong aptitude for analytical problem-solving. Consider focusing your elective credits on advanced Data Structures to leverage these strengths.</p>
+</div>
+<button class="shrink-0 bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-colors">
+                        View Recommendations
+                    </button>
+</div>
+</div>
+</main>
+</div>
+<!-- Chart.js Initialization -->
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Common Theme Colors from Tailwind Config
+            const themePrimary = '#470044';
+            const themePrimaryContainer = '#63195e';
+            const themeSecondary = '#006c49';
+            const themeSurfaceVariant = '#d3e4fe';
+            const themeOnSurface = '#0b1c30';
+            const themeOnSurfaceVariant = '#50434c';
+            const themeOutline = '#82737d';
+            
+            // Chart Default Settings
+            Chart.defaults.color = themeOnSurfaceVariant;
+            Chart.defaults.font.family = "'Hanken Grotesk', sans-serif";
+            
+            // 1. Performance Trend (Line Chart)
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+            
+            // Create Gradient for Line Chart
+            const gradientTrend = ctxTrend.createLinearGradient(0, 0, 0, 300);
+            gradientTrend.addColorStop(0, 'rgba(71, 0, 68, 0.2)'); // Primary with opacity
+            gradientTrend.addColorStop(1, 'rgba(71, 0, 68, 0)');
+
+            new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Overall Performance',
+                        data: [75, 78, 80, 85, 84, 89],
+                        borderColor: themePrimary,
+                        backgroundColor: gradientTrend,
+                        borderWidth: 3,
+                        pointBackgroundColor: themeSurfaceVariant,
+                        pointBorderColor: themePrimary,
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4 // Smooth curve
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(11, 28, 48, 0.9)',
+                            titleFont: { family: "'Hanken Grotesk', sans-serif", size: 14 },
+                            bodyFont: { family: "'Hanken Grotesk', sans-serif", size: 14 },
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 60,
+                            max: 100,
+                            grid: { color: 'rgba(212, 193, 205, 0.2)' },
+                            border: { display: false }
+                        },
+                        x: {
+                            grid: { display: false },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // 2. Attendance (Donut Chart)
+            const ctxAttendance = document.getElementById('attendanceChart').getContext('2d');
+            new Chart(ctxAttendance, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Present', 'Late', 'Absent'],
+                    datasets: [{
+                        data: [92, 5, 3],
+                        backgroundColor: [
+                            themePrimary,
+                            '#F57C00', // Warning orange
+                            '#ba1a1a'  // Error red
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%', // Make it a thin donut
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: { family: "'Hanken Grotesk', sans-serif", size: 12 }
+                            }
+                        },
+                        tooltip: {
+                             backgroundColor: 'rgba(11, 28, 48, 0.9)',
+                             padding: 12,
+                             cornerRadius: 8
+                        }
+                    }
+                }
+            });
+
+            // 3. Marks per Subject (Bar Chart)
+            const ctxMarks = document.getElementById('marksChart').getContext('2d');
+            new Chart(ctxMarks, {
+                type: 'bar',
+                data: {
+                    labels: ['CS', 'UX', 'DS', 'Math'],
+                    datasets: [{
+                        label: 'Marks',
+                        data: [92, 88, 85, 95],
+                        backgroundColor: [
+                            themePrimary,
+                            themePrimaryContainer,
+                            '#8f4186', // surface-tint
+                            themePrimary
+                        ],
+                        borderRadius: 6, // Rounded bars
+                        barThickness: 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                             backgroundColor: 'rgba(11, 28, 48, 0.9)',
+                             padding: 12,
+                             cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: 'rgba(212, 193, 205, 0.2)' },
+                            border: { display: false }
+                        },
+                        x: {
+                            grid: { display: false },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // 4. Skill Strength (Radar Chart)
+            const ctxSkills = document.getElementById('skillsChart').getContext('2d');
+            new Chart(ctxSkills, {
+                type: 'radar',
+                data: {
+                    labels: ['Technical', 'Creative', 'Analytical', 'Communication', 'Research'],
+                    datasets: [{
+                        label: 'Skill Level',
+                        data: [90, 75, 85, 80, 70],
+                        backgroundColor: 'rgba(71, 0, 68, 0.2)', // Primary with opacity
+                        borderColor: themePrimary,
+                        pointBackgroundColor: themePrimary,
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: themePrimary,
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                             backgroundColor: 'rgba(11, 28, 48, 0.9)',
+                             padding: 12,
+                             cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(212, 193, 205, 0.3)' },
+                            grid: { color: 'rgba(212, 193, 205, 0.3)' },
+                            pointLabels: {
+                                font: { family: "'Hanken Grotesk', sans-serif", size: 11 },
+                                color: themeOnSurfaceVariant
+                            },
+                            ticks: { display: false, min: 0, max: 100 }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body></html>

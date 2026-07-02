@@ -166,6 +166,11 @@ export default function CurriculumBuilder() {
     openEditBlockDialog,
     handleSelectBlockType,
     handleSaveBlock,
+    handleVideoFileChange,
+    handleDuplicateCourse,
+    handleDuplicateModule,
+    handleDuplicateSubModule,
+    loadCurriculumData,
     // Multi course props
     loadedCourses,
     activeCourseId,
@@ -261,19 +266,20 @@ export default function CurriculumBuilder() {
           <div className="w-px h-4 bg-slate-200" />
 
           <button
-            onClick={() => navigate(`/courses/${id}/edit`)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-slate-600 hover:text-[#6C1D5F] hover:bg-slate-50 rounded-lg text-[12px] font-semibold transition-colors cursor-pointer bg-transparent border-none outline-none"
+            onClick={() => course && navigate(`/courses/${course.id}/edit`)}
+            disabled={!course}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-slate-600 hover:text-[#6C1D5F] hover:bg-slate-50 rounded-lg text-[12px] font-semibold transition-colors cursor-pointer bg-transparent border-none outline-none disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Eye size={13} /> Preview
           </button>
 
-          <button className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg text-[12px] font-semibold transition-colors cursor-pointer bg-transparent outline-none">
+          <button disabled={!course} className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg text-[12px] font-semibold transition-colors cursor-pointer bg-transparent outline-none disabled:opacity-40 disabled:cursor-not-allowed">
             <Save size={13} /> Save Draft
           </button>
 
           <button
             onClick={handlePublishCourse}
-            disabled={course?.status === "Published"}
+            disabled={!course || course?.status === "Published"}
             className="px-4 py-1.5 bg-[#6C1D5F] text-white hover:bg-[#521347] disabled:bg-slate-200 disabled:text-slate-400 rounded-lg text-[12px] font-bold shadow-sm shadow-[#6C1D5F]/20 transition-all cursor-pointer disabled:cursor-not-allowed border-none outline-none"
           >
             {course?.status === "Published" ? "Published ✓" : "Publish"}
@@ -326,6 +332,10 @@ export default function CurriculumBuilder() {
           setActiveCourseId={setActiveCourseId}
           expandedCourses={expandedCourses}
           setExpandedCourses={setExpandedCourses}
+          handleDuplicateCourse={handleDuplicateCourse}
+          handleDuplicateModule={handleDuplicateModule}
+          handleDuplicateSubModule={handleDuplicateSubModule}
+          loadCurriculumData={loadCurriculumData}
         />
 
         <CurriculumEditor
@@ -341,17 +351,20 @@ export default function CurriculumBuilder() {
           handlePublishCourse={handlePublishCourse}
           course={course}
           openAddModuleModal={openAddModuleModal}
+          openCourseDialog={openCourseDialog}
         />
 
-        <CurriculumRightPanel
-          activeSubModule={activeSubModule}
-          activeRightTab={activeRightTab}
-          setActiveRightTab={setActiveRightTab}
-          openEditSubModuleDrawer={openEditSubModuleDrawer}
-          openEditBlockDialog={openEditBlockDialog}
-          requestDelete={requestDelete}
-          openAddModuleModal={openAddModuleModal}
-        />
+        {course && (
+          <CurriculumRightPanel
+            activeSubModule={activeSubModule}
+            activeRightTab={activeRightTab}
+            setActiveRightTab={setActiveRightTab}
+            openEditSubModuleDrawer={openEditSubModuleDrawer}
+            openEditBlockDialog={openEditBlockDialog}
+            requestDelete={requestDelete}
+            openAddModuleModal={openAddModuleModal}
+          />
+        )}
       </div>
 
       <CurriculumDialogs

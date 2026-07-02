@@ -19,6 +19,7 @@ import {
   ChevronsUpDown,
   HelpCircle,
   X,
+  LayoutTemplate,
 } from "lucide-react";
 
 import adminProfileIcon from "../../assets/admin_profile_icon.svg";
@@ -37,6 +38,7 @@ const NAV_GROUPS = [
       { title: "Categories", path: "/categories", icon: FolderOpen },
       { title: "Courses", path: "/courses", icon: BookOpen },
       { title: "Module Management", path: "/module-management", icon: Layers },
+      { title: "Curriculum Builder", path: "/curriculum", icon: LayoutTemplate },
       { title: "Content Library", path: "/content-library", icon: FileText },
     ],
   },
@@ -184,6 +186,17 @@ export default function Sidebar() {
           ))
         )}
       </nav>
+
+      {/* ── Student Panel Switch ── */}
+      <div className="flex-shrink-0 border-t border-slate-200 p-3 bg-slate-50/50">
+        <NavLink
+          to="/student"
+          className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[#6C1D5F] hover:bg-[#521347] text-white text-[12px] font-semibold transition-all shadow-sm shadow-[#6C1D5F]/15 hover:shadow-md cursor-pointer text-center w-full"
+        >
+          <GraduationCap size={13} className="shrink-0" />
+          <span>Student Panel</span>
+        </NavLink>
+      </div>
 
       {/* ── User Footer ──────────────────────────── */}
       <div className="flex-shrink-0 border-t border-slate-200 p-3">

@@ -2,6 +2,17 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 function Dialog({ open, onOpenChange, children }) {
+  React.useEffect(() => {
+    if (open) {
+      document.body.classList.add("overflow-hidden")
+    } else {
+      document.body.classList.remove("overflow-hidden")
+    }
+    return () => {
+      document.body.classList.remove("overflow-hidden")
+    }
+  }, [open])
+
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fadeIn">

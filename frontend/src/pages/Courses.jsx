@@ -70,7 +70,7 @@ export default function Courses() {
 
         <CoursesStatsBar courses={courses} counts={counts} />
 
-        <CoursesTabs activeTab={activeTab} setActiveTab={setActiveTab} counts={counts} />
+        <CoursesTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
         <CoursesFilterBar
           searchQuery={searchQuery}

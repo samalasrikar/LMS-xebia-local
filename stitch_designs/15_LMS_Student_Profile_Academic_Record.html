@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Profile - EduLearn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#cbdbf5",
+                    "tertiary-fixed": "#e8dff5",
+                    "on-error-container": "#93000a",
+                    "on-primary": "#ffffff",
+                    "background": "#f8f9ff",
+                    "primary-fixed-dim": "#ffabf0",
+                    "surface-container": "#e5eeff",
+                    "secondary-fixed-dim": "#4edea3",
+                    "outline-variant": "#d4c1cd",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-container": "#a8a0b5",
+                    "on-tertiary-fixed": "#1e1929",
+                    "secondary-fixed": "#6ffbbe",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#005236",
+                    "on-surface-variant": "#50434c",
+                    "surface-container-highest": "#d3e4fe",
+                    "surface-variant": "#d3e4fe",
+                    "on-primary-fixed-variant": "#73286c",
+                    "surface": "#f8f9ff",
+                    "surface-bright": "#f8f9ff",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-primary": "#ffabf0",
+                    "inverse-surface": "#213145",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-secondary-container": "#00714d",
+                    "secondary": "#006c49",
+                    "primary-fixed": "#ffd7f4",
+                    "streak-orange": "#F57C00",
+                    "primary": "#470044",
+                    "outline": "#82737d",
+                    "on-error": "#ffffff",
+                    "on-surface": "#0b1c30",
+                    "streak-bg": "#FFF3E0",
+                    "on-tertiary-fixed-variant": "#4a4455",
+                    "surface-tint": "#8f4186",
+                    "tertiary-container": "#3c3748",
+                    "surface-container-high": "#dce9ff",
+                    "on-secondary": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#390036",
+                    "tertiary-fixed-dim": "#ccc3d8",
+                    "tertiary": "#272232",
+                    "secondary-container": "#6cf8bb",
+                    "on-primary-container": "#dd85d0",
+                    "on-secondary-fixed": "#002113",
+                    "on-background": "#0b1c30",
+                    "primary-container": "#63195e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "body-md": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "label-sm": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "label-md": ["Hanken Grotesk"],
+                    "title-md": ["Hanken Grotesk"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Hanken Grotesk', sans-serif; background-color: #f8f9ff; color: #0b1c30; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-effect { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
+        .sidebar-item-active { background-color: #f1e9f1; color: #470044; }
+        .tab-active { border-bottom: 2px solid #470044; color: #470044; }
+    </style>
+</head>
+<body class="min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-[#fbf9fb] group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation (Shared Component Integration) -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f1e9f1] px-4 md:px-10 py-3 bg-white sticky top-0 z-50">
+<div class="flex items-center gap-4 text-[#191019]">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-[#191019] text-xl font-bold leading-tight tracking-[-0.015em]">EduLearn</h2>
+</div>
+<div class="flex gap-4">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-[#f1e9f1] text-[#191019]">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-[#f1e9f1] text-[#191019]">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="hidden md:flex items-center gap-2 ml-2">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8" data-alt="Close-up portrait of a cheerful young woman with curly hair, wearing glasses and a purple sweater, standing in a bright minimalist office environment. Professional but friendly lighting." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB6oE_6MmW3JmXgL8ZDFfDrgYUM33tid5SOmj3L-uY5RAkCF8rgzU-_aATi14zfYyKp-h_FmQc00EQN8ih3n12Sm3zuQOD6RrcA6VXp5Vmexw5pUt1QYK2k9hdFnVHB3h9Hg-E13Jxdj2qBu9ouCagNZPhvwzFagunVT9UMaluN_ugmXIWUy3j7ieLrzYLk-MUADf1cWok_nfeKOzmKFhnrzirtULXedqnajRe82U49wvEjwFD2FaAdLZONs0sAkqso2QJwEhcio_M");'></div>
+<span class="text-sm font-bold">Alex Johnson</span>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="hidden lg:flex flex-col w-72 bg-white border-r border-[#f1e9f1] p-6 gap-6">
+<div class="flex items-center gap-3 px-3 py-4 border-b border-surface-container">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12 shadow-sm" data-alt="A professional profile headshot of a student named Alex Johnson. The image is bright with high-key lighting, featuring a clean white background that emphasizes the modern EduLearn platform's light mode aesthetic." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAs6ch8ykFHH_wcQ-kbjG10OOFCu-T1TZjDzwxgH_5DRC59DBGxwlztght1HEgJct6ITSfdg9NAfLXkOsj2mUjrFd8zqFMkYlUE8tIGdAFTwQSu3Gp0z2OqrREqQlg7KI124j3HogE5S1tBcDVClmgk7UfpLJZyjkQ6uVRMLTgFeaP7IyXQG0HXufErmt-T0MUeTXjyugvJc_3lvR5u4czRWNSfm9ODd6HfROVw7P-Qh4sezpSIpzTyi1EHsKp7wAj4WY9lFYF_BHI");'></div>
+<div class="flex flex-col">
+<h1 class="text-primary text-base font-bold">Alex Johnson</h1>
+<p class="text-secondary text-xs font-medium uppercase tracking-wider">B.Tech Computer Science</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined text-primary" data-icon="dashboard">dashboard</span>
+<p class="text-on-surface text-sm font-semibold">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined text-primary" data-icon="auto_stories">auto_stories</span>
+<p class="text-on-surface text-sm font-semibold">My Courses</p>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined text-primary" data-icon="explore">explore</span>
+<p class="text-on-surface text-sm font-semibold">Learning Path</p>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl sidebar-item-active shadow-sm" href="#">
+<span class="material-symbols-outlined" data-icon="person" style='font-variation-settings: "FILL" 1;'>person</span>
+<p class="text-sm font-bold">Profile</p>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-container transition-all mt-auto text-error" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<p class="text-sm font-semibold">Sign Out</p>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12">
+<div class="max-w-5xl mx-auto space-y-10">
+<!-- Header Section: Large Avatar & Bio -->
+<section class="flex flex-col md:flex-row items-center md:items-start gap-8">
+<div class="relative group">
+<div class="size-40 md:size-48 rounded-full border-4 border-white shadow-xl overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="High-resolution, bright portrait of Alex Johnson, a student in her 20s, with a warm and engaged expression. She is in a contemporary study space with soft, natural morning light, capturing a sense of focus and optimism. The style is clean, modern, and perfectly suited for a high-end educational dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrTfboTuwmPakNK38ow5O_BbgISVhGSzJxEH_R8fPiHF4u5reJsCKaQmzYoEWpV_jdbS4AWMO2VZHJR8pGDeAi5-aepeHjwuINLMMVmLXjrsSQEiWHV-1PLwEymXDVvkaNZQxup33uc8K_LbWFmvE32xEIh8zMt-0nmT7w0HD40wARH5frhoKCoPt1GrSR-jmFSaTzMZBB84eieDsEgAVIq0V0fHqGd8DJj8ppBpXS-JxvpIAfqpBpKdaJYaqszBjgadMt4e8GNvo"/>
+</div>
+<button class="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+</button>
+</div>
+<div class="flex-1 text-center md:text-left pt-4">
+<div class="flex flex-col md:flex-row md:items-center gap-2 mb-4">
+<h1 class="text-4xl font-bold text-on-surface">Alex Johnson</h1>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-xs font-bold w-fit mx-auto md:mx-0">ACTIVE</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface rounded-full text-xs font-bold w-fit mx-auto md:mx-0">FULL-TIME</span>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm font-medium text-on-surface-variant max-w-2xl">
+<div>
+<p class="text-outline text-xs uppercase tracking-wider">Student ID</p>
+<p class="font-bold">STU-2021-8902</p>
+</div>
+<div>
+<p class="text-outline text-xs uppercase tracking-wider">Roll Number</p>
+<p class="font-bold">21CSB045</p>
+</div>
+<div>
+<p class="text-outline text-xs uppercase tracking-wider">Program</p>
+<p class="font-bold">B.Tech Computer Science</p>
+</div>
+<div>
+<p class="text-outline text-xs uppercase tracking-wider">Department</p>
+<p class="font-bold">Computer Science &amp; Engineering</p>
+</div>
+<div>
+<p class="text-outline text-xs uppercase tracking-wider">Semester</p>
+<p class="font-bold">5th Semester</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Statistics Grid -->
+<section class="grid grid-cols-2 md:grid-cols-3 gap-6">
+<div class="bg-white p-6 rounded-2xl border border-outline-variant hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-primary bg-primary-fixed p-2 rounded-xl" data-icon="menu_book">menu_book</span>
+</div>
+<p class="text-on-surface-variant text-sm font-medium">Enrolled Courses</p>
+<h3 class="text-3xl font-bold text-on-surface mt-1">6</h3>
+</div>
+<div class="bg-white p-6 rounded-2xl border border-outline-variant hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-secondary bg-secondary-container p-2 rounded-xl" data-icon="verified">verified</span>
+</div>
+<p class="text-on-surface-variant text-sm font-medium">Completed Courses</p>
+<h3 class="text-3xl font-bold text-on-surface mt-1">24</h3>
+</div>
+<div class="bg-white p-6 rounded-2xl border border-outline-variant hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-streak-orange bg-streak-bg p-2 rounded-xl" data-icon="school">school</span>
+</div>
+<p class="text-on-surface-variant text-sm font-medium">Current CGPA</p>
+<h3 class="text-3xl font-bold text-on-surface mt-1">3.85 <span class="text-base font-normal text-outline">/ 4.0</span></h3>
+</div>
+<div class="bg-white p-6 rounded-2xl border border-outline-variant hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-primary bg-primary-fixed p-2 rounded-xl" data-icon="event_available">event_available</span>
+</div>
+<p class="text-on-surface-variant text-sm font-medium">Attendance</p>
+<h3 class="text-3xl font-bold text-on-surface mt-1">94%</h3>
+</div>
+<div class="bg-white p-6 rounded-2xl border border-outline-variant hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-secondary bg-secondary-container p-2 rounded-xl" data-icon="workspace_premium">workspace_premium</span>
+</div>
+<p class="text-on-surface-variant text-sm font-medium">Credits Earned</p>
+<h3 class="text-3xl font-bold text-on-surface mt-1">72 <span class="text-base font-normal text-outline">CR</span></h3>
+</div>
+<div class="bg-white p-6 rounded-2xl border border-outline-variant hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-streak-orange bg-streak-bg p-2 rounded-xl" data-icon="assignment_late">assignment_late</span>
+</div>
+<p class="text-on-surface-variant text-sm font-medium">Assignments Pending</p>
+<h3 class="text-3xl font-bold text-on-surface mt-1">3</h3>
+</div>
+</section>
+<!-- Tabs & Settings -->
+<section class="bg-white rounded-3xl border border-outline-variant overflow-hidden">
+<div class="flex border-b border-outline-variant px-8 overflow-x-auto whitespace-nowrap">
+<button class="py-6 px-4 font-bold text-sm transition-all flex items-center gap-2 tab-active" id="tab-general" onclick="switchTab('general')">
+<span class="material-symbols-outlined text-lg" data-icon="person">person</span>General Information
+</button>
+<button class="py-6 px-4 font-bold text-sm transition-all flex items-center gap-2 text-outline" id="tab-academic" onclick="switchTab('academic')">
+<span class="material-symbols-outlined text-lg" data-icon="school">school</span>Academic Information
+</button>
+<button class="py-6 px-4 font-bold text-sm transition-all flex items-center gap-2 text-outline" id="tab-learning" onclick="switchTab('learning')">
+<span class="material-symbols-outlined text-lg" data-icon="menu_book">menu_book</span>Learning Information
+</button>
+<button class="py-6 px-4 font-bold text-sm transition-all flex items-center gap-2 text-outline" id="tab-account" onclick="switchTab('account')">
+<span class="material-symbols-outlined text-lg" data-icon="settings">settings</span>Account Settings
+</button>
+</div>
+<div class="p-8">
+<!-- General Information Content -->
+<div class="space-y-8" id="content-general">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Full Name</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary" type="text" value="Alex Johnson"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Student ID</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary" readonly="" type="text" value="STU-2021-8902"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Roll Number</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary" readonly="" type="text" value="21CSB045"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Email Address</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary" type="email" value="alex.j@university.edu"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Phone Number</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary" type="tel" value="+1 (555) 123-4567"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Date of Birth</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary" type="date" value="2002-05-15"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Gender</label>
+<select class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary">
+<option>Female</option>
+<option>Male</option>
+<option>Non-binary</option>
+<option>Prefer not to say</option>
+</select>
+</div>
+<div class="space-y-2 md:col-span-2">
+<label class="text-sm font-bold text-on-surface">Permanent Address</label>
+<textarea class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary" rows="2">123 Tech Lane, Silicon Valley, CA 94000</textarea>
+</div>
+</div>
+<div class="flex justify-end">
+<button class="bg-primary text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-primary/20 transition-all">Save Changes</button>
+</div>
+</div>
+<!-- Academic Information Content -->
+<div class="space-y-8 hidden" id="content-academic">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Program</label>
+<input class="w-full bg-surface-container-low text-on-surface-variant border-none rounded-xl px-4 py-3" readonly="" type="text" value="B.Tech Computer Science"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Department</label>
+<input class="w-full bg-surface-container-low text-on-surface-variant border-none rounded-xl px-4 py-3" readonly="" type="text" value="Computer Science &amp; Engineering"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Batch</label>
+<input class="w-full bg-surface-container-low text-on-surface-variant border-none rounded-xl px-4 py-3" readonly="" type="text" value="2021-2025"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Semester</label>
+<input class="w-full bg-surface-container-low text-on-surface-variant border-none rounded-xl px-4 py-3" readonly="" type="text" value="5th Semester"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Section</label>
+<input class="w-full bg-surface-container-low text-on-surface-variant border-none rounded-xl px-4 py-3" readonly="" type="text" value="A"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Admission Year</label>
+<input class="w-full bg-surface-container-low text-on-surface-variant border-none rounded-xl px-4 py-3" readonly="" type="text" value="Fall 2021"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Graduation Year</label>
+<input class="w-full bg-surface-container-low text-on-surface-variant border-none rounded-xl px-4 py-3" readonly="" type="text" value="Spring 2025"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Academic Advisor</label>
+<input class="w-full bg-surface-container-low text-on-surface-variant border-none rounded-xl px-4 py-3" readonly="" type="text" value="Dr. Sarah Jenkins"/>
+</div>
+</div>
+</div>
+<!-- Learning Information Content -->
+<div class="space-y-8 hidden" id="content-learning">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Enrolled Courses (Current Semester)</label>
+<input class="w-full bg-surface-container-low text-on-surface-variant border-none rounded-xl px-4 py-3" readonly="" type="text" value="6 Active Courses"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Certificates Earned</label>
+<input class="w-full bg-surface-container-low text-on-surface-variant border-none rounded-xl px-4 py-3" readonly="" type="text" value="14 External Certifications"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Total Learning Hours</label>
+<input class="w-full bg-surface-container-low text-on-surface-variant border-none rounded-xl px-4 py-3" readonly="" type="text" value="845 Hours"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Completed Modules</label>
+<input class="w-full bg-surface-container-low text-on-surface-variant border-none rounded-xl px-4 py-3" readonly="" type="text" value="128 Modules"/>
+</div>
+<div class="space-y-2 md:col-span-2">
+<label class="text-sm font-bold text-on-surface mb-2 block">Current Semester Progress</label>
+<div class="w-full bg-surface-container-low rounded-full h-4 overflow-hidden">
+<div class="bg-primary h-full w-[65%] rounded-full"></div>
+</div>
+<p class="text-xs text-outline mt-1 text-right">65% Completed</p>
+</div>
+</div>
+</div>
+<!-- Account Settings Content -->
+<div class="space-y-8 hidden" id="content-account">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+<div class="space-y-6">
+<h4 class="text-lg font-bold text-on-surface border-b border-outline-variant pb-2">Change Password</h4>
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Current Password</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary" placeholder="••••••••" type="password"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">New Password</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary" placeholder="••••••••" type="password"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface">Confirm New Password</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary" placeholder="••••••••" type="password"/>
+</div>
+<button class="bg-primary text-white px-8 py-3 rounded-full font-bold shadow-lg">Update Password</button>
+</div>
+</div>
+<div class="space-y-6">
+<h4 class="text-lg font-bold text-on-surface border-b border-outline-variant pb-2">Security &amp; Privacy</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl">
+<div>
+<p class="font-bold text-on-surface">Two-Factor Authentication (2FA)</p>
+<p class="text-sm text-outline">Secure your account with an extra layer</p>
+</div>
+<input checked="" class="w-12 h-6 bg-outline-variant rounded-full appearance-none checked:bg-secondary relative transition-colors cursor-pointer before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-1 before:left-1 checked:before:translate-x-6 before:transition-transform" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl">
+<div>
+<p class="font-bold text-on-surface">Email Notifications</p>
+<p class="text-sm text-outline">Receive course updates and announcements</p>
+</div>
+<input checked="" class="w-12 h-6 bg-outline-variant rounded-full appearance-none checked:bg-secondary relative transition-colors cursor-pointer before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-1 before:left-1 checked:before:translate-x-6 before:transition-transform" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl">
+<div>
+<p class="font-bold text-on-surface">Public Profile</p>
+<p class="text-sm text-outline">Allow peers to see your academic progress</p>
+</div>
+<input class="w-12 h-6 bg-outline-variant rounded-full appearance-none checked:bg-secondary relative transition-colors cursor-pointer before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-1 before:left-1 checked:before:translate-x-6 before:transition-transform" type="checkbox"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</div>
+</div>
+<script>
+    function switchTab(tabId) {
+        // Reset all tabs
+        const tabs = ['general', 'academic', 'learning', 'account'];
+        tabs.forEach(t => {
+            const tabBtn = document.getElementById(`tab-${t}`);
+            const tabContent = document.getElementById(`content-${t}`);
+            if(tabBtn) {
+                tabBtn.classList.remove('tab-active');
+                tabBtn.classList.add('text-outline');
+            }
+            if(tabContent) {
+                tabContent.classList.add('hidden');
+            }
+        });
+
+        // Set active tab
+        const activeTab = document.getElementById(`tab-${tabId}`);
+        const activeContent = document.getElementById(`content-${tabId}`);
+        if(activeTab) {
+            activeTab.classList.add('tab-active');
+            activeTab.classList.remove('text-outline');
+        }
+        if(activeContent) {
+            activeContent.classList.remove('hidden');
+        }
+    }
+
+    // Interactive button hover states
+    document.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('mousedown', () => btn.classList.add('scale-95'));
+        btn.addEventListener('mouseup', () => btn.classList.remove('scale-95'));
+    });
+</script>
+</body></html>

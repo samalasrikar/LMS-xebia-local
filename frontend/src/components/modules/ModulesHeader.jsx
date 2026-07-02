@@ -14,6 +14,8 @@ export default function ModulesHeader({
   courses,
   selectedCourseId,
   setSelectedCourseId,
+  isDropdownOpen,
+  setIsDropdownOpen,
 }) {
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white border border-slate-200 rounded-xl p-5 shadow-sm text-left">
@@ -25,7 +27,7 @@ export default function ModulesHeader({
         <Label htmlFor="courseSelect" className="text-[13px] font-semibold text-slate-500 whitespace-nowrap">
           Select Course:
         </Label>
-        <DropdownMenu>
+        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
           <DropdownMenuTrigger asChild>
             <Button
               id="courseSelect"
@@ -33,7 +35,7 @@ export default function ModulesHeader({
               className="bg-white border border-slate-200 text-slate-700 text-[13px] font-medium rounded-lg px-3.5 py-2.5 min-w-[200px] justify-between h-10 hover:bg-slate-50 cursor-pointer"
             >
               <span>
-                {courses.find((c) => String(c.id) === String(selectedCourseId))?.title || "Select Course"}
+                {courses.find((c) => String(c.id) === String(selectedCourseId))?.title || "Select a Course"}
               </span>
               <ChevronDown size={14} className="opacity-50 ml-2" />
             </Button>

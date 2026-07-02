@@ -1,5 +1,6 @@
 import React from "react";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Layers } from "lucide-react";
+import EmptyState from "../shared/EmptyState";
 
 export default function ModulesPane({
   modules,
@@ -25,10 +26,20 @@ export default function ModulesPane({
         </button>
       </div>
 
-      <div className="p-3 space-y-2 flex-1 overflow-y-auto max-h-[550px]">
+      <div className="p-3 space-y-2 flex-1 overflow-y-auto max-h-[550px] flex flex-col">
         {modules.length === 0 ? (
-          <div className="py-12 text-center text-slate-400 text-[13px]">
-            No modules defined for this course. Click "Add Module" to start.
+          <div className="flex-1 flex items-center justify-center">
+            <EmptyState
+              size="sm"
+              icon={Layers}
+              title="No modules defined"
+              description="Click 'Add Module' to start building this course curriculum."
+              primaryAction={{
+                label: "Add Module",
+                disabled: !selectedCourseId,
+                onClick: () => handleOpenModuleModal(),
+              }}
+            />
           </div>
         ) : (
           modules.map((mod) => {

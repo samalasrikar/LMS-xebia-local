@@ -1,4 +1,6 @@
 import { Layers, Edit, Trash2, BookOpen, Loader2, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import EmptyState from "../shared/EmptyState";
 
 export default function CategoryGrid({
   categories,
@@ -7,6 +9,8 @@ export default function CategoryGrid({
   onEdit,
   onDelete,
 }) {
+  const navigate = useNavigate();
+
   if (loading) {
     return (
       <div className="bg-white border border-slate-200 rounded-xl p-20 flex flex-col items-center justify-center text-slate-400 shadow-sm">
@@ -18,11 +22,15 @@ export default function CategoryGrid({
 
   if (categories.length === 0) {
     return (
-      <div className="bg-white border border-slate-200 rounded-xl p-20 text-center text-slate-400 shadow-sm flex flex-col items-center justify-center">
-        <Layers className="text-slate-350 mb-3" size={36} />
-        <p className="text-[13.5px] font-bold text-slate-700">No Categories Found</p>
-        <p className="text-[11px] text-slate-400 mt-0.5">Try adjusting your search query or filters.</p>
-      </div>
+      <EmptyState
+        icon={Layers}
+        title="No Categories Found"
+        description="Try adjusting your search query or filters, or create a new category to get started."
+        primaryAction={{
+          label: "Create New Category",
+          onClick: () => navigate("/categories/create"),
+        }}
+      />
     );
   }
 
