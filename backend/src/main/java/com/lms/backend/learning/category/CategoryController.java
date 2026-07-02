@@ -46,7 +46,7 @@ public class CategoryController {
         description = "Fetches a category using its unique ID"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(@PathVariable @NonNull Long id) {
     return ResponseEntity.ok(
         ResponseBuilder.success(
             "Category fetched successfully",
