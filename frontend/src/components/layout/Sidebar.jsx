@@ -19,6 +19,9 @@ import {
   ChevronsUpDown,
   HelpCircle,
   TrendingUp,
+  Brain,
+  Award,
+  Trophy,
   X,
 } from "lucide-react";
 
@@ -53,12 +56,12 @@ const NAV_GROUPS = [
     label: "Learning",
     items: [
       { title: "Learners", path: "/learners", icon: Users },
-      { title: "Certifications", path: "/certifications", icon: Award },
-      { title: "Assessments", path: "/assessments", icon: Trophy },
-      { title: "Schedule", path: "/schedule", icon: Calendar },
-
-      // Remove this if Learning Coverage already exists
       { title: "Learning Coverage", path: "/learning/coverage", icon: TrendingUp },
+      { title: "AI Transformation", path: "/ai-transformation", icon: Brain },
+      { title: "Certifications", path: "/certifications", icon: Award },
+      { title: "Flagship Programs", path: "/flagship-programs", icon: BookOpen },
+      { title: "Learning Champions", path: "/learning-champions", icon: Trophy },
+      { title: "Schedule", path: "/schedule", icon: Calendar },
     ],
   },
 
@@ -73,6 +76,7 @@ const NAV_GROUPS = [
     ],
   },
 ];
+
 
 
 
