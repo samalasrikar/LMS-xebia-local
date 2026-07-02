@@ -8,7 +8,12 @@ import CategoryDetail from "./pages/CategoryDetail";
 import CurriculumBuilder from "./pages/CurriculumBuilder";
 import ModuleManagement from "./pages/Modules";
 import ContentLibrary from "./pages/ContentLibrary";
-
+import ExecutiveSummary from "./pages/ExecutiveSummary";
+import TrainingEffectiveness from "./pages/TrainingEffectiveness";
+import ProjectLearningInvestment from "./pages/ProjectLearningInvestment";
+import FresherJourney from "./pages/FresherJourney";
+import SkillGap from "./pages/SkillGap";
+import PredictiveAnalytics from "./pages/PredictiveAnalytics";
 function App() {
   return (
     <Routes>
@@ -26,6 +31,32 @@ function App() {
       <Route path="/modules" element={<ModuleManagement />} />
       <Route path="/curriculum" element={<ContentLibrary />} />
       <Route path="/content-builder" element={<ContentLibrary />} />
+      <Route path="/executive-summary" element={<ExecutiveSummary />} />
+      <Route
+  path="/training-effectiveness"
+  element={<TrainingEffectiveness />}
+/>
+
+<Route
+  path="/project-learning-investment"
+  element={<ProjectLearningInvestment />}
+/>
+
+<Route
+  path="/fresher-journey"
+  element={<FresherJourney />}
+/>
+
+<Route
+  path="/skill-gap"
+  element={<SkillGap />}
+/>
+
+<Route
+  path="/predictive-analytics"
+  element={<PredictiveAnalytics />}
+/>
+ 
     </Routes>
   );
 }
