@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
+
 public class CourseRequest {
 
     @NotBlank(message = "Course title is required")
@@ -25,6 +27,26 @@ public class CourseRequest {
     private Long categoryId;
 
     private String status;
+
+    private String slug;
+
+    private String language;
+
+    private String targetAudience;
+
+    private Boolean hasCertificate;
+
+    private String currency;
+
+    private String price;
+
+    private String courseCode;
+
+    private String teaserVideoUrl;
+
+    private String prerequisites;
+
+    private List<String> takeaways;
 
     public CourseRequest() {
     }
@@ -91,5 +113,85 @@ public class CourseRequest {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getTargetAudience() {
+        return targetAudience;
+    }
+
+    public void setTargetAudience(String targetAudience) {
+        this.targetAudience = targetAudience;
+    }
+
+    public Boolean getHasCertificate() {
+        return hasCertificate;
+    }
+
+    public void setHasCertificate(Boolean hasCertificate) {
+        this.hasCertificate = hasCertificate;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getCourseCode() {
+        return courseCode;
+    }
+
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
+    public String getTeaserVideoUrl() {
+        return teaserVideoUrl;
+    }
+
+    public void setTeaserVideoUrl(String teaserVideoUrl) {
+        this.teaserVideoUrl = teaserVideoUrl;
+    }
+
+    public String getPrerequisites() {
+        return prerequisites;
+    }
+
+    public void setPrerequisites(String prerequisites) {
+        this.prerequisites = prerequisites;
+    }
+
+    public List<String> getTakeaways() {
+        return takeaways;
+    }
+
+    public void setTakeaways(List<String> takeaways) {
+        this.takeaways = takeaways;
     }
 }
