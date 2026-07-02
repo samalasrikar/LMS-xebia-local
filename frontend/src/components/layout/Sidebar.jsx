@@ -18,6 +18,9 @@ import {
   GraduationCap,
   ChevronsUpDown,
   HelpCircle,
+  Brain,
+  Award,
+  Trophy,
   X,
 } from "lucide-react";
 
@@ -41,6 +44,37 @@ const NAV_GROUPS = [
     ],
   },
   {
+    title: "Courses",
+    path: "/courses",
+    icon: GraduationCap,
+  },
+  {
+    title: "AI Transformation",
+    path: "/ai-transformation",
+    icon: Brain,
+  },
+  {
+    title: "Certifications",
+    path: "/certifications",
+    icon: Award,
+  },
+  {
+    title: "Flagship Programs",
+    path: "/flagship-programs",
+    icon: BookOpen,
+  },
+  {
+    title: "Learning Champions",
+    path: "/learning-champions",
+    icon: Trophy,
+  },
+];
+
+const footer = [
+  {
+    title: "Settings",
+    path: "/settings",
+    icon: Settings,
     label: "Learning",
     items: [
       { title: "Learners", path: "/learners", icon: Users },
