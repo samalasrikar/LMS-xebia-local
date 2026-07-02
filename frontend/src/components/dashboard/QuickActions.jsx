@@ -1,88 +1,44 @@
-import {
-  FolderPlus,
-  GraduationCap,
-  BookPlus,
-  UploadCloud,
-} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { BookOpen, Users, FolderOpen, FileText, ArrowRight } from "lucide-react";
 
-import { Card } from "../ui/card";
-import { Button } from "../ui/button";
-
-const actions = [
-
-  {
-    title: "New Category",
-    icon: FolderPlus,
-  },
-
-  {
-    title: "New Course",
-    icon: GraduationCap,
-  },
-
-  {
-    title: "New Module",
-    icon: BookPlus,
-  },
-
-  {
-    title: "Upload Content",
-    icon: UploadCloud,
-  },
-
+const ACTIONS = [
+  { label: "Create Course",    icon: BookOpen,   path: "/courses/create",  iconBg: "bg-[#eef2ff]", iconColor: "text-[#6C1D5F]" },
+  { label: "Add Learner",      icon: Users,      path: "/learners",        iconBg: "bg-emerald-50", iconColor: "text-emerald-600" },
+  { label: "New Category",     icon: FolderOpen, path: "/categories",      iconBg: "bg-amber-50",   iconColor: "text-amber-600" },
+  { label: "Content Library",  icon: FileText,   path: "/content-library",      iconBg: "bg-blue-50",    iconColor: "text-blue-600" },
 ];
 
 export default function QuickActions() {
+  const navigate = useNavigate();
 
   return (
-
-    <Card className="rounded-2xl border border-slate-200">
-
-      <div className="border-b p-6">
-
-        <h2 className="text-lg font-semibold">
-          Quick Actions
-        </h2>
-
-        <p className="mt-1 text-sm text-slate-500">
-          Frequently used actions
-        </p>
-
+    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+      {/* Header */}
+      <div className="px-[18px] py-3.5 border-b border-slate-200">
+        <div className="text-[13px] font-bold text-slate-900">Quick Actions</div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 p-6">
-
-        {actions.map((item) => {
-
-          const Icon = item.icon;
-
+      {/* Actions */}
+      <div className="p-2">
+        {ACTIONS.map((action) => {
+          const Icon = action.icon;
           return (
-
-            <Button
-              key={item.title}
-              variant="outline"
-              className="h-28 flex-col gap-3 rounded-xl"
+            <button
+              key={action.label}
+              onClick={() => navigate(action.path)}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md hover:bg-slate-50 transition-colors group"
             >
-
-              <Icon
-                size={24}
-                className="text-[#6C1D5F]"
-              />
-
-              <span>
-                {item.title}
+              <div className={`w-7 h-7 rounded-md ${action.iconBg} ${action.iconColor} flex items-center justify-center flex-shrink-0`}>
+                <Icon size={13} />
+              </div>
+              <span className="flex-1 text-left text-[12px] font-semibold text-slate-700">
+                {action.label}
               </span>
-
-            </Button>
-
+              <ArrowRight size={12} className="text-slate-300 group-hover:text-slate-400 transition-colors" />
+            </button>
           );
-
         })}
-
       </div>
-
-    </Card>
-
+    </div>
   );
-
 }

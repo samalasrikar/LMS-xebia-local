@@ -26,6 +26,17 @@ public class CourseMapper {
         if (request.getStatus() != null && !request.getStatus().isBlank()) {
             course.setStatus(request.getStatus());
         }
+        
+        course.setSlug(request.getSlug());
+        course.setLanguage(request.getLanguage() != null ? request.getLanguage() : "English");
+        course.setTargetAudience(request.getTargetAudience());
+        course.setHasCertificate(request.getHasCertificate() != null ? request.getHasCertificate() : false);
+        course.setCurrency(request.getCurrency());
+        course.setPrice(request.getPrice());
+        course.setCourseCode(request.getCourseCode());
+        course.setTeaserVideoUrl(request.getTeaserVideoUrl());
+        course.setPrerequisites(request.getPrerequisites());
+        course.setTakeaways(request.getTakeaways());
 
         return course;
     }
@@ -46,7 +57,17 @@ public class CourseMapper {
                 course.getDuration(),
                 course.getCategory().getId(),
                 course.getCategory().getName(),
-                course.getStatus()
+                course.getStatus(),
+                course.getSlug(),
+                course.getLanguage(),
+                course.getTargetAudience(),
+                course.isHasCertificate(),
+                course.getCurrency(),
+                course.getPrice(),
+                course.getCourseCode(),
+                course.getTeaserVideoUrl(),
+                course.getPrerequisites(),
+                course.getTakeaways()
         );
     }
 
@@ -65,5 +86,20 @@ public class CourseMapper {
         if (request.getStatus() != null && !request.getStatus().isBlank()) {
             course.setStatus(request.getStatus());
         }
+        
+        course.setSlug(request.getSlug());
+        if (request.getLanguage() != null) {
+            course.setLanguage(request.getLanguage());
+        }
+        course.setTargetAudience(request.getTargetAudience());
+        if (request.getHasCertificate() != null) {
+            course.setHasCertificate(request.getHasCertificate());
+        }
+        course.setCurrency(request.getCurrency());
+        course.setPrice(request.getPrice());
+        course.setCourseCode(request.getCourseCode());
+        course.setTeaserVideoUrl(request.getTeaserVideoUrl());
+        course.setPrerequisites(request.getPrerequisites());
+        course.setTakeaways(request.getTakeaways());
     }
 }
