@@ -30,8 +30,8 @@ export default function CategoryDialog({
     mode === "view"
       ? "Category Details"
       : mode === "edit"
-      ? "Edit Category"
-      : "Add New Category";
+        ? "Edit Category"
+        : "Add New Category";
 
   const isView = mode === "view";
 
@@ -194,8 +194,8 @@ export default function CategoryDialog({
                   {submitting
                     ? "Saving..."
                     : mode === "edit"
-                    ? "Save Changes"
-                    : "Save Category"}
+                      ? "Save Changes"
+                      : "Save Category"}
                 </button>
               </>
             )}

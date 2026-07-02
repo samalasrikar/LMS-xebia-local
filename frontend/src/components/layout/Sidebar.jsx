@@ -6,6 +6,7 @@ import {
   BookOpen,
   Settings,
   HelpCircle,
+  TrendingUp,
 } from "lucide-react";
 
 import logo from "../../assets/xebia-logo.png";
@@ -26,6 +27,11 @@ const menu = [
     title: "Courses",
     path: "/courses",
     icon: GraduationCap,
+  },
+  {
+    title: "Learning Coverage",
+    path: "/learning/coverage",
+    icon: TrendingUp,
   },
 ];
 

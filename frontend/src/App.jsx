@@ -4,6 +4,7 @@ import Categories from "./pages/Categories";
 import Courses from "./pages/Courses";
 import CreateCourse from "./pages/CreateCourse";
 import CurriculumBuilder from "./pages/CurriculumBuilder";
+import LearningCoverage from "./pages/LearningCoverage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path="/courses/:id/curriculum" element={<CurriculumBuilder />} />
       <Route path="/modules" element={<Courses />} />
       <Route path="/curriculum" element={<Courses />} />
+      <Route path="/learning/coverage" element={<LearningCoverage />} />
     </Routes>
   );
 }
