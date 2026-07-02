@@ -66,9 +66,25 @@ export default function useCreateCategory() {
         const fd = new FormData();
         fd.append("name", nameToSubmit);
         fd.append("description", form.shortDesc);
-        fd.append("status", form.status === "Published" ? "Active" : "Inactive");
+        fd.append("publishState", form.status);
+        fd.append("status",form.status === "Published" ? "Active" : "Inactive");
         if (imageFile) {
           fd.append("image", imageFile);
+        }
+        fd.append("slug", form.slug || "");
+        fd.append("parentCat", form.parentCat || "");
+        fd.append("emoji", form.emoji || "");
+        fd.append("accentColor", form.accentColor || "");
+        fd.append("longDesc", form.longDesc || "");
+        fd.append("visibleCatalog", form.visibleCatalog);
+        fd.append("featured", form.featured);
+        fd.append("allowEnroll", form.allowEnroll);
+        fd.append("showNav", form.showNav);
+        fd.append("metaTitle", form.metaTitle || "");
+        fd.append("metaDesc", form.metaDesc || "");
+        fd.append("focusKeyword", form.focusKeyword || "");
+        if (form.tags && form.tags.length > 0) {
+          form.tags.forEach(tag => fd.append("tags", tag));
         }
         await categoryService.createCategory(fd);
         success = true;

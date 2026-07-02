@@ -1,5 +1,7 @@
 package com.lms.backend.learning.course.dto;
 
+import java.util.List;
+
 public class CourseResponse {
 
     private Long id;
@@ -9,10 +11,20 @@ public class CourseResponse {
     private String curriculum;
     private String difficulty;
     private String duration;
-
     private Long categoryId;
     private String categoryName;
     private String status;
+
+    private String slug;
+    private String language;
+    private String targetAudience;
+    private boolean hasCertificate;
+    private String currency;
+    private String price;
+    private String courseCode;
+    private String teaserVideoUrl;
+    private String prerequisites;
+    private List<String> takeaways;
 
     public CourseResponse() {
     }
@@ -27,7 +39,17 @@ public class CourseResponse {
             String duration,
             Long categoryId,
             String categoryName,
-            String status) {
+            String status,
+            String slug,
+            String language,
+            String targetAudience,
+            boolean hasCertificate,
+            String currency,
+            String price,
+            String courseCode,
+            String teaserVideoUrl,
+            String prerequisites,
+            List<String> takeaways) {
 
         this.id = id;
         this.title = title;
@@ -39,6 +61,16 @@ public class CourseResponse {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.status = status;
+        this.slug = slug;
+        this.language = language;
+        this.targetAudience = targetAudience;
+        this.hasCertificate = hasCertificate;
+        this.currency = currency;
+        this.price = price;
+        this.courseCode = courseCode;
+        this.teaserVideoUrl = teaserVideoUrl;
+        this.prerequisites = prerequisites;
+        this.takeaways = takeaways;
     }
 
     public Long getId() {
@@ -119,5 +151,85 @@ public class CourseResponse {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getTargetAudience() {
+        return targetAudience;
+    }
+
+    public void setTargetAudience(String targetAudience) {
+        this.targetAudience = targetAudience;
+    }
+
+    public boolean isHasCertificate() {
+        return hasCertificate;
+    }
+
+    public void setHasCertificate(boolean hasCertificate) {
+        this.hasCertificate = hasCertificate;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getCourseCode() {
+        return courseCode;
+    }
+
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
+    public String getTeaserVideoUrl() {
+        return teaserVideoUrl;
+    }
+
+    public void setTeaserVideoUrl(String teaserVideoUrl) {
+        this.teaserVideoUrl = teaserVideoUrl;
+    }
+
+    public String getPrerequisites() {
+        return prerequisites;
+    }
+
+    public void setPrerequisites(String prerequisites) {
+        this.prerequisites = prerequisites;
+    }
+
+    public List<String> getTakeaways() {
+        return takeaways;
+    }
+
+    public void setTakeaways(List<String> takeaways) {
+        this.takeaways = takeaways;
     }
 }
