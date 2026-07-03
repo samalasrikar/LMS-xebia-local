@@ -16,7 +16,11 @@ import com.lms.backend.learning.category.dto.CategoryRequest;
 import com.lms.backend.learning.category.dto.CategoryResponse;
 
 
+import org.springframework.transaction.annotation.Transactional;
+
+
 @Service
+@Transactional(readOnly = true)
 public class CategoryService {
 
     private final CategoryRepository repository;
@@ -45,6 +49,7 @@ public class CategoryService {
             return mapper.toResponse(category);
     }
 
+    @Transactional
     public CategoryResponse createCategory(CategoryRequest request, MultipartFile imageFile) {
 
         if (repository.existsByName(request.getName())) {
@@ -60,6 +65,7 @@ public class CategoryService {
         return mapper.toResponse(saved);
     }
 
+    @Transactional
     public CategoryResponse updateCategory(@NonNull Long id, CategoryRequest request, MultipartFile imageFile) {
 
         log.info("Updating category {}", id);
@@ -77,6 +83,7 @@ public class CategoryService {
         return mapper.toResponse(updated);
     }
 
+    @Transactional
     public void deleteCategory(@NonNull Long id) {
         log.info("Deleting category {}", id);
         Category category = repository.findById(id)

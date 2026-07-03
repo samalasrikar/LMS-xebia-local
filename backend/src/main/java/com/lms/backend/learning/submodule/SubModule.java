@@ -11,6 +11,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import org.hibernate.annotations.BatchSize;
+import com.lms.backend.learning.content.Content;
+import java.util.List;
 
 @Entity
 @Table(name = "sub_modules")
@@ -29,6 +34,10 @@ public class SubModule {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id", nullable = false)
     private Module module;
+
+    @OneToMany(mappedBy = "subModule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @BatchSize(size = 25)
+    private List<Content> contents;
 
     public SubModule() {}
 
@@ -62,5 +71,13 @@ public class SubModule {
 
     public void setModule(Module module) {
         this.module = module;
+    }
+
+    public List<Content> getContents() {
+        return contents;
+    }
+
+    public void setContents(List<Content> contents) {
+        this.contents = contents;
     }
 }

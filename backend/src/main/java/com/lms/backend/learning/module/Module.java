@@ -11,6 +11,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import org.hibernate.annotations.BatchSize;
+import com.lms.backend.learning.submodule.SubModule;
+import java.util.List;
 
 @Entity
 @Table(name = "modules")
@@ -29,6 +34,10 @@ public class Module {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
+
+    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @BatchSize(size = 25)
+    private List<SubModule> subModules;
 
     public Module() {}
 
@@ -62,5 +71,13 @@ public class Module {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public List<SubModule> getSubModules() {
+        return subModules;
+    }
+
+    public void setSubModules(List<SubModule> subModules) {
+        this.subModules = subModules;
     }
 }

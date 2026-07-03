@@ -67,7 +67,7 @@ public class CourseMapper {
                 course.getCourseCode(),
                 course.getTeaserVideoUrl(),
                 course.getPrerequisites(),
-                course.getTakeaways()
+                course.getTakeaways() != null ? new java.util.ArrayList<>(course.getTakeaways()) : null
         );
     }
 

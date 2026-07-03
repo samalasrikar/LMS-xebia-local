@@ -63,7 +63,7 @@ public class CategoryMapper {
             category.getMetaTitle(),
             category.getMetaDesc(),
             category.getFocusKeyword(),
-            category.getTags(),
+            category.getTags() != null ? new java.util.ArrayList<>(category.getTags()) : null,
             category.getCreatedAt(),
             category.getUpdatedAt()
         );

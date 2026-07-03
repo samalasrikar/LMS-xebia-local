@@ -1,7 +1,6 @@
 package com.lms.backend.learning.category;
 
 import java.time.LocalDateTime;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,6 +13,11 @@ import jakarta.persistence.Table;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
+import org.hibernate.annotations.BatchSize;
+import com.lms.backend.learning.course.Course;
 import java.util.List;
 
 @Entity
@@ -30,8 +34,7 @@ public class Category {
     @Column(length = 1000)
     private String description;
 
-    @Lob
-    @Column(name = "image", columnDefinition = "LONGBLOB")
+    @Column(name = "image", length = 16777215)
     private byte[] image;
 
     @Column(name = "publish_state", length = 30)
@@ -79,7 +82,12 @@ public class Category {
     @ElementCollection
     @CollectionTable(name = "category_tags", joinColumns = @JoinColumn(name = "category_id"))
     @Column(name = "tag")
+    @org.hibernate.annotations.BatchSize(size = 25)
     private List<String> tags;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @BatchSize(size = 25)
+    private List<Course> courses;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -280,5 +288,13 @@ public class Category {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public List<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<Course> courses) {
+        this.courses = courses;
     }
 }

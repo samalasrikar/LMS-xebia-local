@@ -46,8 +46,8 @@ export default function TopCategories() {
             id: cat.id,
             name: cat.name,
             courses: count,
-            // Dynamic mock learners proportional to courses count (since we don't have learners db table)
-            learners: count * 15 + Math.floor(Math.random() * 10),
+            // Dynamic learners (since we don't have learners db table)
+            learners: 0,
             pct: Math.round((count / totalCourses) * 100),
             color: COLORS[idx % COLORS.length],
             emoji: getEmojiForCategory(cat.name),

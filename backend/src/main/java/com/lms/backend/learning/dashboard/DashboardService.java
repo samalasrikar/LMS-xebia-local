@@ -16,8 +16,11 @@ import com.lms.backend.learning.submodule.SubModuleRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class DashboardService {
     private final CategoryRepository categoryRepository;
     private final CourseRepository courseRepository;
@@ -35,6 +38,9 @@ public class DashboardService {
         response.setTotalModules(moduleRepository.count());
         response.setTotalSubmodules(submoduleRepository.count());
         response.setTotalContents(contentRepository.count());
+        response.setTotalStudents(0);
+        response.setTotalEnrollments(0);
+        response.setTotalInstructors(0);
 
         return response;
     }

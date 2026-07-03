@@ -16,7 +16,10 @@ import com.lms.backend.learning.category.CategoryRepository;
 import com.lms.backend.learning.course.dto.CourseRequest;
 import com.lms.backend.learning.course.dto.CourseResponse;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional(readOnly = true)
 public class CourseService {
 
     private static final Logger log = LoggerFactory.getLogger(CourseService.class);
@@ -36,7 +39,7 @@ public class CourseService {
     }
 
     public List<CourseResponse> getAllCourses() {
-        return repository.findAll()
+        return repository.findAllWithCategory()
                 .stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
@@ -50,6 +53,7 @@ public class CourseService {
         return mapper.toResponse(course);
     }
 
+    @Transactional
     public CourseResponse createCourse(CourseRequest request) {
 
         if (repository.existsByTitle(request.getTitle())) {
@@ -68,6 +72,7 @@ public class CourseService {
         return mapper.toResponse(saved);
     }
 
+    @Transactional
     public CourseResponse updateCourse(
             @NonNull Long id,
             CourseRequest request) {
@@ -87,6 +92,7 @@ public class CourseService {
         return mapper.toResponse(updated);
     }
 
+    @Transactional
     public void deleteCourse(@NonNull Long id) {
 
         repository.deleteById(id);
