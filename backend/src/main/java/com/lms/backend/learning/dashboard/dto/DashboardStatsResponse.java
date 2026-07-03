@@ -16,6 +16,9 @@ public class DashboardStatsResponse {
     private long totalModules;
     private long totalSubmodules;
     private long totalContents;
+    private long totalStudents;
+    private long totalEnrollments;
+    private long totalInstructors;
 
     // getters setters
 }

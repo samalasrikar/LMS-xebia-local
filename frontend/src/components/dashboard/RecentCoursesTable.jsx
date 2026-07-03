@@ -147,7 +147,7 @@ export default function RecentCoursesTable() {
 
                     {/* Learners */}
                     <td className="px-3.5 py-3 text-[13px] font-bold text-slate-900">
-                      {((course.title.length * 7 + (course.id % 13) * 11) % 150 + 12).toLocaleString()}
+                      0
                     </td>
 
                     {/* Action */}

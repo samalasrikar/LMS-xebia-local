@@ -38,6 +38,9 @@ public class DashboardService {
         response.setTotalModules(moduleRepository.count());
         response.setTotalSubmodules(submoduleRepository.count());
         response.setTotalContents(contentRepository.count());
+        response.setTotalStudents(0);
+        response.setTotalEnrollments(0);
+        response.setTotalInstructors(0);
 
         return response;
     }
