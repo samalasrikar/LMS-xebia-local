@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import adminProfileIcon from "../../assets/admin_profile_icon.svg";
 
 const PATH_LABELS = {
-  "/": "Dashboard",
+  "/admin": "Dashboard",
   "/analytics": "Analytics",
   "/categories": "Categories",
   "/courses": "Courses",
@@ -29,7 +29,7 @@ const PATH_LABELS = {
 function getBreadcrumb(pathname) {
   // Match exact or prefix
   const label = Object.entries(PATH_LABELS).find(([key]) =>
-    key !== "/" ? pathname.startsWith(key) : pathname === "/"
+    key !== "/admin" ? pathname.startsWith(key) : pathname === "/admin"
   );
   return label ? label[1] : "Page";
 }

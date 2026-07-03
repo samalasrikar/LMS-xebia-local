@@ -1,4 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import Landing from "./pages/Landing";
+import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
 import Courses from "./pages/Courses";
@@ -18,6 +20,13 @@ import PredictiveAnalytics from "./pages/PredictiveAnalytics";
 
 import LearningCoverage from "./pages/LearningCoverage";
 import StudentLayout from "./components/layout/StudentLayout";
+
+// New Pages
+import SEOMeta from "./pages/SEOMeta";
+import Learners from "./pages/Learners";
+import Integrations from "./pages/Integrations";
+import Settings from "./pages/Settings";
+import DesignSystem from "./pages/DesignSystem";
 
 // AI & Certification Analytics Dashboards Pages
 import AITransformation from "./modules/ai-certification/pages/AITransformation";
@@ -46,7 +55,16 @@ import StudentNotifications from "./pages/student/StudentNotifications";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
+      <Route path="/" element={<Landing />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/admin" element={<Dashboard />} />
+
+      {/* Stitch-integrated Admin pages */}
+      <Route path="/seo" element={<SEOMeta />} />
+      <Route path="/learners" element={<Learners />} />
+      <Route path="/integrations" element={<Integrations />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/design-system" element={<DesignSystem />} />
 
       {/* Categories */}
       <Route path="/categories" element={<Categories />} />

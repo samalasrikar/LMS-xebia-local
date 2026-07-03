@@ -1,0 +1,380 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>SEO &amp; Meta Configuration | Xebia LMS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid #E2E8F0;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 10px;
+        }
+        .input-focus-ring:focus {
+            outline: none;
+            border-color: #aa3000;
+            box-shadow: 0 0 0 2px rgba(170, 48, 0, 0.1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#8e7068",
+                        "primary-fixed": "#ffdbd0",
+                        "surface-dim": "#cbdbf5",
+                        "surface-variant": "#d3e4fe",
+                        "on-tertiary-container": "#fbfcff",
+                        "on-surface-variant": "#5a4139",
+                        "tertiary": "#595c5f",
+                        "inverse-primary": "#ffb59f",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#1a1a2e",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#191c1e",
+                        "on-tertiary-fixed-variant": "#44474a",
+                        "surface-container-low": "#eff4ff",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#ae3100",
+                        "inverse-surface": "#213145",
+                        "on-background": "#0b1c30",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#e0e3e6",
+                        "surface": "#f8f9ff",
+                        "secondary-fixed": "#e2e0fc",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary-fixed-dim": "#ffb59f",
+                        "on-primary-fixed-variant": "#852400",
+                        "on-error-container": "#93000a",
+                        "background": "#f8f9ff",
+                        "secondary": "#5d5c74",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#e2e0fc",
+                        "on-secondary-fixed-variant": "#45455b",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary": "#aa3000",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#c4c7ca",
+                        "on-primary-container": "#fffbff",
+                        "on-surface": "#0b1c30",
+                        "surface-container-high": "#dce9ff",
+                        "on-primary-fixed": "#3a0a00",
+                        "on-secondary-container": "#63627a",
+                        "secondary-fixed-dim": "#c6c4df",
+                        "tertiary-container": "#727578",
+                        "primary-container": "#d04411",
+                        "outline-variant": "#e2bfb5",
+                        "surface-container": "#e5eeff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sidebar-width": "260px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "container-max": "1440px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["13px", {"lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-sm": ["11px", {"lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface custom-scrollbar">
+<!-- SideNavBar Shell -->
+
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 right-0 h-16 bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm flex items-center justify-between px-gutter w-full z-40 left-0">
+<div class="flex items-center gap-lg">
+<h1 class="font-headline-md text-headline-md font-black text-on-surface dark:text-inverse-on-surface">LMS Admin</h1>
+<div class="relative w-80">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-body-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Global Search..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-all duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-all duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-xl px-xl">
+<div class="max-w-[container-max] mx-auto">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-sm mb-lg text-label-md">
+<span class="text-secondary hover:text-primary cursor-pointer transition-colors">Dashboard</span>
+<span class="material-symbols-outlined text-secondary text-sm">chevron_right</span>
+<span class="text-on-surface font-semibold">SEO &amp; Meta</span>
+</nav>
+<div class="flex flex-col lg:flex-row gap-lg">
+<!-- Left Column: Form Fields -->
+<div class="flex-1 space-y-lg">
+<!-- General Settings Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm" style="opacity: 1; transform: translateY(0px); transition: 0.5s ease-out;">
+<div class="flex items-center gap-md mb-xl">
+<div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">public</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">General Meta Tags</h2>
+<p class="text-body-md text-secondary">Basic configuration for search engine crawlers.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-semibold text-on-surface">Site Title</label>
+<input class="w-full px-md py-sm bg-white border border-outline-variant rounded-lg font-body-md input-focus-ring transition-all" id="site-title-input" type="text" value="Xebia LMS - Global Training Platform">
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-semibold text-on-surface">Meta Title</label>
+<input class="w-full px-md py-sm bg-white border border-outline-variant rounded-lg font-body-md input-focus-ring transition-all" id="meta-title-input" type="text" value="Best Enterprise Learning Management System | Xebia">
+</div>
+<div class="md:col-span-2 flex flex-col gap-xs">
+<label class="text-label-md font-semibold text-on-surface">Meta Description</label>
+<textarea class="w-full px-md py-sm bg-white border border-outline-variant rounded-lg font-body-md input-focus-ring transition-all resize-none" id="meta-desc-input" rows="3">Empower your workforce with Xebia LMS. The enterprise-grade training platform designed for high-performance learning and professional growth.</textarea>
+<div class="flex justify-between mt-1">
+<span class="text-[10px] text-secondary font-medium">Recommended: 150-160 characters</span>
+<span class="text-[10px] text-primary font-bold" id="char-count">148/160</span>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-semibold text-on-surface">Keywords</label>
+<input class="w-full px-md py-sm bg-white border border-outline-variant rounded-lg font-body-md input-focus-ring transition-all" type="text" value="lms, enterprise learning, xebia, corporate training">
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-semibold text-on-surface">Canonical URL</label>
+<input class="w-full px-md py-sm bg-white border border-outline-variant rounded-lg font-body-md input-focus-ring transition-all" type="text" value="https://lms.xebia.com/">
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-semibold text-on-surface">Robots</label>
+<select class="w-full px-md py-sm bg-white border border-outline-variant rounded-lg font-body-md input-focus-ring transition-all">
+<option>index, follow</option>
+<option>noindex, nofollow</option>
+<option>index, nofollow</option>
+<option>noindex, follow</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Social Media Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm" style="opacity: 1; transform: translateY(0px); transition: 0.5s ease-out;">
+<div class="flex items-center gap-md mb-xl">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">share</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Social Graph</h2>
+<p class="text-body-md text-secondary">Define how your site appears on Twitter, Facebook, and LinkedIn.</p>
+</div>
+</div>
+<div class="space-y-lg">
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-semibold text-on-surface">Open Graph Image</label>
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center gap-md bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary">cloud_upload</span>
+</div>
+<div class="text-center">
+<p class="text-body-md font-bold text-on-surface">Click to upload or drag and drop</p>
+<p class="text-label-sm text-secondary">PNG, JPG or WebP (Recommended: 1200 x 630px)</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-semibold text-on-surface">Twitter Card Type</label>
+<select class="w-full px-md py-sm bg-white border border-outline-variant rounded-lg font-body-md input-focus-ring transition-all">
+<option>summary_large_image</option>
+<option>summary</option>
+<option>app</option>
+<option>player</option>
+</select>
+</div>
+</div>
+</div>
+</section>
+<!-- Analytics Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm" style="opacity: 1; transform: translateY(0px); transition: 0.5s ease-out;">
+<div class="flex items-center gap-md mb-xl">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">analytics</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Tracking &amp; Analytics</h2>
+<p class="text-body-md text-secondary">Connect your external monitoring tools.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-semibold text-on-surface">Google Analytics ID</label>
+<div class="relative">
+<input class="w-full pl-md pr-12 py-sm bg-white border border-outline-variant rounded-lg font-body-md input-focus-ring transition-all" type="text" value="G-XB12345678">
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary text-sm">info</span>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-semibold text-on-surface">Google Tag Manager ID</label>
+<div class="relative">
+<input class="w-full pl-md pr-12 py-sm bg-white border border-outline-variant rounded-lg font-body-md input-focus-ring transition-all" type="text" value="GTM-NWK909">
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary text-sm">info</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Live Preview & Actions -->
+<div class="w-full lg:w-[400px] space-y-lg">
+<!-- Save Button sticky container -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-md sticky top-24 z-10">
+<button class="w-full bg-primary text-on-primary py-md px-lg rounded-lg font-bold flex items-center justify-center gap-md hover:opacity-90 active:scale-[0.98] transition-all mb-md">
+<span class="material-symbols-outlined">save</span>
+                            Save Configuration
+                        </button>
+<button class="w-full border border-outline-variant text-on-surface py-md px-lg rounded-lg font-semibold flex items-center justify-center gap-md hover:bg-surface-container-low transition-all">
+                            Discard Changes
+                        </button>
+<div class="mt-lg flex items-center gap-sm text-label-sm text-secondary justify-center">
+<span class="material-symbols-outlined text-[14px]">history</span>
+                            Last saved: 12 mins ago by Alex Rivera
+                        </div>
+</div>
+<!-- Live SEO Preview -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
+<div class="flex items-center justify-between mb-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface">Search Preview</h3>
+<span class="px-sm py-1 bg-surface-container text-primary font-bold text-[10px] rounded-full uppercase">Google Desktop</span>
+</div>
+<div class="p-lg bg-white border border-outline-variant rounded-lg space-y-2 group">
+<div class="flex items-center gap-sm">
+<div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden">
+<span class="text-[8px] font-bold text-secondary">X</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[12px] text-slate-700 leading-none">Xebia LMS</span>
+<span class="text-[11px] text-slate-500 leading-none">https://lms.xebia.com</span>
+</div>
+</div>
+<h4 class="text-lg text-blue-800 hover:underline cursor-pointer font-medium leading-tight" id="preview-title">Best Enterprise Learning Management System | Xebia</h4>
+<p class="text-sm text-slate-600 leading-relaxed" id="preview-desc">Empower your workforce with Xebia LMS. The enterprise-grade training platform designed for high-performance learning and professional growth.</p>
+</div>
+<div class="mt-lg space-y-md">
+<div class="flex items-center justify-between text-label-sm">
+<span class="text-secondary">Readability Score</span>
+<span class="text-green-600 font-bold">Excellent</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="w-[92%] h-full bg-green-500"></div>
+</div>
+<p class="text-label-sm text-on-surface-variant italic leading-relaxed">
+                                Tip: Including your primary keyword "Enterprise Learning" in the first 60 characters of your Meta Title improves ranking.
+                            </p>
+</div>
+</div>
+<!-- Knowledge Base Widget -->
+<div class="p-lg bg-primary/5 border border-primary/20 rounded-xl">
+<h4 class="font-semibold text-primary mb-2 flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">lightbulb</span>
+                            SEO Best Practices
+                        </h4>
+<ul class="text-body-md text-on-surface-variant space-y-md list-disc pl-4">
+
+<li class="">Avoid "Keyword Stuffing" in descriptions.</li>
+<li class="">Ensure your OG Image is high quality.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interactions for Live Preview
+        const metaTitleInput = document.getElementById('meta-title-input');
+        const metaDescInput = document.getElementById('meta-desc-input');
+        const previewTitle = document.getElementById('preview-title');
+        const previewDesc = document.getElementById('preview-desc');
+        const charCountDisplay = document.getElementById('char-count');
+
+        metaTitleInput.addEventListener('input', (e) => {
+            previewTitle.textContent = e.target.value || 'Title goes here...';
+        });
+
+        metaDescInput.addEventListener('input', (e) => {
+            const length = e.target.value.length;
+            previewDesc.textContent = e.target.value || 'Description goes here...';
+            charCountDisplay.textContent = `${length}/160`;
+            
+            if (length > 160) {
+                charCountDisplay.classList.add('text-error');
+                charCountDisplay.classList.remove('text-primary');
+            } else {
+                charCountDisplay.classList.remove('text-error');
+                charCountDisplay.classList.add('text-primary');
+            }
+        });
+
+        // Simple smooth transition effect for cards on load
+        document.querySelectorAll('section').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease-out';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+    </script>
+
+
+</body></html>
