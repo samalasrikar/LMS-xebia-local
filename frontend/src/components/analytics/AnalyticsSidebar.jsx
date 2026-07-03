@@ -21,7 +21,8 @@ import {
   RefreshCw,
   FileText,
   ChevronsLeft,
-  ChevronsRight
+  ChevronsRight,
+  ArrowLeft
 } from "lucide-react";
 import { Button } from "../ui/button";
 
@@ -320,6 +321,16 @@ export default function AnalyticsSidebar({
               );
             })}
           </div>
+          {/* ── Collapsed Back to Admin Switch ── */}
+          <div className="flex-shrink-0 border-t border-[#d5c1cc]/60 p-3 bg-white flex justify-center w-full">
+            <Link
+              to="/admin"
+              title="Back to Admin"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#6C1D5F] hover:bg-[#521347] text-white transition-all cursor-pointer shadow-sm shadow-[#6C1D5F]/15"
+            >
+              <ArrowLeft size={16} />
+            </Link>
+          </div>
         </>
       ) : (
         <>
@@ -465,6 +476,16 @@ export default function AnalyticsSidebar({
                 <p className="text-[11px] text-slate-400">No matching reports found</p>
               </div>
             )}
+          </div>
+          {/* ── Expanded Back to Admin Switch ── */}
+          <div className="flex-shrink-0 border-t border-[#d5c1cc]/60 p-3 bg-white">
+            <Link
+              to="/admin"
+              className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-[#6C1D5F] hover:bg-[#521347] text-white text-[12px] font-semibold transition-all shadow-sm shadow-[#6C1D5F]/15 hover:shadow-md cursor-pointer text-center w-full"
+            >
+              <ArrowLeft size={13} className="shrink-0" />
+              <span>Back to Admin</span>
+            </Link>
           </div>
         </>
       )}
