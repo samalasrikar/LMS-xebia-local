@@ -1,7 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import { filterDataset } from "../utils/mockData";
 
 export default function useDashboardData() {
+  const context = useOutletContext() || {};
+  const reloadTrigger = context.reloadTrigger;
+
   // State for all dashboards filters
   const [filters, setFilters] = useState({
     year: "2026",
@@ -30,6 +34,16 @@ export default function useDashboardData() {
   const [isLoadingState, setIsLoadingState] = useState(false);
   const [isErrorState, setIsErrorState] = useState(false);
   const [isEmptyState, setIsEmptyState] = useState(false);
+
+  useEffect(() => {
+    if (reloadTrigger !== undefined && reloadTrigger > 0) {
+      setIsLoadingState(true);
+      const timer = setTimeout(() => {
+        setIsLoadingState(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [reloadTrigger]);
 
   const ITEMS_PER_PAGE = 5;
 
