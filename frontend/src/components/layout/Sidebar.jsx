@@ -23,7 +23,12 @@ import {
   Clock,
   LineChart,
   X,
+
+  Briefcase,
+  Target,
+
   LayoutTemplate,
+
 } from "lucide-react";
 
 import adminProfileIcon from "../../assets/admin_profile_icon.svg";
@@ -40,6 +45,18 @@ const NAV_GROUPS = [
         badge: "New",
         badgeAccent: true,
       },
+    ],
+  },
+
+  {
+    label: "Analytics",
+    items: [
+      { title: "Executive Summary", path: "/executive-summary", icon: LayoutDashboard },
+      { title: "Training Effectiveness", path: "/training-effectiveness", icon: BarChart3 },
+      { title: "Project Learning Investment", path: "/project-learning-investment", icon: Briefcase },
+      { title: "Fresher Journey", path: "/fresher-journey", icon: GraduationCap },
+      { title: "Skill Gap", path: "/skill-gap", icon: Target },
+      { title: "Predictive Analytics", path: "/predictive-analytics", icon: LineChart },
     ],
   },
 

@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
 import Courses from "./pages/Courses";
@@ -8,6 +8,14 @@ import CategoryDetail from "./pages/CategoryDetail";
 import CurriculumBuilder from "./pages/CurriculumBuilder";
 import ModuleManagement from "./pages/Modules";
 import ContentLibrary from "./pages/ContentLibrary";
+
+import ExecutiveSummary from "./pages/ExecutiveSummary";
+import TrainingEffectiveness from "./pages/TrainingEffectiveness";
+import ProjectLearningInvestment from "./pages/ProjectLearningInvestment";
+import FresherJourney from "./pages/FresherJourney";
+import SkillGap from "./pages/SkillGap";
+import PredictiveAnalytics from "./pages/PredictiveAnalytics";
+
 import LearningCoverage from "./pages/LearningCoverage";
 import StudentLayout from "./components/layout/StudentLayout";
 
@@ -34,7 +42,7 @@ import StudentSettings from "./pages/student/StudentSettings";
 import StudentDownloads from "./pages/student/StudentDownloads";
 import StudentAssistant from "./pages/student/StudentAssistant";
 import StudentNotifications from "./pages/student/StudentNotifications";
-
+ 
 function App() {
   return (
     <Routes>
@@ -58,6 +66,10 @@ function App() {
       <Route path="/module-management" element={<ModuleManagement />} />
       <Route path="/content-library" element={<ContentLibrary />} />
 
+      {/* Redirects for old routes */}
+      <Route path="/analytics" element={<Navigate to="/executive-summary" replace />} />
+
+
       {/* ── Student Portal (sidebar layout) ── */}
       <Route path="/student" element={<StudentLayout />}>
         <Route index element={<StudentDashboard />} />
@@ -74,9 +86,38 @@ function App() {
       </Route>
 
       {/* Backward Compatibility */}
+
       <Route path="/modules" element={<ModuleManagement />} />
       <Route path="/curriculum" element={<CurriculumBuilder />} />
       <Route path="/content-builder" element={<ContentLibrary />} />
+
+      <Route path="/executive-summary" element={<ExecutiveSummary />} />
+      <Route
+  path="/training-effectiveness"
+  element={<TrainingEffectiveness />}
+/>
+
+<Route
+  path="/project-learning-investment"
+  element={<ProjectLearningInvestment />}
+/>
+
+<Route
+  path="/fresher-journey"
+  element={<FresherJourney />}
+/>
+
+<Route
+  path="/skill-gap"
+  element={<SkillGap />}
+/>
+
+<Route
+  path="/predictive-analytics"
+  element={<PredictiveAnalytics />}
+/>
+ 
+
 
       {/* Learning Coverage */}
       <Route
@@ -115,6 +156,7 @@ function App() {
         path="/learning-champions"
         element={<LearningChampions />}
       />
+
     </Routes>
   );
 }

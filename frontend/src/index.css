@@ -156,6 +156,41 @@
     --spacing-xs: 4px;
     --spacing-xl: 32px;
     --spacing-3xl: 64px;
+
+    /* Stitch custom typography */
+    --font-body-base: "Inter", sans-serif;
+    --font-headline-xl: "Inter", sans-serif;
+    --font-headline-lg: "Inter", sans-serif;
+    --font-body-sm: "Inter", sans-serif;
+    --font-headline-md: "Inter", sans-serif;
+    --font-label-caps: "Inter", sans-serif;
+
+    --text-body-base: 16px;
+    --text-body-base--line-height: 24px;
+    --text-body-base--font-weight: 400;
+
+    --text-headline-xl: 30px;
+    --text-headline-xl--line-height: 36px;
+    --text-headline-xl--letter-spacing: -0.02em;
+    --text-headline-xl--font-weight: 700;
+
+    --text-headline-lg: 24px;
+    --text-headline-lg--line-height: 32px;
+    --text-headline-lg--letter-spacing: -0.01em;
+    --text-headline-lg--font-weight: 600;
+
+    --text-body-sm: 14px;
+    --text-body-sm--line-height: 20px;
+    --text-body-sm--font-weight: 400;
+
+    --text-headline-md: 20px;
+    --text-headline-md--line-height: 28px;
+    --text-headline-md--font-weight: 600;
+
+    --text-label-caps: 12px;
+    --text-label-caps--line-height: 16px;
+    --text-label-caps--letter-spacing: 0.05em;
+    --text-label-caps--font-weight: 600;
 }
 
 :root {

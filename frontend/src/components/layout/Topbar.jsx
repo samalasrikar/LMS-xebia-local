@@ -18,6 +18,12 @@ const PATH_LABELS = {
   "/permissions": "Permissions",
   "/integrations": "Integrations",
   "/support": "Support",
+  "/executive-summary": "Executive Summary",
+  "/training-effectiveness": "Training Effectiveness",
+  "/project-learning-investment": "Project Learning Investment",
+  "/fresher-journey": "Fresher Journey",
+  "/skill-gap": "Skill Gap",
+  "/predictive-analytics": "Predictive Analytics",
 };
 
 function getBreadcrumb(pathname) {
