@@ -16,8 +16,11 @@ import com.lms.backend.learning.submodule.SubModuleRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class DashboardService {
     private final CategoryRepository categoryRepository;
     private final CourseRepository courseRepository;

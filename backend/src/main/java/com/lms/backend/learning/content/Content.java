@@ -26,10 +26,10 @@ public class Content {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String videoUrl;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String pdfUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)

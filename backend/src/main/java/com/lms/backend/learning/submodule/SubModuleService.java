@@ -16,7 +16,10 @@ import com.lms.backend.learning.module.ModuleRepository;
 import com.lms.backend.learning.submodule.dto.SubModuleRequest;
 import com.lms.backend.learning.submodule.dto.SubModuleResponse;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional(readOnly = true)
 public class SubModuleService {
 
     private static final Logger log = LoggerFactory.getLogger(SubModuleService.class);
@@ -42,6 +45,7 @@ public class SubModuleService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public SubModuleResponse createSubModule(SubModuleRequest request) {
 
         if (repository.existsByTitleAndModule_Id(request.getTitle(), request.getModuleId())) {
@@ -60,6 +64,7 @@ public class SubModuleService {
         return mapper.toResponse(saved);
     }
 
+    @Transactional
     public SubModuleResponse updateSubModule(
             @NonNull Long id,
             SubModuleRequest request) {
@@ -78,6 +83,7 @@ public class SubModuleService {
         return mapper.toResponse(updated);
     }
 
+    @Transactional
     public void deleteSubModule(@NonNull Long id) {
         repository.deleteById(id);
     }

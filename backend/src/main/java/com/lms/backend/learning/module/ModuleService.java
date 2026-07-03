@@ -16,7 +16,10 @@ import com.lms.backend.learning.course.CourseRepository;
 import com.lms.backend.learning.module.dto.ModuleRequest;
 import com.lms.backend.learning.module.dto.ModuleResponse;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional(readOnly = true)
 public class ModuleService {
 
     private static final Logger log = LoggerFactory.getLogger(ModuleService.class);
@@ -42,6 +45,7 @@ public class ModuleService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ModuleResponse createModule(ModuleRequest request) {
 
         if (repository.existsByTitleAndCourse_Id(request.getTitle(), request.getCourseId())) {
@@ -59,6 +63,7 @@ public class ModuleService {
         return mapper.toResponse(saved);
     }
 
+    @Transactional
     public ModuleResponse updateModule(
             @NonNull Long id,
             ModuleRequest request) {
@@ -75,6 +80,7 @@ public class ModuleService {
         return mapper.toResponse(updated);
     }
 
+    @Transactional
     public void deleteModule(@NonNull Long id) {
         repository.deleteById(id);
     }

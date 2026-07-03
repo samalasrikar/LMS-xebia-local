@@ -17,6 +17,10 @@ import jakarta.persistence.Table;
 
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.CollectionTable;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import org.hibernate.annotations.BatchSize;
+import com.lms.backend.learning.module.Module;
 import java.util.List;
 
 @Entity
@@ -33,7 +37,7 @@ public class Course {
     @Column(length = 1000)
     private String description;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String thumbnail;
 
     @Column(length = 2000)
@@ -75,11 +79,16 @@ public class Course {
     @ElementCollection
     @CollectionTable(name = "course_takeaways", joinColumns = @JoinColumn(name = "course_id"))
     @Column(name = "takeaway")
+    @org.hibernate.annotations.BatchSize(size = 25)
     private List<String> takeaways;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @BatchSize(size = 25)
+    private List<Module> modules;
 
     @Column(length = 20, nullable = false)
     private String status = "Published";
@@ -243,5 +252,13 @@ public class Course {
 
     public void setTakeaways(List<String> takeaways) {
         this.takeaways = takeaways;
+    }
+
+    public List<Module> getModules() {
+        return modules;
+    }
+
+    public void setModules(List<Module> modules) {
+        this.modules = modules;
     }
 }

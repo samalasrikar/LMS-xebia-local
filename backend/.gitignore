@@ -33,5 +33,3 @@ build/
 .vscode/
 
 ### Local configuration overrides ###
-src/main/resources/application.properties
-

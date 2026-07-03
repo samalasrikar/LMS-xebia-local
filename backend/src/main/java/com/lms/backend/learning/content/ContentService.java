@@ -16,7 +16,10 @@ import com.lms.backend.learning.content.dto.ContentResponse;
 import com.lms.backend.learning.submodule.SubModule;
 import com.lms.backend.learning.submodule.SubModuleRepository;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional(readOnly = true)
 public class ContentService {
 
     private static final Logger log = LoggerFactory.getLogger(ContentService.class);
@@ -42,6 +45,7 @@ public class ContentService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ContentResponse createContent(ContentRequest request) {
 
         if (repository.existsByTitleAndSubModule_Id(request.getTitle(), request.getSubModuleId())) {
@@ -59,6 +63,7 @@ public class ContentService {
         return mapper.toResponse(saved);
     }
 
+    @Transactional
     public ContentResponse updateContent(
             @NonNull Long id,
             ContentRequest request) {
@@ -75,6 +80,7 @@ public class ContentService {
         return mapper.toResponse(updated);
     }
 
+    @Transactional
     public void deleteContent(@NonNull Long id) {
         repository.deleteById(id);
     }
