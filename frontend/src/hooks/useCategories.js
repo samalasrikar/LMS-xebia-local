@@ -19,6 +19,17 @@ export default function useCategories() {
   const [newCatImageFile, setNewCatImageFile] = useState(null);
   const [newCatImagePreview, setNewCatImagePreview] = useState("");
   const [newCatStatus, setNewCatStatus] = useState("Active");
+  const [newCatEmoji, setNewCatEmoji] = useState("");
+  const [newCatAccentColor, setNewCatAccentColor] = useState("");
+  const [newCatTags, setNewCatTags] = useState([]);
+  const [newCatFeatured, setNewCatFeatured] = useState(false);
+  const [newCatMetaTitle, setNewCatMetaTitle] = useState("");
+  const [newCatMetaDesc, setNewCatMetaDesc] = useState("");
+  const [newCatFocusKeyword, setNewCatFocusKeyword] = useState("");
+  const [newCatLongDesc, setNewCatLongDesc] = useState("");
+  const [newCatPublishState, setNewCatPublishState] = useState("Published");
+  const [newCatSlug, setNewCatSlug] = useState("");
+  const [newCatParentCat, setNewCatParentCat] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -51,6 +62,17 @@ export default function useCategories() {
             status: cat.status || "Active",
             created: "Recently",
             image: cat.image || null,
+            emoji: cat.emoji || "",
+            accentColor: cat.accentColor || "",
+            tags: cat.tags || [],
+            featured: cat.featured || false,
+            metaTitle: cat.metaTitle || "",
+            metaDesc: cat.metaDesc || "",
+            focusKeyword: cat.focusKeyword || "",
+            longDesc: cat.longDesc || "",
+            publishState: cat.publishState || "Published",
+            slug: cat.slug || "",
+            parentCat: cat.parentCat || "",
           };
         });
         setCategories(mapped);
@@ -71,6 +93,17 @@ export default function useCategories() {
     setNewCatImageFile(null);
     setNewCatImagePreview("");
     setNewCatStatus("Active");
+    setNewCatEmoji("");
+    setNewCatAccentColor("");
+    setNewCatTags([]);
+    setNewCatFeatured(false);
+    setNewCatMetaTitle("");
+    setNewCatMetaDesc("");
+    setNewCatFocusKeyword("");
+    setNewCatLongDesc("");
+    setNewCatPublishState("Published");
+    setNewCatSlug("");
+    setNewCatParentCat("");
     setErrorMsg("");
   };
 
@@ -91,6 +124,17 @@ export default function useCategories() {
     setNewCatImageFile(null);
     setNewCatImagePreview(cat.image || "");
     setNewCatStatus(cat.status || "Active");
+    setNewCatEmoji(cat.emoji || "");
+    setNewCatAccentColor(cat.accentColor || "");
+    setNewCatTags(cat.tags || []);
+    setNewCatFeatured(cat.featured || false);
+    setNewCatMetaTitle(cat.metaTitle || "");
+    setNewCatMetaDesc(cat.metaDesc || "");
+    setNewCatFocusKeyword(cat.focusKeyword || "");
+    setNewCatLongDesc(cat.longDesc || "");
+    setNewCatPublishState(cat.publishState || "Published");
+    setNewCatSlug(cat.slug || "");
+    setNewCatParentCat(cat.parentCat || "");
     setModalMode("view");
     setErrorMsg("");
     setShowModal(true);
@@ -102,6 +146,17 @@ export default function useCategories() {
     setNewCatImageFile(null);
     setNewCatImagePreview(cat.image || "");
     setNewCatStatus(cat.status || "Active");
+    setNewCatEmoji(cat.emoji || "");
+    setNewCatAccentColor(cat.accentColor || "");
+    setNewCatTags(cat.tags || []);
+    setNewCatFeatured(cat.featured || false);
+    setNewCatMetaTitle(cat.metaTitle || "");
+    setNewCatMetaDesc(cat.metaDesc || "");
+    setNewCatFocusKeyword(cat.focusKeyword || "");
+    setNewCatLongDesc(cat.longDesc || "");
+    setNewCatPublishState(cat.publishState || "Published");
+    setNewCatSlug(cat.slug || "");
+    setNewCatParentCat(cat.parentCat || "");
     setSelectedCatDbId(cat.dbId);
     setModalMode("edit");
     setErrorMsg("");
@@ -128,6 +183,21 @@ export default function useCategories() {
       if (newCatImageFile) {
         formData.append("image", newCatImageFile);
       }
+      formData.append("emoji", newCatEmoji || "");
+      formData.append("accentColor", newCatAccentColor || "");
+      if (newCatTags && newCatTags.length > 0) {
+        newCatTags.forEach(tag => formData.append("tags", tag));
+      } else {
+        formData.append("tags", "");
+      }
+      formData.append("featured", newCatFeatured);
+      formData.append("metaTitle", newCatMetaTitle || "");
+      formData.append("metaDesc", newCatMetaDesc || "");
+      formData.append("focusKeyword", newCatFocusKeyword || "");
+      formData.append("longDesc", newCatLongDesc || "");
+      formData.append("publishState", newCatPublishState);
+      formData.append("slug", newCatSlug || "");
+      formData.append("parentCat", newCatParentCat || "");
 
       if (modalMode === "add") {
         await categoryService.createCategory(formData);
@@ -192,6 +262,28 @@ export default function useCategories() {
     newCatImagePreview,
     newCatStatus,
     setNewCatStatus,
+    newCatEmoji,
+    setNewCatEmoji,
+    newCatAccentColor,
+    setNewCatAccentColor,
+    newCatTags,
+    setNewCatTags,
+    newCatFeatured,
+    setNewCatFeatured,
+    newCatMetaTitle,
+    setNewCatMetaTitle,
+    newCatMetaDesc,
+    setNewCatMetaDesc,
+    newCatFocusKeyword,
+    setNewCatFocusKeyword,
+    newCatLongDesc,
+    setNewCatLongDesc,
+    newCatPublishState,
+    setNewCatPublishState,
+    newCatSlug,
+    setNewCatSlug,
+    newCatParentCat,
+    setNewCatParentCat,
     submitting,
     errorMsg,
     deleteTarget,

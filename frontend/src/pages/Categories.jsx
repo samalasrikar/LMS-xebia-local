@@ -26,6 +26,28 @@ export default function Categories() {
     newCatImagePreview,
     newCatStatus,
     setNewCatStatus,
+    newCatEmoji,
+    setNewCatEmoji,
+    newCatAccentColor,
+    setNewCatAccentColor,
+    newCatTags,
+    setNewCatTags,
+    newCatFeatured,
+    setNewCatFeatured,
+    newCatMetaTitle,
+    setNewCatMetaTitle,
+    newCatMetaDesc,
+    setNewCatMetaDesc,
+    newCatFocusKeyword,
+    setNewCatFocusKeyword,
+    newCatLongDesc,
+    setNewCatLongDesc,
+    newCatPublishState,
+    setNewCatPublishState,
+    newCatSlug,
+    setNewCatSlug,
+    newCatParentCat,
+    setNewCatParentCat,
     submitting,
     errorMsg,
     deleteTarget,
@@ -77,6 +99,28 @@ export default function Categories() {
           onStatusChange={setNewCatStatus}
           onClose={() => setShowModal(false)}
           onSubmit={handleFormSubmit}
+          emoji={newCatEmoji}
+          onEmojiChange={setNewCatEmoji}
+          accentColor={newCatAccentColor}
+          onAccentColorChange={setNewCatAccentColor}
+          tags={newCatTags}
+          onTagsChange={setNewCatTags}
+          featured={newCatFeatured}
+          onFeaturedChange={setNewCatFeatured}
+          metaTitle={newCatMetaTitle}
+          onMetaTitleChange={setNewCatMetaTitle}
+          metaDesc={newCatMetaDesc}
+          onMetaDescChange={setNewCatMetaDesc}
+          focusKeyword={newCatFocusKeyword}
+          onFocusKeywordChange={setNewCatFocusKeyword}
+          longDesc={newCatLongDesc}
+          onLongDescChange={setNewCatLongDesc}
+          publishState={newCatPublishState}
+          onPublishStateChange={setNewCatPublishState}
+          slug={newCatSlug}
+          onSlugChange={setNewCatSlug}
+          parentCat={newCatParentCat}
+          onParentCatChange={setNewCatParentCat}
         />
 
         <DeleteDialog

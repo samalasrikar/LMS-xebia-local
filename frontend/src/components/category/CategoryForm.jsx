@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Info, Palette, AlignLeft, ToggleRight, Search as SearchIcon, CheckCircle, X, TrendingUp, Link, List, Code,
   Upload, Image as ImageIcon
 } from "lucide-react";
+import EmojiPicker from "../shared/EmojiPicker";
 
 /* ─── Preset colors ──────────────────────────────────────────────── */
 const PRESET_COLORS = ["#6366f1", "#22c55e", "#7c3aed", "#f59e0b", "#2563eb", "#0891b2", "#e11d48", "#059669", "#d97706"];
@@ -21,6 +22,8 @@ export default function CategoryForm({
   seoBarWidth,
   seoBarColor,
 }) {
+  const [showPicker, setShowPicker] = useState(false);
+
   return (
     <div className="space-y-6">
       {/* ── CARD 1: Basic Information ─────────────────────────── */}
@@ -90,19 +93,23 @@ export default function CategoryForm({
         <div className="space-y-4 text-left">
           {/* Emoji picker */}
           <FieldRow label="Category Icon / Emoji">
-            <div className="flex items-center gap-3">
-              <div className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-3xl cursor-pointer hover:border-[#6C1D5F] transition-colors flex-shrink-0">
-                {form.emoji}
-              </div>
+            <div className="flex items-center gap-3 relative">
+              <button
+                type="button"
+                onClick={() => setShowPicker(!showPicker)}
+                className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-3xl cursor-pointer hover:border-[#6C1D5F] hover:bg-slate-100 transition-colors flex-shrink-0"
+              >
+                {form.emoji || "📁"}
+              </button>
               <div>
                 <div className="text-[12px] font-semibold text-slate-700 mb-2">Quick pick</div>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-2 flex-wrap items-center">
                   {EMOJIS.map(e => (
                     <button
                       key={e}
                       type="button"
                       onClick={() => update("emoji", e)}
-                      className={`w-9 h-9 rounded-md border flex items-center justify-center text-lg transition-all ${form.emoji === e
+                      className={`w-9 h-9 rounded-md border flex items-center justify-center text-lg transition-all cursor-pointer ${form.emoji === e
                         ? "border-[#6C1D5F] bg-[#eef2ff]"
                         : "border-slate-200 bg-slate-50 hover:border-slate-300"
                         }`}
@@ -110,9 +117,27 @@ export default function CategoryForm({
                       {e}
                     </button>
                   ))}
-                  <button type="button" className="px-2 py-1 text-[12px] font-medium text-slate-500 border border-slate-200 rounded-md bg-white hover:bg-slate-50">Browse all…</button>
+                  <button
+                    type="button"
+                    onClick={() => setShowPicker(!showPicker)}
+                    className="px-2 py-1 text-[12px] font-medium text-slate-500 border border-slate-200 rounded-md bg-white hover:bg-slate-50 cursor-pointer"
+                  >
+                    Browse all…
+                  </button>
                 </div>
               </div>
+
+              {showPicker && (
+                <div className="absolute z-50 top-18 left-0 shadow-2xl">
+                  <EmojiPicker
+                    onSelect={(val) => {
+                      update("emoji", val);
+                      setShowPicker(false);
+                    }}
+                    onClose={() => setShowPicker(false)}
+                  />
+                </div>
+              )}
             </div>
           </FieldRow>
 
