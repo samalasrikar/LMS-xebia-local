@@ -37,7 +37,7 @@ const NAV_GROUPS = [
   {
     label: "Overview",
     items: [
-      { title: "Dashboard", path: "/", icon: LayoutDashboard },
+      { title: "Dashboard", path: "/admin", icon: LayoutDashboard },
       {
         title: "Analytics",
         path: "/analytics",
@@ -91,6 +91,7 @@ const NAV_GROUPS = [
     label: "System",
     items: [
       { title: "SEO & Meta", path: "/seo", icon: Search },
+      { title: "Design System", path: "/design-system", icon: LayoutTemplate },
       { title: "Settings", path: "/settings", icon: Settings },
       { title: "Permissions", path: "/permissions", icon: Shield },
       { title: "Integrations", path: "/integrations", icon: Plug },
@@ -107,7 +108,7 @@ export default function Sidebar() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const isActive = (path) => {
-    if (path === "/") return location.pathname === "/";
+    if (path === "/admin") return location.pathname === "/admin";
     return location.pathname.startsWith(path);
   };
 

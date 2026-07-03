@@ -1,0 +1,519 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Settings | Xebia LMS Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F7FA;
+        }
+        .settings-card {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .settings-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .custom-toggle:checked + .toggle-bg {
+            background-color: #aa3000;
+        }
+        .custom-toggle:checked + .toggle-bg .toggle-dot {
+            transform: translateX(100%);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#8e7068",
+                        "primary-fixed": "#ffdbd0",
+                        "surface-dim": "#cbdbf5",
+                        "surface-variant": "#d3e4fe",
+                        "on-tertiary-container": "#fbfcff",
+                        "on-surface-variant": "#5a4139",
+                        "tertiary": "#595c5f",
+                        "inverse-primary": "#ffb59f",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#1a1a2e",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#191c1e",
+                        "on-tertiary-fixed-variant": "#44474a",
+                        "surface-container-low": "#eff4ff",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#ae3100",
+                        "inverse-surface": "#213145",
+                        "on-background": "#0b1c30",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#e0e3e6",
+                        "surface": "#f8f9ff",
+                        "secondary-fixed": "#e2e0fc",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary-fixed-dim": "#ffb59f",
+                        "on-primary-fixed-variant": "#852400",
+                        "on-error-container": "#93000a",
+                        "background": "#f8f9ff",
+                        "secondary": "#5d5c74",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#e2e0fc",
+                        "on-secondary-fixed-variant": "#45455b",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary": "#aa3000",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#c4c7ca",
+                        "on-primary-container": "#fffbff",
+                        "on-surface": "#0b1c30",
+                        "surface-container-high": "#dce9ff",
+                        "on-primary-fixed": "#3a0a00",
+                        "on-secondary-container": "#63627a",
+                        "secondary-fixed-dim": "#c6c4df",
+                        "tertiary-container": "#727578",
+                        "primary-container": "#d04411",
+                        "outline-variant": "#e2bfb5",
+                        "surface-container": "#e5eeff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sidebar-width": "260px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "container-max": "1440px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["13px", {"lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-sm": ["11px", {"lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Sidebar Navigation -->
+<aside class="w-[sidebar-width] h-screen fixed left-0 top-0 bg-surface dark:bg-inverse-surface border-r border-outline-variant dark:border-outline flex flex-col py-lg z-50">
+<div class="px-gutter mb-xl flex items-center gap-sm">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div>
+<h1 class="font-display-lg text-display-lg font-bold text-primary dark:text-primary-fixed leading-tight">Xebia</h1>
+<p class="font-body-md text-label-sm text-secondary uppercase tracking-widest">Enterprise Admin</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto px-sm space-y-xs">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:bg-surface-container-low transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md">Learners</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:bg-surface-container-low transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-body-md">Schedule</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:bg-surface-container-low transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">language</span>
+<span class="font-body-md">SEO &amp; Meta</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-4 border-primary bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:bg-surface-container-low transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">shield_person</span>
+<span class="font-body-md">Permissions</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:bg-surface-container-low transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">alt_route</span>
+<span class="font-body-md">Integrations</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:bg-surface-container-low transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-md">Support</span>
+</a>
+</nav>
+<div class="mt-auto px-gutter border-t border-outline-variant pt-lg">
+<div class="flex items-center gap-md">
+<img class="w-10 h-10 rounded-full border border-outline-variant object-cover" data-alt="A professional corporate headshot of a female executive with a confident smile, wearing a sleek charcoal suit against a clean, soft-lit professional studio background. The lighting is bright and modern, matching a high-end enterprise software aesthetic with clear skin textures and professional color grading." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSw3iQB_qQmEX_D21a8p-EAy7v_xOBBo6tRr_X1CjJxWXrJK8hNUr5J8DHlB1Vvws0Q4yJvPowIivM9kLv4bO2Ez60VTice9zHtvJUVMzkXVgcwes5wT1WJAGOfbAPJSVoceHmGgD-5P2fBHw21HobrMGgSAUu6y_-z4-RrNSDQ0_VzUDtQTmn6N5vhAkTg5EpERnnXrjZnIbvBPiL7PQR1n-WJC39s71XrcFk46VKSmG4i2HX_qkh">
+<div class="flex-1 overflow-hidden">
+<p class="font-label-md text-on-surface truncate">Alex Rivera</p>
+<p class="text-[11px] text-secondary truncate">Global Administrator</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top AppBar -->
+<header class="fixed top-0 right-0 left-[sidebar-width] h-16 bg-surface border-b border-outline-variant flex items-center justify-between px-gutter z-40">
+<div class="flex items-center gap-md">
+<nav class="flex items-center gap-xs text-secondary font-label-md">
+<a class="hover:text-primary transition-colors" href="#">Dashboard</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-on-surface font-semibold">Settings</span>
+</nav>
+</div>
+<div class="flex items-center gap-lg">
+<div class="relative group">
+<span class="material-symbols-outlined text-secondary hover:text-primary cursor-pointer transition-colors">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+</div>
+<button class="bg-primary text-white px-lg py-sm rounded-lg font-label-md hover:bg-primary-container transition-all active:scale-95 flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                Save Changes
+            </button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-[sidebar-width] mt-16 p-xl max-w-container-max mx-auto">
+<header class="mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Platform Settings</h2>
+<p class="font-body-md text-secondary">Manage your LMS configuration, branding, and security preferences.</p>
+</header>
+<div class="grid grid-cols-12 gap-lg">
+<!-- General Settings -->
+<div class="col-span-12 lg:col-span-8 settings-card p-lg">
+<div class="flex items-center gap-md mb-lg">
+<div class="p-sm bg-surface-container-low rounded-lg text-primary">
+<span class="material-symbols-outlined">tune</span>
+</div>
+<h3 class="font-headline-md text-headline-md">General</h3>
+</div>
+<div class="space-y-lg">
+<div class="grid grid-cols-2 gap-lg">
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface">Instance Name</label>
+<input class="w-full px-md py-sm border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" type="text" value="Xebia Global Learning">
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface">Admin Contact Email</label>
+<input class="w-full px-md py-sm border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" type="email" value="admin@xebia.com">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-lg">
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface">Language</label>
+<select class="w-full px-md py-sm border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none bg-white">
+<option>English (US)</option>
+<option>Dutch</option>
+<option>French</option>
+<option>German</option>
+</select>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface">Time Zone</label>
+<select class="w-full px-md py-sm border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none bg-white">
+<option>(GMT+01:00) Central European Time</option>
+<option>(GMT-05:00) Eastern Time</option>
+<option>(GMT+05:30) India Standard Time</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- Branding -->
+<div class="col-span-12 lg:col-span-4 settings-card p-lg">
+<div class="flex items-center gap-md mb-lg">
+<div class="p-sm bg-surface-container-low rounded-lg text-primary">
+<span class="material-symbols-outlined">palette</span>
+</div>
+<h3 class="font-headline-md text-headline-md">Branding</h3>
+</div>
+<div class="space-y-lg">
+<div class="flex flex-col items-center justify-center p-xl border-2 border-dashed border-outline-variant rounded-xl bg-surface-bright text-center group cursor-pointer hover:border-primary transition-colors">
+<img class="w-16 h-16 object-contain mb-sm opacity-80 group-hover:opacity-100" data-alt="A clean and minimalist corporate logo for a technology training company. The design features a bold, abstract geometric shape in Xebia's signature primary orange against a pure white background. The style is modern, professional, and high-contrast, designed for visibility in a high-end enterprise software navigation bar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6Cp3Dk0YXVtHBqXrCvHDMZpzfa2iHgVg066gIrErfnylri5H6xijLgeYka3ctvVPkVU2vTQd6X0t7R34ooD50nAA1EMAsga0090VyPKDWgWDf4i1d8JOgVU_r2XdUxWPhHgufVNmBPIwTTkdCnzk3ATg8jPpABIdmEZ_yZXnJtxejcDkhgEZdtQZS0gLhLCEjcYtweULv5uDZ59K876lK_XP-2fLGWet5pp0EjKMk_wAv2WeGFHID">
+<p class="font-label-md text-on-surface">Upload Platform Logo</p>
+<p class="text-[11px] text-secondary">SVG, PNG or JPG (max. 2MB)</p>
+</div>
+<div class="space-y-md">
+<label class="font-label-md text-on-surface">Primary Brand Color</label>
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-primary border-2 border-white shadow-sm ring-1 ring-outline-variant"></div>
+<input class="flex-1 px-md py-sm border border-outline-variant rounded-lg font-mono text-sm" type="text" value="#AA3000">
+<button class="p-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[20px]">colorize</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Appearance & Display -->
+<div class="col-span-12 lg:col-span-6 settings-card p-lg">
+<div class="flex items-center gap-md mb-lg">
+<div class="p-sm bg-surface-container-low rounded-lg text-primary">
+<span class="material-symbols-outlined">visibility</span>
+</div>
+<h3 class="font-headline-md text-headline-md">Appearance</h3>
+</div>
+<div class="space-y-md">
+<div class="flex items-center justify-between p-md bg-surface-bright rounded-lg border border-outline-variant">
+<div>
+<p class="font-label-md text-on-surface">Dark Mode</p>
+<p class="text-[12px] text-secondary">Switch between light and dark themes</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only custom-toggle" type="checkbox">
+<div class="w-11 h-6 bg-secondary-fixed rounded-full toggle-bg transition-colors relative">
+<div class="absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform toggle-dot shadow-sm"></div>
+</div>
+</label>
+</div>
+<div class="flex items-center justify-between p-md bg-surface-bright rounded-lg border border-outline-variant">
+<div>
+<p class="font-label-md text-on-surface">Compact View</p>
+<p class="text-[12px] text-secondary">Reduce whitespace in data tables</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only custom-toggle" type="checkbox">
+<div class="w-11 h-6 bg-secondary-fixed rounded-full toggle-bg transition-colors relative">
+<div class="absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform toggle-dot shadow-sm"></div>
+</div>
+</label>
+</div>
+</div>
+</div>
+<!-- Email Configuration -->
+<div class="col-span-12 lg:col-span-6 settings-card p-lg">
+<div class="flex items-center gap-md mb-lg">
+<div class="p-sm bg-surface-container-low rounded-lg text-primary">
+<span class="material-symbols-outlined">mail</span>
+</div>
+<h3 class="font-headline-md text-headline-md">Email Configuration</h3>
+</div>
+<div class="space-y-md">
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface">SMTP Server</label>
+<input class="w-full px-md py-sm border border-outline-variant rounded-lg" type="text" value="smtp.xebia-cloud.com">
+</div>
+<div class="flex gap-md">
+<div class="flex-1 space-y-xs">
+<label class="font-label-md text-on-surface">Port</label>
+<input class="w-full px-md py-sm border border-outline-variant rounded-lg" type="text" value="587">
+</div>
+<div class="flex-[2] space-y-xs">
+<label class="font-label-md text-on-surface">Encryption</label>
+<select class="w-full px-md py-sm border border-outline-variant rounded-lg bg-white">
+<option>STARTTLS</option>
+<option>SSL/TLS</option>
+<option>None</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- Notifications Toggles -->
+<div class="col-span-12 settings-card p-lg">
+<div class="flex items-center gap-md mb-lg">
+<div class="p-sm bg-surface-container-low rounded-lg text-primary">
+<span class="material-symbols-outlined">notifications_active</span>
+</div>
+<h3 class="font-headline-md text-headline-md">System Notifications</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+<div class="flex items-center justify-between p-md rounded-lg bg-surface-bright">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary">person_add</span>
+<span class="font-body-md">New Learner Registration</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only custom-toggle" type="checkbox">
+<div class="w-11 h-6 bg-secondary-fixed rounded-full toggle-bg transition-colors relative">
+<div class="absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform toggle-dot shadow-sm"></div>
+</div>
+</label>
+</div>
+<div class="flex items-center justify-between p-md rounded-lg bg-surface-bright">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary">assignment_turned_in</span>
+<span class="font-body-md">Course Completions</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only custom-toggle" type="checkbox">
+<div class="w-11 h-6 bg-secondary-fixed rounded-full toggle-bg transition-colors relative">
+<div class="absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform toggle-dot shadow-sm"></div>
+</div>
+</label>
+</div>
+<div class="flex items-center justify-between p-md rounded-lg bg-surface-bright">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary">security</span>
+<span class="font-body-md">Security Alerts</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only custom-toggle" type="checkbox">
+<div class="w-11 h-6 bg-secondary-fixed rounded-full toggle-bg transition-colors relative">
+<div class="absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform toggle-dot shadow-sm"></div>
+</div>
+</label>
+</div>
+</div>
+</div>
+<!-- Security & Sessions -->
+<div class="col-span-12 lg:col-span-7 settings-card p-lg">
+<div class="flex items-center gap-md mb-lg">
+<div class="p-sm bg-surface-container-low rounded-lg text-primary">
+<span class="material-symbols-outlined">lock</span>
+</div>
+<h3 class="font-headline-md text-headline-md">Security &amp; Session Management</h3>
+</div>
+<div class="space-y-lg">
+<div class="flex items-center justify-between p-md bg-surface-bright rounded-lg border border-outline-variant">
+<div class="flex gap-md items-center">
+<span class="material-symbols-outlined text-primary">vibration</span>
+<div>
+<p class="font-label-md text-on-surface">Two-Factor Authentication (2FA)</p>
+<p class="text-[12px] text-secondary">Enforce 2FA for all administrative accounts</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only custom-toggle" type="checkbox">
+<div class="w-11 h-6 bg-secondary-fixed rounded-full toggle-bg transition-colors relative">
+<div class="absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform toggle-dot shadow-sm"></div>
+</div>
+</label>
+</div>
+<div class="space-y-md">
+<h4 class="font-label-sm text-secondary uppercase tracking-widest">Active Sessions</h4>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-md bg-white border border-outline-variant rounded-lg">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary">desktop_windows</span>
+<div>
+<p class="font-label-md">Chrome on Windows • 192.168.1.104</p>
+<p class="text-[11px] text-secondary">Current Session • Active Now</p>
+</div>
+</div>
+<span class="px-sm py-[2px] rounded bg-green-100 text-green-700 font-label-sm">SECURE</span>
+</div>
+<div class="flex items-center justify-between p-md bg-white border border-outline-variant rounded-lg">
+<div class="flex items-center gap-md opacity-70">
+<span class="material-symbols-outlined text-secondary">smartphone</span>
+<div>
+<p class="font-label-md">Safari on iPhone 15 • 45.23.12.89</p>
+<p class="text-[11px] text-secondary">Last active: 2 hours ago</p>
+</div>
+</div>
+<button class="text-error font-label-sm hover:underline">Revoke</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Backup & Restore -->
+<div class="col-span-12 lg:col-span-5 settings-card p-lg">
+<div class="flex items-center gap-md mb-lg">
+<div class="p-sm bg-surface-container-low rounded-lg text-primary">
+<span class="material-symbols-outlined">backup</span>
+</div>
+<h3 class="font-headline-md text-headline-md">Backup &amp; Maintenance</h3>
+</div>
+<div class="space-y-lg">
+<div class="p-md bg-primary-fixed rounded-xl flex items-start gap-md">
+<span class="material-symbols-outlined text-primary mt-xs">info</span>
+<div>
+<p class="font-label-md text-on-primary-fixed-variant">Automated Backups Enabled</p>
+<p class="text-[12px] text-on-primary-fixed-variant opacity-80">Last successful backup was 4 hours ago. Backups are stored on AWS S3 (Ireland).</p>
+</div>
+</div>
+<div class="space-y-sm">
+<button class="w-full py-md px-md bg-white border border-outline-variant rounded-lg flex items-center justify-between group hover:bg-surface-container transition-colors">
+<span class="font-label-md text-on-surface">Download Full Database Export</span>
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">download</span>
+</button>
+<button class="w-full py-md px-md bg-white border border-outline-variant rounded-lg flex items-center justify-between group hover:bg-surface-container transition-colors">
+<span class="font-label-md text-on-surface">Cloud Storage Sync Settings</span>
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">cloud_sync</span>
+</button>
+</div>
+<div class="pt-lg border-t border-outline-variant">
+<button class="w-full py-md px-md bg-error text-white rounded-lg flex items-center justify-center gap-sm hover:bg-red-700 transition-all active:scale-95">
+<span class="material-symbols-outlined">delete_forever</span>
+                            Clear Platform Cache
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<footer class="mt-xl pt-lg border-t border-outline-variant flex justify-end gap-md">
+<button class="px-xl py-md border border-outline-variant text-secondary rounded-lg font-label-md hover:bg-surface-container transition-colors">Discard Changes</button>
+<button class="px-xl py-md bg-primary text-white rounded-lg font-label-md hover:bg-primary-container shadow-lg shadow-primary/20 transition-all active:scale-95">Save All Settings</button>
+</footer>
+</main>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('.settings-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                // Subtle interaction
+            });
+        });
+
+        // Simulating a save toast
+        document.querySelectorAll('button').forEach(btn => {
+            if (btn.innerText.includes('Save')) {
+                btn.addEventListener('click', () => {
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Saving...';
+                    btn.disabled = true;
+                    setTimeout(() => {
+                        btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Saved!';
+                        btn.classList.replace('bg-primary', 'bg-green-600');
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.classList.replace('bg-green-600', 'bg-primary');
+                            btn.disabled = false;
+                        }, 2000);
+                    }, 1200);
+                });
+            }
+        });
+    </script>
+</body></html>
