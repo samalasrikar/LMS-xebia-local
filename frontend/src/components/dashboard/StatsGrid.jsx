@@ -5,7 +5,7 @@ import dashboardService from "../../services/dashboardService";
 /* ─── Static Banani-style stat cards with live backend data overlay ── */
 const CARDS = [
   {
-    key: "categories",
+    key: "totalCategories",
     label: "Categories",
     icon: BookOpen,
     iconBg: "bg-[#6C1D5F]/10",
@@ -16,7 +16,7 @@ const CARDS = [
     fallback: 0,
   },
   {
-    key: "courses",
+    key: "totalCourses",
     label: "Active Courses",
     icon: BookOpen,
     iconBg: "bg-emerald-50",
@@ -27,7 +27,7 @@ const CARDS = [
     fallback: 0,
   },
   {
-    key: "modules",
+    key: "totalModules",
     label: "Modules",
     icon: Target,
     iconBg: "bg-amber-50",
@@ -38,7 +38,7 @@ const CARDS = [
     fallback: 0,
   },
   {
-    key: "contents",
+    key: "totalContents",
     label: "Content Items",
     icon: DollarSign,
     iconBg: "bg-blue-50",
@@ -51,7 +51,13 @@ const CARDS = [
 ];
 
 export default function StatsGrid() {
-  const [stats, setStats] = useState({ categories: 0, courses: 0, modules: 0, subModules: 0, contents: 0 });
+  const [stats, setStats] = useState({
+  totalCategories: 0,
+  totalCourses: 0,
+  totalModules: 0,
+  totalSubmodules: 0,
+  totalContents: 0,
+});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
