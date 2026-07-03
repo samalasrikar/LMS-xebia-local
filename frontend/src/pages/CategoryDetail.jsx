@@ -81,11 +81,11 @@ export default function CategoryDetail() {
 
   // Dynamic SEO checks
   const seoChecks = [
-    { ok: !!cat.name, label: "Meta title set" },
-    { ok: !!cat.description, label: "Meta description set" },
-    { ok: true, label: "Canonical URL defined" },
-    { ok: !!cat.image, label: "OG image configured" },
-    { ok: false, label: "Twitter card not configured" },
+    { ok: !!cat.metaTitle, label: cat.metaTitle ? `Meta Title: "${cat.metaTitle}"` : "Meta Title not configured" },
+    { ok: !!cat.metaDesc, label: cat.metaDesc ? "Meta Description configured" : "Meta Description not configured" },
+    { ok: !!cat.focusKeyword, label: cat.focusKeyword ? `Focus Keyword: "${cat.focusKeyword}"` : "Focus Keyword not configured" },
+    { ok: !!cat.image, label: "OG Image configured" },
+    { ok: !!cat.slug, label: cat.slug ? `Slug: /categories/${cat.slug}` : "Slug not configured" },
   ];
   const seoScore = Math.round((seoChecks.filter(c => c.ok).length / seoChecks.length) * 100);
 
