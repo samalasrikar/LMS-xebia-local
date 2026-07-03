@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
 import Courses from "./pages/Courses";
@@ -28,6 +28,7 @@ function App() {
       <Route path="/module-management" element={<ModuleManagement />} />
       <Route path="/content-library" element={<ContentLibrary />} />
       {/* Redirects for old routes */}
+      <Route path="/analytics" element={<Navigate to="/executive-summary" replace />} />
       <Route path="/modules" element={<ModuleManagement />} />
       <Route path="/curriculum" element={<ContentLibrary />} />
       <Route path="/content-builder" element={<ContentLibrary />} />

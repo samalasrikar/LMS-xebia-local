@@ -19,6 +19,9 @@ import {
   ChevronsUpDown,
   HelpCircle,
   X,
+  Briefcase,
+  Target,
+  LineChart,
 } from "lucide-react";
 
 import adminProfileIcon from "../../assets/admin_profile_icon.svg";
@@ -28,7 +31,17 @@ const NAV_GROUPS = [
     label: "Overview",
     items: [
       { title: "Dashboard", path: "/", icon: LayoutDashboard },
-      { title: "Analytics", path: "/analytics", icon: BarChart3, badge: "New", badgeAccent: true },
+    ],
+  },
+  {
+    label: "Analytics",
+    items: [
+      { title: "Executive Summary", path: "/executive-summary", icon: LayoutDashboard },
+      { title: "Training Effectiveness", path: "/training-effectiveness", icon: BarChart3 },
+      { title: "Project Learning Investment", path: "/project-learning-investment", icon: Briefcase },
+      { title: "Fresher Journey", path: "/fresher-journey", icon: GraduationCap },
+      { title: "Skill Gap", path: "/skill-gap", icon: Target },
+      { title: "Predictive Analytics", path: "/predictive-analytics", icon: LineChart },
     ],
   },
   {
