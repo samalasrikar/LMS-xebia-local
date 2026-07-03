@@ -1,6 +1,7 @@
 import React from "react";
 import { Edit, Trash2, Video, FileText, File } from "lucide-react";
 import { Button } from "../ui/button";
+import EmptyState from "../shared/EmptyState";
 
 export default function ContentLibraryGrid({
   filteredContents,
@@ -38,8 +39,16 @@ export default function ContentLibraryGrid({
         <tbody className="divide-y divide-slate-200">
           {filteredContents.length === 0 ? (
             <tr>
-              <td colSpan={6} className="px-5 py-12 text-center text-slate-400 text-[13px] font-medium">
-                No content items found matching your filters.
+              <td colSpan={6} className="px-5 py-8 text-center">
+                <EmptyState
+                  icon={FileText}
+                  title="No content items found"
+                  description="Try adjusting your search or filters, or upload a new content item to get started."
+                  primaryAction={{
+                    label: "Add Content",
+                    onClick: () => handleOpenModal(),
+                  }}
+                />
               </td>
             </tr>
           ) : (
@@ -81,7 +90,7 @@ export default function ContentLibraryGrid({
                   <td className="px-5 py-4">
                     <span className="text-[13px] font-semibold text-slate-800 leading-snug">{c.title}</span>
                   </td>
-                  <td className="px-5 py-4 max-w-xs">
+                  <td className="px-5 py-4 max-w-[200px]">
                     <span className="text-[12px] text-slate-400 font-medium line-clamp-1">{c.body || "No additional body details."}</span>
                   </td>
                   <td className="px-5 py-4">

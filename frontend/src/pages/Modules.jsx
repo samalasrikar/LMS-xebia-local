@@ -1,12 +1,17 @@
-import { Loader2 } from "lucide-react";
+import React, { useState } from "react";
+import { Loader2, BookOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
 import useModules from "../hooks/useModules";
 import ModulesHeader from "../components/modules/ModulesHeader";
 import ModulesPane from "../components/modules/ModulesPane";
 import SubModulesPane from "../components/modules/SubModulesPane";
 import ModulesDialogs from "../components/modules/ModulesDialogs";
+import EmptyState from "../components/shared/EmptyState";
 
 export default function Modules() {
+  const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const {
     courses,
     selectedCourseId,
@@ -53,6 +58,8 @@ export default function Modules() {
           courses={courses}
           selectedCourseId={selectedCourseId}
           setSelectedCourseId={setSelectedCourseId}
+          isDropdownOpen={isDropdownOpen}
+          setIsDropdownOpen={setIsDropdownOpen}
         />
 
         {loading ? (
@@ -60,6 +67,20 @@ export default function Modules() {
             <Loader2 className="animate-spin text-[#6C1D5F] mb-3" size={32} />
             <p className="text-[13px] font-medium">Loading curriculum data...</p>
           </div>
+        ) : !selectedCourseId ? (
+          <EmptyState
+            icon={BookOpen}
+            title="No Course Selected"
+            description="Select an existing course or create a new one to start managing modules and curriculum."
+            primaryAction={{
+              label: "Select Course",
+              onClick: () => setIsDropdownOpen(true),
+            }}
+            secondaryAction={{
+              label: "Create New Course",
+              onClick: () => navigate("/courses/create"),
+            }}
+          />
         ) : (
           <div className="grid grid-cols-12 gap-6 items-start">
             

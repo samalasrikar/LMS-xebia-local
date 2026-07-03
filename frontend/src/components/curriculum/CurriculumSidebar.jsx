@@ -16,7 +16,11 @@ import {
   FileText,
   AlignLeft,
   Layers,
+  Copy,
+  RefreshCw,
 } from "lucide-react";
+
+import { Button } from "../ui/button";
 
 import {
   DropdownMenu as ShadcnDropdownMenu,
@@ -50,6 +54,10 @@ export default function CurriculumSidebar({
   setActiveCourseId,
   expandedCourses,
   setExpandedCourses,
+  handleDuplicateCourse,
+  handleDuplicateModule,
+  handleDuplicateSubModule,
+  loadCurriculumData,
 }) {
   return (
     <aside className="w-[300px] bg-slate-50 border-r border-slate-200 flex flex-col shrink-0">
@@ -57,12 +65,28 @@ export default function CurriculumSidebar({
       <div className="p-4 border-b border-slate-200/60 flex flex-col gap-2.5 shrink-0 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Curriculum Explorer</span>
-          <button
-            onClick={() => openCourseDialog()}
-            className="flex items-center gap-1 text-[10.5px] font-bold text-[#6C1D5F] hover:text-[#521347] uppercase tracking-wider transition-colors cursor-pointer"
-          >
-            <Plus size={12} /> Add Course
-          </button>
+          <div className="flex items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => loadCurriculumData?.()}
+              title="Refresh Curriculum"
+              aria-label="Refresh Curriculum"
+              className="text-slate-500 hover:text-[#6C1D5F] hover:bg-slate-100 rounded-md cursor-pointer"
+            >
+              <RefreshCw className={`size-3.5 ${loadingCurriculum ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => openCourseDialog()}
+              title="Add Course"
+              aria-label="Add Course"
+              className="text-slate-500 hover:text-[#6C1D5F] hover:bg-slate-100 rounded-md cursor-pointer"
+            >
+              <Plus className="size-3.5" />
+            </Button>
+          </div>
         </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={13} />
@@ -178,6 +202,9 @@ export default function CurriculumSidebar({
                           <ShadcnDropdownMenuItem onClick={() => openAddModuleModal(c.id)}>
                             <Plus size={12} className="mr-2" /> Add Module
                           </ShadcnDropdownMenuItem>
+                          <ShadcnDropdownMenuItem onClick={() => handleDuplicateCourse(c)}>
+                            <Copy size={11} className="mr-2" /> Duplicate Course
+                          </ShadcnDropdownMenuItem>
                           <ShadcnDropdownMenuSeparator />
                           <ShadcnDropdownMenuItem onClick={openCourseDialog}>
                             <MoveRight size={12} className="mr-2" /> Switch Course
@@ -287,6 +314,9 @@ export default function CurriculumSidebar({
                                       </ShadcnDropdownMenuItem>
                                       <ShadcnDropdownMenuItem onClick={() => openAddSubModuleDrawer(mod.id)}>
                                         <Layers size={11} className="mr-2" /> Add Sub-module
+                                      </ShadcnDropdownMenuItem>
+                                      <ShadcnDropdownMenuItem onClick={() => handleDuplicateModule(mod)}>
+                                        <Copy size={11} className="mr-2" /> Duplicate Module
                                       </ShadcnDropdownMenuItem>
                                       <ShadcnDropdownMenuSeparator />
                                       <ShadcnDropdownMenuItem
@@ -399,6 +429,9 @@ export default function CurriculumSidebar({
                                                 <ShadcnDropdownMenuItem onClick={() => openEditSubModuleDrawer(sub)}>
                                                   <Edit size={11} className="mr-2" /> Edit Sub-module
                                                 </ShadcnDropdownMenuItem>
+                                                <ShadcnDropdownMenuItem onClick={() => handleDuplicateSubModule(sub)}>
+                                                  <Copy size={11} className="mr-2" /> Duplicate Sub-module
+                                                </ShadcnDropdownMenuItem>
                                                 <ShadcnDropdownMenuSeparator />
                                                 <ShadcnDropdownMenuItem
                                                   onClick={() => requestDelete("submodule", sub)}
@@ -459,6 +492,9 @@ export default function CurriculumSidebar({
                                                       <ShadcnDropdownMenuContent className="text-[12px] min-w-[165px] z-50">
                                                         <ShadcnDropdownMenuItem onClick={() => openEditBlockDialog(sub)}>
                                                           <Edit size={11} className="mr-2" /> Edit Block
+                                                        </ShadcnDropdownMenuItem>
+                                                        <ShadcnDropdownMenuItem onClick={() => handleDuplicateSubModule(sub)}>
+                                                          <Copy size={11} className="mr-2" /> Duplicate Block
                                                         </ShadcnDropdownMenuItem>
                                                         <ShadcnDropdownMenuSeparator />
                                                         <ShadcnDropdownMenuItem

@@ -18,10 +18,17 @@ import {
   GraduationCap,
   ChevronsUpDown,
   HelpCircle,
+  TrendingUp,
+  Brain,
+  Clock,
+  LineChart,
   X,
+
   Briefcase,
   Target,
-  LineChart,
+
+  LayoutTemplate,
+
 } from "lucide-react";
 
 import adminProfileIcon from "../../assets/admin_profile_icon.svg";
@@ -31,8 +38,16 @@ const NAV_GROUPS = [
     label: "Overview",
     items: [
       { title: "Dashboard", path: "/", icon: LayoutDashboard },
+      {
+        title: "Analytics",
+        path: "/analytics",
+        icon: BarChart3,
+        badge: "New",
+        badgeAccent: true,
+      },
     ],
   },
+
   {
     label: "Analytics",
     items: [
@@ -44,24 +59,34 @@ const NAV_GROUPS = [
       { title: "Predictive Analytics", path: "/predictive-analytics", icon: LineChart },
     ],
   },
+
   {
     label: "Content",
     items: [
       { title: "Categories", path: "/categories", icon: FolderOpen },
       { title: "Courses", path: "/courses", icon: BookOpen },
       { title: "Module Management", path: "/module-management", icon: Layers },
+      { title: "Curriculum Builder", path: "/curriculum", icon: LayoutTemplate },
       { title: "Content Library", path: "/content-library", icon: FileText },
     ],
   },
+
   {
     label: "Learning",
     items: [
       { title: "Learners", path: "/learners", icon: Users },
+      { title: "Learning Coverage", path: "/learning/coverage", icon: TrendingUp },
+      { title: "Learning Hours", path: "/learning/hours", icon: Clock },
+      { title: "Learning Categories", path: "/learning/categories", icon: FolderOpen },
+      { title: "Learning Trends", path: "/learning/trends", icon: LineChart },
+      { title: "AI Transformation", path: "/ai-transformation", icon: Brain },
       { title: "Certifications", path: "/certifications", icon: Award },
-      { title: "Assessments", path: "/assessments", icon: Trophy },
+      { title: "Flagship Programs", path: "/flagship-programs", icon: BookOpen },
+      { title: "Learning Champions", path: "/learning-champions", icon: Trophy },
       { title: "Schedule", path: "/schedule", icon: Calendar },
     ],
   },
+
   {
     label: "System",
     items: [
@@ -73,6 +98,9 @@ const NAV_GROUPS = [
     ],
   },
 ];
+
+
+
 
 export default function Sidebar() {
   const location = useLocation();
@@ -165,10 +193,9 @@ export default function Sidebar() {
                     to={item.path}
                     onClick={() => setSearchQuery("")}
                     className={() =>
-                      `flex items-center gap-2.5 mx-1.5 px-3 py-1.5 my-px rounded-md text-[13px] font-medium transition-all ${
-                        active
-                          ? "bg-[#6C1D5F]/10 text-[#6C1D5F] font-semibold"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      `flex items-center gap-2.5 mx-1.5 px-3 py-1.5 my-px rounded-md text-[13px] font-medium transition-all ${active
+                        ? "bg-[#6C1D5F]/10 text-[#6C1D5F] font-semibold"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                       }`
                     }
                   >
@@ -181,11 +208,10 @@ export default function Sidebar() {
                     </span>
                     {item.badge && (
                       <span
-                        className={`text-[10px] font-semibold px-1.5 py-px rounded-full border ${
-                          item.badgeAccent
-                            ? "bg-[#6C1D5F] text-white border-[#6C1D5F]"
-                            : "bg-slate-100 text-slate-500 border-slate-200"
-                        }`}
+                        className={`text-[10px] font-semibold px-1.5 py-px rounded-full border ${item.badgeAccent
+                          ? "bg-[#6C1D5F] text-white border-[#6C1D5F]"
+                          : "bg-slate-100 text-slate-500 border-slate-200"
+                          }`}
                       >
                         {item.badge}
                       </span>
@@ -197,6 +223,17 @@ export default function Sidebar() {
           ))
         )}
       </nav>
+
+      {/* ── Student Panel Switch ── */}
+      <div className="flex-shrink-0 border-t border-slate-200 p-3 bg-slate-50/50">
+        <NavLink
+          to="/student"
+          className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[#6C1D5F] hover:bg-[#521347] text-white text-[12px] font-semibold transition-all shadow-sm shadow-[#6C1D5F]/15 hover:shadow-md cursor-pointer text-center w-full"
+        >
+          <GraduationCap size={13} className="shrink-0" />
+          <span>Student Panel</span>
+        </NavLink>
+      </div>
 
       {/* ── User Footer ──────────────────────────── */}
       <div className="flex-shrink-0 border-t border-slate-200 p-3">

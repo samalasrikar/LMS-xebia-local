@@ -25,6 +25,7 @@ import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
 import { getEmbedInfo } from "../../utils/curriculumHelpers";
+import EmptyState from "../shared/EmptyState";
 
 export default function CurriculumDialogs({
   // Block picker
@@ -698,9 +699,9 @@ export default function CurriculumDialogs({
           COURSE SELECTION DIALOG
       ══════════════════════════════════════════════════════════ */}
       <Dialog open={courseDialogOpen} onOpenChange={setCourseDialogOpen}>
-        <DialogContent className="max-w-[560px] rounded-2xl shadow-2xl bg-white border border-slate-200 p-0 overflow-hidden">
+        <DialogContent className="max-w-[560px] max-h-[85vh] rounded-2xl shadow-2xl bg-white border border-slate-200 p-0 overflow-hidden flex flex-col">
           {/* Header */}
-          <div className="px-6 pt-5 pb-4 border-b border-slate-100">
+          <div className="px-6 pt-5 pb-4 border-b border-slate-100 shrink-0">
             <div className="flex items-center gap-3 mb-1">
               <div className="w-9 h-9 rounded-xl bg-[#6C1D5F]/8 flex items-center justify-center">
                 <GraduationCap size={18} className="text-[#6C1D5F]" />
@@ -734,9 +735,9 @@ export default function CurriculumDialogs({
 
           {/* Tab: Select Existing */}
           {courseDialogTab === "select" && (
-            <div className="flex flex-col" style={{ maxHeight: "420px" }}>
+            <div className="flex flex-col flex-1 min-h-0">
               {/* Search */}
-              <div className="px-5 py-3 border-b border-slate-100">
+              <div className="px-5 py-3 border-b border-slate-100 shrink-0">
                 <div className="relative">
                   <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                   <input
@@ -755,7 +756,7 @@ export default function CurriculumDialogs({
               </div>
 
               {/* Course list */}
-              <ScrollArea className="flex-1">
+              <ScrollArea className="flex-1 min-h-0">
                 <div className="p-3 space-y-1">
                   {loadingAllCourses ? (
                     [1, 2, 3, 4].map(i => (
@@ -772,19 +773,16 @@ export default function CurriculumDialogs({
                       !courseSearch || c.title?.toLowerCase().includes(courseSearch.toLowerCase())
                     );
                     if (filtered.length === 0) return (
-                      <div className="py-8 text-center">
-                        <Search size={20} className="mx-auto mb-2 text-slate-300" />
-                        <p className="text-[12.5px] font-semibold text-slate-500">No courses found</p>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
-                          {courseSearch ? `No results for "${courseSearch}"` : "Create your first course"}
-                        </p>
-                        <button
-                          onClick={() => setCourseDialogTab("create")}
-                          className="mt-3 flex items-center gap-1.5 px-4 py-2 bg-[#6C1D5F] text-white rounded-xl text-[12px] font-bold mx-auto shadow-sm hover:bg-[#521347] transition-all cursor-pointer"
-                        >
-                          <Plus size={13} /> Create New Course
-                        </button>
-                      </div>
+                      <EmptyState
+                        size="sm"
+                        icon={Search}
+                        title="No courses found"
+                        description={courseSearch ? `No results for "${courseSearch}"` : "Create your first course"}
+                        primaryAction={{
+                          label: "Create New Course",
+                          onClick: () => setCourseDialogTab("create"),
+                        }}
+                      />
                     );
                     return filtered.map(c => {
                       const isCurrent = c.id === Number(id);
@@ -836,7 +834,7 @@ export default function CurriculumDialogs({
                 </div>
               </ScrollArea>
 
-              <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between shrink-0 bg-white z-10">
                 <span className="text-[11.5px] text-slate-400">
                   {allCourses.length} course{allCourses.length !== 1 ? "s" : ""} available
                 </span>
@@ -852,7 +850,7 @@ export default function CurriculumDialogs({
 
           {/* Tab: Create New Course */}
           {courseDialogTab === "create" && (
-            <form onSubmit={handleCreateAndSelectCourse} className="p-5 space-y-4">
+            <form onSubmit={handleCreateAndSelectCourse} className="p-5 space-y-4 overflow-y-auto flex-1 min-h-0">
               <div className="space-y-1.5">
                 <Label htmlFor="newCourseTitle" className="text-[12px] font-semibold text-slate-500">
                   Course Title <span className="text-red-500">*</span>
@@ -903,7 +901,7 @@ export default function CurriculumDialogs({
       ══════════════════════════════════════════════════════════ */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm border border-slate-200 p-6 space-y-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-[400px] border border-slate-200 p-6 space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
                 <AlertCircle size={20} className="text-red-600" />

@@ -11,6 +11,11 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.JoinColumn;
+import java.util.List;
+
 @Entity
 @Table(name = "categories")
 public class Category {
@@ -29,8 +34,52 @@ public class Category {
     @Column(name = "image", columnDefinition = "LONGBLOB")
     private byte[] image;
 
+    @Column(name = "publish_state", length = 30)
+    private String publishState;
+
     @Column(nullable = false)
     private String status = "Active";
+
+    @Column(length = 150)
+    private String slug;
+
+    @Column(name = "parent_category", length = 100)
+    private String parentCat;
+
+    @Column(length = 50)
+    private String emoji;
+
+    @Column(name = "accent_color", length = 50)
+    private String accentColor;
+
+    @Column(name = "long_description", columnDefinition = "TEXT")
+    private String longDesc;
+
+    @Column(name = "visible_catalog", nullable = false)
+    private boolean visibleCatalog = true;
+
+    @Column(nullable = false)
+    private boolean featured = false;
+
+    @Column(name = "allow_enroll", nullable = false)
+    private boolean allowEnroll = true;
+
+    @Column(name = "show_nav", nullable = false)
+    private boolean showNav = false;
+
+    @Column(name = "meta_title", length = 200)
+    private String metaTitle;
+
+    @Column(name = "meta_description", length = 1000)
+    private String metaDesc;
+
+    @Column(name = "focus_keyword", length = 200)
+    private String focusKeyword;
+
+    @ElementCollection
+    @CollectionTable(name = "category_tags", joinColumns = @JoinColumn(name = "category_id"))
+    @Column(name = "tag")
+    private List<String> tags;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -98,7 +147,13 @@ public class Category {
     public void setImage(byte[] image) {
         this.image = image;
     }
+    public String getPublishState() {
+        return publishState;
+    }
 
+    public void setPublishState(String publishState) {
+        this.publishState = publishState;
+    }
     public String getStatus() {
         return status;
     }
@@ -121,5 +176,109 @@ public class Category {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public String getParentCat() {
+        return parentCat;
+    }
+
+    public void setParentCat(String parentCat) {
+        this.parentCat = parentCat;
+    }
+
+    public String getEmoji() {
+        return emoji;
+    }
+
+    public void setEmoji(String emoji) {
+        this.emoji = emoji;
+    }
+
+    public String getAccentColor() {
+        return accentColor;
+    }
+
+    public void setAccentColor(String accentColor) {
+        this.accentColor = accentColor;
+    }
+
+    public String getLongDesc() {
+        return longDesc;
+    }
+
+    public void setLongDesc(String longDesc) {
+        this.longDesc = longDesc;
+    }
+
+    public boolean isVisibleCatalog() {
+        return visibleCatalog;
+    }
+
+    public void setVisibleCatalog(boolean visibleCatalog) {
+        this.visibleCatalog = visibleCatalog;
+    }
+
+    public boolean isFeatured() {
+        return featured;
+    }
+
+    public void setFeatured(boolean featured) {
+        this.featured = featured;
+    }
+
+    public boolean isAllowEnroll() {
+        return allowEnroll;
+    }
+
+    public void setAllowEnroll(boolean allowEnroll) {
+        this.allowEnroll = allowEnroll;
+    }
+
+    public boolean isShowNav() {
+        return showNav;
+    }
+
+    public void setShowNav(boolean showNav) {
+        this.showNav = showNav;
+    }
+
+    public String getMetaTitle() {
+        return metaTitle;
+    }
+
+    public void setMetaTitle(String metaTitle) {
+        this.metaTitle = metaTitle;
+    }
+
+    public String getMetaDesc() {
+        return metaDesc;
+    }
+
+    public void setMetaDesc(String metaDesc) {
+        this.metaDesc = metaDesc;
+    }
+
+    public String getFocusKeyword() {
+        return focusKeyword;
+    }
+
+    public void setFocusKeyword(String focusKeyword) {
+        this.focusKeyword = focusKeyword;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 }

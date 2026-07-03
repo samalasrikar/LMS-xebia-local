@@ -12,6 +12,7 @@ import {
   GraduationCap,
   Target,
   LineChart,
+  LayoutTemplate,
 } from "lucide-react";
 
 const menuItems = [
@@ -64,6 +65,11 @@ const menuItems = [
     title: "Module Management",
     path: "/module-management",
     icon: Boxes,
+  },
+  {
+    title: "Curriculum Builder",
+    path: "/curriculum",
+    icon: LayoutTemplate,
   },
   {
     title: "Sub Modules",

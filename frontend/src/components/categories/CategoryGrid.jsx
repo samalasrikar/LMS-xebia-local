@@ -1,4 +1,6 @@
 import { Layers, Edit, Trash2, BookOpen, Loader2, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import EmptyState from "../shared/EmptyState";
 
 export default function CategoryGrid({
   categories,
@@ -7,6 +9,8 @@ export default function CategoryGrid({
   onEdit,
   onDelete,
 }) {
+  const navigate = useNavigate();
+
   if (loading) {
     return (
       <div className="bg-white border border-slate-200 rounded-xl p-20 flex flex-col items-center justify-center text-slate-400 shadow-sm">
@@ -18,11 +22,15 @@ export default function CategoryGrid({
 
   if (categories.length === 0) {
     return (
-      <div className="bg-white border border-slate-200 rounded-xl p-20 text-center text-slate-400 shadow-sm flex flex-col items-center justify-center">
-        <Layers className="text-slate-350 mb-3" size={36} />
-        <p className="text-[13.5px] font-bold text-slate-700">No Categories Found</p>
-        <p className="text-[11px] text-slate-400 mt-0.5">Try adjusting your search query or filters.</p>
-      </div>
+      <EmptyState
+        icon={Layers}
+        title="No Categories Found"
+        description="Try adjusting your search query or filters, or create a new category to get started."
+        primaryAction={{
+          label: "Create New Category",
+          onClick: () => navigate("/categories/create"),
+        }}
+      />
     );
   }
 
@@ -47,16 +55,41 @@ export default function CategoryGrid({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-tr from-[#6C1D5F] to-[#521347] flex items-center justify-center">
+              <div 
+                className="w-full h-full flex items-center justify-center"
+                style={{ 
+                  background: cat.accentColor 
+                    ? `linear-gradient(135deg, ${cat.accentColor}, ${cat.accentColor}cc)` 
+                    : "linear-gradient(to top right, #6C1D5F, #521347)" 
+                }}
+              >
                 <span className="text-white text-3xl font-extrabold tracking-widest opacity-25">
                   {getInitials(cat.name)}
                 </span>
               </div>
             )}
             
-            {/* Status Badge */}
-            <div className="absolute top-3.5 right-3.5">
-              <span className={`px-2.5 py-0.5 border rounded-full text-[10px] font-bold uppercase tracking-wider ${
+            {/* Featured Badge */}
+            {cat.featured && (
+              <div className="absolute top-3.5 left-3.5">
+                <span className="bg-amber-500 text-white border-none px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider shadow-sm flex items-center gap-0.5">
+                  ★ Featured
+                </span>
+              </div>
+            )}
+
+            {/* Status Badges */}
+            <div className="absolute top-3.5 right-3.5 flex gap-1.5 items-center">
+              {cat.publishState && (
+                <span className={`px-2 py-0.5 border rounded-full text-[9px] font-extrabold uppercase tracking-wider ${
+                  cat.publishState === "Published"
+                    ? "bg-blue-50 border-blue-100 text-blue-700"
+                    : "bg-amber-50 border-amber-100 text-amber-700"
+                }`}>
+                  {cat.publishState}
+                </span>
+              )}
+              <span className={`px-2 py-0.5 border rounded-full text-[9px] font-extrabold uppercase tracking-wider ${
                 cat.status === "Active"
                   ? "bg-emerald-50 border-emerald-100 text-emerald-700"
                   : "bg-slate-100 border-slate-200 text-slate-500"
@@ -74,8 +107,9 @@ export default function CategoryGrid({
 
           {/* Card Body */}
           <div className="p-5 flex-1 flex flex-col min-w-0">
-            <h4 className="font-bold text-slate-800 text-[14.5px] truncate mb-1">
-              {cat.name}
+            <h4 className="font-bold text-slate-800 text-[14.5px] truncate mb-1 flex items-center gap-1.5">
+              {cat.emoji && <span className="text-base shrink-0 select-none">{cat.emoji}</span>}
+              <span className="truncate">{cat.name}</span>
             </h4>
             <p className="text-slate-400 text-[11.5px] font-medium uppercase tracking-wider mb-2">
               {cat.id}
@@ -83,6 +117,22 @@ export default function CategoryGrid({
             <p className="text-slate-500 text-[12.5px] leading-relaxed line-clamp-2 mb-4">
               {cat.description || "No description provided."}
             </p>
+
+            {/* Tags */}
+            {cat.tags && cat.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-4">
+                {cat.tags.slice(0, 3).map((tag, i) => (
+                  <span key={i} className="text-[10px] px-2 py-0.5 bg-slate-50 text-slate-600 border border-slate-150 rounded-full font-medium">
+                    #{tag}
+                  </span>
+                ))}
+                {cat.tags.length > 3 && (
+                  <span className="text-[10px] px-1.5 py-0.5 text-slate-400 font-medium select-none">
+                    +{cat.tags.length - 3} more
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Card Footer Actions */}
             <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">

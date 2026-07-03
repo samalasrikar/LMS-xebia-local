@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import courseService from "../services/courseService";
 import moduleService from "../services/moduleService";
 import subModuleService from "../services/subModuleService";
 
 export default function useModules() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [courses, setCourses] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,10 +45,22 @@ export default function useModules() {
     try {
       const data = await courseService.getAllCourses();
       setCourses(data || []);
-      if (data && data.length > 0) {
-        const firstId = String(data[0].id);
-        setSelectedCourseId(firstId);
-        loadCurriculum(firstId);
+
+      // Check if courseId is passed through navigation state or search params
+      const stateCourseId = location.state?.courseId || location.state?.selectedCourseId || location.state?.id;
+      
+      const searchParams = new URLSearchParams(location.search);
+      const queryCourseId = searchParams.get("courseId") || searchParams.get("id");
+      
+      const targetCourseId = stateCourseId || queryCourseId;
+
+      if (targetCourseId) {
+        const idStr = String(targetCourseId);
+        setSelectedCourseId(idStr);
+        loadCurriculum(idStr);
+      } else {
+        setSelectedCourseId("");
+        loadCurriculum("");
       }
     } catch (err) {
       console.error(err);
@@ -56,7 +69,8 @@ export default function useModules() {
   }
 
   async function loadCurriculum(courseId) {
-    if (!courseId) {
+    const targetCourseId = courseId !== undefined ? courseId : selectedCourseId;
+    if (!targetCourseId) {
       setModules([]);
       setSubmodules([]);
       setActiveModuleId(null);
@@ -71,13 +85,17 @@ export default function useModules() {
 
       // Filter modules for selected course
       const filteredModules = allModules.filter(
-        (m) => m.courseId === Number(courseId)
+        (m) => m.courseId === Number(targetCourseId)
       );
       setModules(filteredModules);
       setSubmodules(allSubModules);
 
       if (filteredModules.length > 0) {
-        setActiveModuleId(filteredModules[0].id);
+        if (activeModuleId && filteredModules.some((m) => m.id === activeModuleId)) {
+          // Keep active module
+        } else {
+          setActiveModuleId(filteredModules[0].id);
+        }
       } else {
         setActiveModuleId(null);
       }
