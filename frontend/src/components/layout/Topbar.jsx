@@ -4,6 +4,20 @@ import adminProfileIcon from "../../assets/admin_profile_icon.svg";
 
 const PATH_LABELS = {
   "/admin": "Dashboard",
+  "/analytics/executive-summary": "Executive Summary",
+  "/analytics/training-effectiveness": "Training Effectiveness",
+  "/analytics/project-learning-investment": "Project Learning Investment",
+  "/analytics/fresher-journey": "Fresher Journey",
+  "/analytics/skill-gap": "Skill Gap",
+  "/analytics/predictive-analytics": "Predictive Analytics",
+  "/analytics/learning/coverage": "Learning Coverage",
+  "/analytics/learning/hours": "Learning Hours",
+  "/analytics/learning/categories": "Learning Categories",
+  "/analytics/learning/trends": "Learning Trends",
+  "/analytics/ai-transformation": "AI Transformation",
+  "/analytics/certifications": "Certifications",
+  "/analytics/flagship-programs": "Flagship Programs",
+  "/analytics/learning-champions": "Learning Champions",
   "/analytics": "Analytics",
   "/categories": "Categories",
   "/courses": "Courses",
@@ -18,12 +32,6 @@ const PATH_LABELS = {
   "/permissions": "Permissions",
   "/integrations": "Integrations",
   "/support": "Support",
-  "/executive-summary": "Executive Summary",
-  "/training-effectiveness": "Training Effectiveness",
-  "/project-learning-investment": "Project Learning Investment",
-  "/fresher-journey": "Fresher Journey",
-  "/skill-gap": "Skill Gap",
-  "/predictive-analytics": "Predictive Analytics",
 };
 
 function getBreadcrumb(pathname) {

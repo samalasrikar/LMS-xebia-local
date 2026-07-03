@@ -49,18 +49,6 @@ const NAV_GROUPS = [
   },
 
   {
-    label: "Analytics",
-    items: [
-      { title: "Executive Summary", path: "/executive-summary", icon: LayoutDashboard },
-      { title: "Training Effectiveness", path: "/training-effectiveness", icon: BarChart3 },
-      { title: "Project Learning Investment", path: "/project-learning-investment", icon: Briefcase },
-      { title: "Fresher Journey", path: "/fresher-journey", icon: GraduationCap },
-      { title: "Skill Gap", path: "/skill-gap", icon: Target },
-      { title: "Predictive Analytics", path: "/predictive-analytics", icon: LineChart },
-    ],
-  },
-
-  {
     label: "Content",
     items: [
       { title: "Categories", path: "/categories", icon: FolderOpen },
@@ -75,14 +63,6 @@ const NAV_GROUPS = [
     label: "Learning",
     items: [
       { title: "Learners", path: "/learners", icon: Users },
-      { title: "Learning Coverage", path: "/learning/coverage", icon: TrendingUp },
-      { title: "Learning Hours", path: "/learning/hours", icon: Clock },
-      { title: "Learning Categories", path: "/learning/categories", icon: FolderOpen },
-      { title: "Learning Trends", path: "/learning/trends", icon: LineChart },
-      { title: "AI Transformation", path: "/ai-transformation", icon: Brain },
-      { title: "Certifications", path: "/certifications", icon: Award },
-      { title: "Flagship Programs", path: "/flagship-programs", icon: BookOpen },
-      { title: "Learning Champions", path: "/learning-champions", icon: Trophy },
       { title: "Schedule", path: "/schedule", icon: Calendar },
     ],
   },

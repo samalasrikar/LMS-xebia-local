@@ -1,56 +1,56 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Categories from "./pages/Categories";
-import Courses from "./pages/Courses";
-import CreateCourse from "./pages/CreateCourse";
-import CreateCategory from "./pages/CreateCategory";
-import CategoryDetail from "./pages/CategoryDetail";
-import CurriculumBuilder from "./pages/CurriculumBuilder";
-import ModuleManagement from "./pages/Modules";
-import ContentLibrary from "./pages/ContentLibrary";
+import {
+  Dashboard,
+  Categories,
+  CategoryDetail,
+  ContentLibrary,
+  Courses,
+  CreateCategory,
+  CreateCourse,
+  CurriculumBuilder,
+  DesignSystem,
+  Integrations,
+  Learners,
+  ModuleManagement,
+  SEOMeta,
+  Settings
+} from "./pages/admin";
 
-import ExecutiveSummary from "./pages/ExecutiveSummary";
-import TrainingEffectiveness from "./pages/TrainingEffectiveness";
-import ProjectLearningInvestment from "./pages/ProjectLearningInvestment";
-import FresherJourney from "./pages/FresherJourney";
-import SkillGap from "./pages/SkillGap";
-import PredictiveAnalytics from "./pages/PredictiveAnalytics";
+import {
+  ExecutiveSummary,
+  TrainingEffectiveness,
+  ProjectLearningInvestment,
+  FresherJourney,
+  SkillGap,
+  PredictiveAnalytics,
+  LearningCoverage,
+  LearningHours,
+  LearningCategories,
+  LearningTrends,
+  AITransformation,
+  Certifications,
+  FlagshipPrograms,
+  LearningChampions
+} from "./pages/analytics";
 
-import LearningCoverage from "./pages/LearningCoverage";
 import StudentLayout from "./components/layout/StudentLayout";
+import AnalyticsExplorerLayout from "./components/analytics/AnalyticsExplorerLayout";
 
-// New Pages
-import SEOMeta from "./pages/SEOMeta";
-import Learners from "./pages/Learners";
-import Integrations from "./pages/Integrations";
-import Settings from "./pages/Settings";
-import DesignSystem from "./pages/DesignSystem";
-
-// AI & Certification Analytics Dashboards Pages
-import AITransformation from "./modules/ai-certification/pages/AITransformation";
-import Certification from "./modules/ai-certification/pages/Certification";
-import FlagshipPrograms from "./modules/ai-certification/pages/FlagshipPrograms";
-import LearningChampions from "./modules/ai-certification/pages/LearningChampions";
-
-// Learning Analytics Dashboard Pages
-import LearningHours from "./modules/learning-hours/pages/LearningHours";
-import LearningCategories from "./modules/learning-categories/pages/LearningCategories";
-import LearningTrends from "./modules/learning-trends/pages/LearningTrends";
-
-// Student Pages
-import StudentDashboard from "./pages/student/StudentDashboard";
-import StudentCourses from "./pages/student/StudentCourses";
-import StudentCalendar from "./pages/student/StudentCalendar";
-import StudentAssignments from "./pages/student/StudentAssignments";
-import StudentGrades from "./pages/student/StudentGrades";
-import StudentAnalytics from "./pages/student/StudentAnalytics";
-import StudentProfile from "./pages/student/StudentProfile";
-import StudentSettings from "./pages/student/StudentSettings";
-import StudentDownloads from "./pages/student/StudentDownloads";
-import StudentAssistant from "./pages/student/StudentAssistant";
-import StudentNotifications from "./pages/student/StudentNotifications";
+import {
+  StudentDashboard,
+  StudentCourses,
+  StudentCalendar,
+  StudentAssignments,
+  StudentGrades,
+  StudentAnalytics,
+  StudentProfile,
+  StudentSettings,
+  StudentDownloads,
+  StudentAssistant,
+  StudentNotifications
+} from "./pages/student";
  
 function App() {
   return (
@@ -84,8 +84,7 @@ function App() {
       <Route path="/module-management" element={<ModuleManagement />} />
       <Route path="/content-library" element={<ContentLibrary />} />
 
-      {/* Redirects for old routes */}
-      <Route path="/analytics" element={<Navigate to="/executive-summary" replace />} />
+
 
 
       {/* ── Student Portal (sidebar layout) ── */}
@@ -109,71 +108,40 @@ function App() {
       <Route path="/curriculum" element={<CurriculumBuilder />} />
       <Route path="/content-builder" element={<ContentLibrary />} />
 
-      <Route path="/executive-summary" element={<ExecutiveSummary />} />
-      <Route
-  path="/training-effectiveness"
-  element={<TrainingEffectiveness />}
-/>
+      {/* ── Analytics Explorer Wrapper ── */}
+      <Route path="/analytics" element={<AnalyticsExplorerLayout />}>
+        <Route index element={<Navigate to="executive-summary" replace />} />
+        <Route path="executive-summary" element={<ExecutiveSummary />} />
+        <Route path="training-effectiveness" element={<TrainingEffectiveness />} />
+        <Route path="project-learning-investment" element={<ProjectLearningInvestment />} />
+        <Route path="fresher-journey" element={<FresherJourney />} />
+        <Route path="skill-gap" element={<SkillGap />} />
+        <Route path="predictive-analytics" element={<PredictiveAnalytics />} />
+        <Route path="learning/coverage" element={<LearningCoverage />} />
+        <Route path="learning/hours" element={<LearningHours />} />
+        <Route path="learning/categories" element={<LearningCategories />} />
+        <Route path="learning/trends" element={<LearningTrends />} />
+        <Route path="ai-transformation" element={<AITransformation />} />
+        <Route path="certifications" element={<Certifications />} />
+        <Route path="flagship-programs" element={<FlagshipPrograms />} />
+        <Route path="learning-champions" element={<LearningChampions />} />
+      </Route>
 
-<Route
-  path="/project-learning-investment"
-  element={<ProjectLearningInvestment />}
-/>
-
-<Route
-  path="/fresher-journey"
-  element={<FresherJourney />}
-/>
-
-<Route
-  path="/skill-gap"
-  element={<SkillGap />}
-/>
-
-<Route
-  path="/predictive-analytics"
-  element={<PredictiveAnalytics />}
-/>
- 
-
-
-      {/* Learning Coverage */}
-      <Route
-        path="/learning/coverage"
-        element={<LearningCoverage />}
-      />
-
-      {/* Learning Analytics Dashboards */}
-      <Route
-        path="/learning/hours"
-        element={<LearningHours />}
-      />
-      <Route
-        path="/learning/categories"
-        element={<LearningCategories />}
-      />
-      <Route
-        path="/learning/trends"
-        element={<LearningTrends />}
-      />
-
-      {/* AI & Certification Analytics */}
-      <Route
-        path="/ai-transformation"
-        element={<AITransformation />}
-      />
-      <Route
-        path="/certifications"
-        element={<Certification />}
-      />
-      <Route
-        path="/flagship-programs"
-        element={<FlagshipPrograms />}
-      />
-      <Route
-        path="/learning-champions"
-        element={<LearningChampions />}
-      />
+      {/* Legacy Redirects for Backwards Compatibility */}
+      <Route path="/executive-summary" element={<Navigate to="/analytics/executive-summary" replace />} />
+      <Route path="/training-effectiveness" element={<Navigate to="/analytics/training-effectiveness" replace />} />
+      <Route path="/project-learning-investment" element={<Navigate to="/analytics/project-learning-investment" replace />} />
+      <Route path="/fresher-journey" element={<Navigate to="/analytics/fresher-journey" replace />} />
+      <Route path="/skill-gap" element={<Navigate to="/analytics/skill-gap" replace />} />
+      <Route path="/predictive-analytics" element={<Navigate to="/analytics/predictive-analytics" replace />} />
+      <Route path="/learning/coverage" element={<Navigate to="/analytics/learning/coverage" replace />} />
+      <Route path="/learning/hours" element={<Navigate to="/analytics/learning/hours" replace />} />
+      <Route path="/learning/categories" element={<Navigate to="/analytics/learning/categories" replace />} />
+      <Route path="/learning/trends" element={<Navigate to="/analytics/learning/trends" replace />} />
+      <Route path="/ai-transformation" element={<Navigate to="/analytics/ai-transformation" replace />} />
+      <Route path="/certifications" element={<Navigate to="/analytics/certifications" replace />} />
+      <Route path="/flagship-programs" element={<Navigate to="/analytics/flagship-programs" replace />} />
+      <Route path="/learning-champions" element={<Navigate to="/analytics/learning-champions" replace />} />
 
     </Routes>
   );

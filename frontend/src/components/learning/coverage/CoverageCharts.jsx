@@ -107,7 +107,7 @@ export default function CoverageCharts({ chartsData = {}, loading = false }) {
       </div>
 
       {/* 2. Coverage by Department */}
-      <div className="bg-white p-6 rounded-3xl border border-[#d5c1cc] flex flex-col hover:shadow-sm transition-all duration-200">
+      <div id="department-coverage" className="bg-white p-6 rounded-3xl border border-[#d5c1cc] flex flex-col hover:shadow-sm transition-all duration-200">
         <div className="flex items-center gap-2 mb-6">
           <BarChart3 size={18} className="text-[#2ebdaf]" />
           <div>
@@ -137,7 +137,7 @@ export default function CoverageCharts({ chartsData = {}, loading = false }) {
       </div>
 
       {/* 3. Coverage by Project */}
-      <div className="bg-white p-6 rounded-3xl border border-[#d5c1cc] flex flex-col hover:shadow-sm transition-all duration-200">
+      <div id="course-coverage" className="bg-white p-6 rounded-3xl border border-[#d5c1cc] flex flex-col hover:shadow-sm transition-all duration-200">
         <div className="flex items-center gap-2 mb-6">
           <Layers size={18} className="text-[#FF6200]" />
           <div>

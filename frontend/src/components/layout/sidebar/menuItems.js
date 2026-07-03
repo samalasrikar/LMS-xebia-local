@@ -22,34 +22,9 @@ const menuItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Executive Summary",
-    path: "/executive-summary",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Training Effectiveness",
-    path: "/training-effectiveness",
+    title: "Analytics",
+    path: "/analytics",
     icon: BarChart3,
-  },
-  {
-    title: "Project Learning Investment",
-    path: "/project-learning-investment",
-    icon: Briefcase,
-  },
-  {
-    title: "Fresher Journey",
-    path: "/fresher-journey",
-    icon: GraduationCap,
-  },
-  {
-    title: "Skill Gap",
-    path: "/skill-gap",
-    icon: Target,
-  },
-  {
-    title: "Predictive Analytics",
-    path: "/predictive-analytics",
-    icon: LineChart,
   },
   {
     title: "Categories",

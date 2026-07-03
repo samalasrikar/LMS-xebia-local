@@ -349,3 +349,21 @@
 
 .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-clamp: 2; }
 .line-clamp-3 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-clamp: 3; }
+
+/* ── Section Scroll Highlight Animation ── */
+@keyframes pulseHighlight {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(108, 29, 95, 0);
+    border-color: rgba(108, 29, 95, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(108, 29, 95, 0.25);
+    border-color: #6C1D5F;
+  }
+}
+.pulse-highlight {
+  animation: pulseHighlight 1.5s ease-in-out infinite;
+  border: 1.5px solid #6C1D5F !important;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
