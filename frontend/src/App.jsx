@@ -1,60 +1,72 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Categories from "./pages/Categories";
-import Courses from "./pages/Courses";
-import CreateCourse from "./pages/CreateCourse";
-import CreateCategory from "./pages/CreateCategory";
-import CategoryDetail from "./pages/CategoryDetail";
-import CurriculumBuilder from "./pages/CurriculumBuilder";
-import ModuleManagement from "./pages/Modules";
-import ContentLibrary from "./pages/ContentLibrary";
+import Landing from "@/features/landing/pages/Landing";
+import Login from "@/features/auth/pages/Login";
 
-import ExecutiveSummary from "./pages/ExecutiveSummary";
-import TrainingEffectiveness from "./pages/TrainingEffectiveness";
-import ProjectLearningInvestment from "./pages/ProjectLearningInvestment";
-import FresherJourney from "./pages/FresherJourney";
-import SkillGap from "./pages/SkillGap";
-import PredictiveAnalytics from "./pages/PredictiveAnalytics";
+// Admin features
+import Dashboard from "@/features/admin/pages/Dashboard";
+import DesignSystem from "@/features/admin/pages/DesignSystem";
+import Integrations from "@/features/admin/pages/Integrations";
+import Learners from "@/features/admin/pages/Learners";
+import SEOMeta from "@/features/admin/pages/SEOMeta";
+import Settings from "@/features/admin/pages/Settings";
 
-import LearningCoverage from "./pages/LearningCoverage";
-import StudentLayout from "./components/layout/StudentLayout";
+// Categories Feature
+import Categories from "@/features/categories/pages/Categories";
+import CategoryDetail from "@/features/categories/pages/CategoryDetail";
+import CreateCategory from "@/features/categories/pages/CreateCategory";
 
-// New Pages
-import SEOMeta from "./pages/SEOMeta";
-import Learners from "./pages/Learners";
-import Integrations from "./pages/Integrations";
-import Settings from "./pages/Settings";
-import DesignSystem from "./pages/DesignSystem";
+// Courses Feature
+import Courses from "@/features/courses/pages/Courses";
+import CreateCourse from "@/features/courses/pages/CreateCourse";
+import CurriculumBuilder from "@/features/courses/pages/CurriculumBuilder";
 
-// AI & Certification Analytics Dashboards Pages
-import AITransformation from "./modules/ai-certification/pages/AITransformation";
-import Certification from "./modules/ai-certification/pages/Certification";
-import FlagshipPrograms from "./modules/ai-certification/pages/FlagshipPrograms";
-import LearningChampions from "./modules/ai-certification/pages/LearningChampions";
+// Modules Feature
+import ModuleManagement from "@/features/modules/pages/Modules";
 
-// Learning Analytics Dashboard Pages
-import LearningHours from "./modules/learning-hours/pages/LearningHours";
-import LearningCategories from "./modules/learning-categories/pages/LearningCategories";
-import LearningTrends from "./modules/learning-trends/pages/LearningTrends";
+// Content Feature
+import ContentLibrary from "@/features/content/pages/ContentLibrary";
 
-// Student Pages
-import StudentDashboard from "./pages/student/StudentDashboard";
-import StudentCourses from "./pages/student/StudentCourses";
-import StudentCalendar from "./pages/student/StudentCalendar";
-import StudentAssignments from "./pages/student/StudentAssignments";
-import StudentGrades from "./pages/student/StudentGrades";
-import StudentAnalytics from "./pages/student/StudentAnalytics";
-import StudentProfile from "./pages/student/StudentProfile";
-import StudentSettings from "./pages/student/StudentSettings";
-import StudentDownloads from "./pages/student/StudentDownloads";
-import StudentAssistant from "./pages/student/StudentAssistant";
-import StudentNotifications from "./pages/student/StudentNotifications";
-import StudentCourseOverview from "./pages/student/StudentCourseOverview";
-import StudentModuleDetail from "./pages/student/StudentModuleDetail";
-import StudentLessonDetail from "./pages/student/StudentLessonDetail";
-import StudentCourseCompletion from "./pages/student/StudentCourseCompletion";
+// Analytics Feature
+import {
+  ExecutiveSummary,
+  TrainingEffectiveness,
+  ProjectLearningInvestment,
+  FresherJourney,
+  SkillGap,
+  PredictiveAnalytics,
+  LearningCoverage,
+  LearningHours,
+  LearningCategories,
+  LearningTrends,
+  AITransformation,
+  Certifications,
+  FlagshipPrograms,
+  LearningChampions
+} from "@/features/analytics/pages";
+
+import StudentLayout from "@/app/layouts/StudentLayout";
+import AnalyticsExplorerLayout from "@/features/analytics/components/layout/AnalyticsExplorerLayout";
+
+// Student Feature Pages
+import {
+  StudentDashboard,
+  StudentCourses,
+  StudentCalendar,
+  StudentAssignments,
+  StudentGrades,
+  StudentAnalytics,
+  StudentProfile,
+  StudentSettings,
+  StudentDownloads,
+  StudentAssistant,
+  StudentNotifications
+} from "@/features/student/pages";
+
+// Student Course Detail Pages
+import StudentCourseOverview from "@/features/student/pages/StudentCourseOverview";
+import StudentModuleDetail from "@/features/student/pages/StudentModuleDetail";
+import StudentLessonDetail from "@/features/student/pages/StudentLessonDetail";
+import StudentCourseCompletion from "@/features/student/pages/StudentCourseCompletion";
  
 function App() {
   return (
@@ -88,8 +100,7 @@ function App() {
       <Route path="/module-management" element={<ModuleManagement />} />
       <Route path="/content-library" element={<ContentLibrary />} />
 
-      {/* Redirects for old routes */}
-      <Route path="/analytics" element={<Navigate to="/executive-summary" replace />} />
+
 
 
       {/* ── Student Portal (sidebar layout) ── */}
@@ -117,71 +128,40 @@ function App() {
       <Route path="/curriculum" element={<CurriculumBuilder />} />
       <Route path="/content-builder" element={<ContentLibrary />} />
 
-      <Route path="/executive-summary" element={<ExecutiveSummary />} />
-      <Route
-  path="/training-effectiveness"
-  element={<TrainingEffectiveness />}
-/>
+      {/* ── Analytics Explorer Wrapper ── */}
+      <Route path="/analytics" element={<AnalyticsExplorerLayout />}>
+        <Route index element={<Navigate to="executive-summary" replace />} />
+        <Route path="executive-summary" element={<ExecutiveSummary />} />
+        <Route path="training-effectiveness" element={<TrainingEffectiveness />} />
+        <Route path="project-learning-investment" element={<ProjectLearningInvestment />} />
+        <Route path="fresher-journey" element={<FresherJourney />} />
+        <Route path="skill-gap" element={<SkillGap />} />
+        <Route path="predictive-analytics" element={<PredictiveAnalytics />} />
+        <Route path="learning/coverage" element={<LearningCoverage />} />
+        <Route path="learning/hours" element={<LearningHours />} />
+        <Route path="learning/categories" element={<LearningCategories />} />
+        <Route path="learning/trends" element={<LearningTrends />} />
+        <Route path="ai-transformation" element={<AITransformation />} />
+        <Route path="certifications" element={<Certifications />} />
+        <Route path="flagship-programs" element={<FlagshipPrograms />} />
+        <Route path="learning-champions" element={<LearningChampions />} />
+      </Route>
 
-<Route
-  path="/project-learning-investment"
-  element={<ProjectLearningInvestment />}
-/>
-
-<Route
-  path="/fresher-journey"
-  element={<FresherJourney />}
-/>
-
-<Route
-  path="/skill-gap"
-  element={<SkillGap />}
-/>
-
-<Route
-  path="/predictive-analytics"
-  element={<PredictiveAnalytics />}
-/>
- 
-
-
-      {/* Learning Coverage */}
-      <Route
-        path="/learning/coverage"
-        element={<LearningCoverage />}
-      />
-
-      {/* Learning Analytics Dashboards */}
-      <Route
-        path="/learning/hours"
-        element={<LearningHours />}
-      />
-      <Route
-        path="/learning/categories"
-        element={<LearningCategories />}
-      />
-      <Route
-        path="/learning/trends"
-        element={<LearningTrends />}
-      />
-
-      {/* AI & Certification Analytics */}
-      <Route
-        path="/ai-transformation"
-        element={<AITransformation />}
-      />
-      <Route
-        path="/certifications"
-        element={<Certification />}
-      />
-      <Route
-        path="/flagship-programs"
-        element={<FlagshipPrograms />}
-      />
-      <Route
-        path="/learning-champions"
-        element={<LearningChampions />}
-      />
+      {/* Legacy Redirects for Backwards Compatibility */}
+      <Route path="/executive-summary" element={<Navigate to="/analytics/executive-summary" replace />} />
+      <Route path="/training-effectiveness" element={<Navigate to="/analytics/training-effectiveness" replace />} />
+      <Route path="/project-learning-investment" element={<Navigate to="/analytics/project-learning-investment" replace />} />
+      <Route path="/fresher-journey" element={<Navigate to="/analytics/fresher-journey" replace />} />
+      <Route path="/skill-gap" element={<Navigate to="/analytics/skill-gap" replace />} />
+      <Route path="/predictive-analytics" element={<Navigate to="/analytics/predictive-analytics" replace />} />
+      <Route path="/learning/coverage" element={<Navigate to="/analytics/learning/coverage" replace />} />
+      <Route path="/learning/hours" element={<Navigate to="/analytics/learning/hours" replace />} />
+      <Route path="/learning/categories" element={<Navigate to="/analytics/learning/categories" replace />} />
+      <Route path="/learning/trends" element={<Navigate to="/analytics/learning/trends" replace />} />
+      <Route path="/ai-transformation" element={<Navigate to="/analytics/ai-transformation" replace />} />
+      <Route path="/certifications" element={<Navigate to="/analytics/certifications" replace />} />
+      <Route path="/flagship-programs" element={<Navigate to="/analytics/flagship-programs" replace />} />
+      <Route path="/learning-champions" element={<Navigate to="/analytics/learning-champions" replace />} />
 
     </Routes>
   );
