@@ -21,8 +21,9 @@ import {
   Edit,
   Trash2,
 } from "lucide-react";
-import { getEmbedInfo, getContentIcon, getContentLabel, getContentType } from "../../utils/curriculumHelpers";
+import { getContentIcon, getContentLabel, getContentType } from "../../utils/curriculumHelpers";
 import EmptyState from "../shared/EmptyState";
+import SafeMediaEmbed from "./SafeMediaEmbed";
 
 export default function CurriculumEditor({
   activeSubModule,
@@ -129,20 +130,7 @@ export default function CurriculumEditor({
                       Lesson Link: <a href={activeSubModule.content.videoUrl} target="_blank" rel="noreferrer" className="text-[#6C1D5F] hover:underline font-semibold break-all">{activeSubModule.content.videoUrl}</a>
                     </p>
                     <div className="aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shadow-inner flex items-center justify-center">
-                      {getEmbedInfo(activeSubModule.content.videoUrl) ? (
-                        <iframe
-                          src={getEmbedInfo(activeSubModule.content.videoUrl)}
-                          title={activeSubModule.title}
-                          className="w-full h-full border-none"
-                          allowFullScreen
-                        />
-                      ) : (
-                        <div className="text-center text-slate-500 space-y-2">
-                          <Video size={36} className="mx-auto text-slate-600 animate-[pulse_2s_infinite]" />
-                          <p className="text-[12px] font-bold">Raw Video Stream Loaded</p>
-                          <p className="text-[10px] text-slate-600">Video embedding requires standard streaming providers</p>
-                        </div>
-                      )}
+                      <SafeMediaEmbed url={activeSubModule.content.videoUrl} title={activeSubModule.title} />
                     </div>
                   </div>
                 </ContentBlock>

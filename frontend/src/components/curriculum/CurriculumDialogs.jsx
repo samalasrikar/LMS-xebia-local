@@ -24,7 +24,7 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
-import { getEmbedInfo } from "../../utils/curriculumHelpers";
+import SafeMediaEmbed from "./SafeMediaEmbed";
 import EmptyState from "../shared/EmptyState";
 
 export default function CurriculumDialogs({
@@ -323,22 +323,11 @@ export default function CurriculumDialogs({
             {blockConfigType === "video" && (
               <div className="space-y-4 text-left">
                 {/* Preview */}
-                {videoUrl.trim() && !videoUrlError && (() => {
-                  const embedInfo = getEmbedInfo(videoUrl);
-                  return (
-                    <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-900 shadow-md">
-                      {embedInfo ? (
-                        embedInfo.type === "youtube" || embedInfo.type === "vimeo" ? (
-                          <iframe src={embedInfo.url} className="absolute inset-0 w-full h-full" allow="autoplay; encrypted-media" allowFullScreen title="Video Preview" />
-                        ) : (
-                          <video controls src={embedInfo.url} className="w-full h-full object-contain" />
-                        )
-                      ) : (
-                        <p className="text-xs text-white p-4">No Preview Available</p>
-                      )}
-                    </div>
-                  );
-                })()}
+                {videoUrl.trim() && !videoUrlError && (
+                  <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-900 shadow-md">
+                    <SafeMediaEmbed url={videoUrl} title="Video Preview" />
+                  </div>
+                )}
 
                 <div className="space-y-1.5">
                   <Label htmlFor="videoSourceUrl" className="text-[12px] font-bold text-slate-500">VIDEO SOURCE URL</Label>

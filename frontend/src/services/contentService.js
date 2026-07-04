@@ -1,23 +1,23 @@
 import api from "./api";
 
 const contentService = {
-  getAllContents: async () => {
-    const response = await api.get("/contents");
+  getAllContents: async (config) => {
+    const response = await api.get("/contents", config);
     return response.data.data;
   },
 
-  createContent: async (contentData) => {
-    const response = await api.post("/contents", contentData);
+  createContent: async (contentData, config) => {
+    const response = await api.post("/contents", contentData, config);
     return response.data.data;
   },
 
-  updateContent: async (id, contentData) => {
-    const response = await api.put(`/contents/${id}`, contentData);
+  updateContent: async (id, contentData, config) => {
+    const response = await api.put(`/contents/${id}`, contentData, config);
     return response.data.data;
   },
 
-  deleteContent: async (id) => {
-    const response = await api.delete(`/contents/${id}`);
+  deleteContent: async (id, config) => {
+    const response = await api.delete(`/contents/${id}`, config);
     return response.data;
   },
 };
