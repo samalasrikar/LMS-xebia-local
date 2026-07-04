@@ -40,6 +40,18 @@ export default function useCurriculumBuilder() {
   const [blockConfigOpen, setBlockConfigOpen] = useState(false);
   const [blockConfigType, setBlockConfigType] = useState("video");
 
+  /* ── Block Extra Fields ── */
+  const [headingText, setHeadingText] = useState("");
+  const [quoteText, setQuoteText] = useState("");
+  const [dividerStyle, setDividerStyle] = useState("");
+  const [imageAlt, setImageAlt] = useState("");
+  const [imageCaption, setImageCaption] = useState("");
+  const [codeContent, setCodeContent] = useState("");
+  const [codeLanguage, setCodeLanguage] = useState("");
+  const [downloadUrl, setDownloadUrl] = useState("");
+  const [downloadDisplayName, setDownloadDisplayName] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkText, setLinkText] = useState("");
 
   /* ── Notification ── */
   const [toast, setToast] = useState(null);
@@ -382,27 +394,84 @@ export default function useCurriculumBuilder() {
   };
 
   /* ── Block Actions ── */
-  const openEditBlockDialog = (subMod) => {
-    setActiveSubModule(subMod);
-    // Reset forms
+  const resetAllBlockFields = () => {
     setVideoUrl("");
     setPdfUrl("");
     setTextContent("");
     setUploadedFileName("");
     setVideoUrlError("");
     setShowVideoPreview(false);
+    setHeadingText("");
+    setQuoteText("");
+    setDividerStyle("solid");
+    setImageAlt("");
+    setImageCaption("");
+    setCodeContent("");
+    setCodeLanguage("javascript");
+    setDownloadUrl("");
+    setDownloadDisplayName("");
+    setLinkUrl("");
+    setLinkText("");
+  };
+
+  const openEditBlockDialog = (subMod) => {
+    setActiveSubModule(subMod);
+    resetAllBlockFields();
 
     if (subMod.content) {
-      if (subMod.content.pdfUrl) {
+      const bt = subMod.content.blockType || "";
+      const c = subMod.content;
+
+      if (bt === "heading") {
+        setBlockConfigType("heading");
+        setHeadingText(c.content || "");
+      } else if (bt === "quote") {
+        setBlockConfigType("quote");
+        setQuoteText(c.content || "");
+      } else if (bt === "divider") {
+        setBlockConfigType("divider");
+        setDividerStyle(c.content || "solid");
+      } else if (bt === "image") {
+        setBlockConfigType("image");
+        // imageUrl stored in c.imageUrl; alt & caption stored as JSON in content
+        if (c.imageUrl) setUploadedFileName(c.imageUrl.split("/").pop());
+        try {
+          const meta = JSON.parse(c.content || "{}");
+          setImageAlt(meta.alt || "");
+          setImageCaption(meta.caption || "");
+        } catch { setImageAlt(""); setImageCaption(""); }
+      } else if (bt === "code") {
+        setBlockConfigType("code");
+        try {
+          const meta = JSON.parse(c.content || "{}");
+          setCodeContent(meta.code || "");
+          setCodeLanguage(meta.language || "javascript");
+        } catch { setCodeContent(c.content || ""); setCodeLanguage("javascript"); }
+      } else if (bt === "download" || bt === "file") {
+        setBlockConfigType(bt);
+        setDownloadUrl(c.pdfUrl || c.imageUrl || "");
+        setDownloadDisplayName(c.content || "");
+      } else if (bt === "link" || bt === "embed") {
+        setBlockConfigType(bt);
+        setLinkUrl(c.videoUrl || c.imageUrl || "");
+        setLinkText(c.content || "");
+      } else if (bt === "callout") {
+        setBlockConfigType("callout");
+        setTextContent(c.content || "");
+      } else if (bt === "audio") {
+        setBlockConfigType("audio");
+        setDownloadUrl(c.videoUrl || "");
+        setDownloadDisplayName(c.content || "");
+      } else if (c.pdfUrl) {
         setBlockConfigType("pdf");
-        setPdfUrl(subMod.content.pdfUrl);
+        setPdfUrl(c.pdfUrl);
         setUploadedFileName("document.pdf");
-      } else if (subMod.content.videoUrl) {
+      } else if (c.videoUrl) {
         setBlockConfigType("video");
-        setVideoUrl(subMod.content.videoUrl);
+        setVideoUrl(c.videoUrl);
       } else {
         setBlockConfigType("text");
-        setTextContent(subMod.content.content || "");
+        setTextContent(c.content || "");
       }
       setBlockConfigOpen(true);
     } else {
@@ -413,14 +482,71 @@ export default function useCurriculumBuilder() {
   const handleSelectBlockType = (type) => {
     setBlockPickerOpen(false);
     setBlockConfigType(type);
-    // Reset forms
-    setVideoUrl("");
-    setPdfUrl("");
-    setTextContent("");
-    setUploadedFileName("");
-    setVideoUrlError("");
-    setShowVideoPreview(false);
+    resetAllBlockFields();
     setBlockConfigOpen(true);
+  };
+
+  const buildBlockPayload = () => {
+    const base = {
+      title: `${activeSubModule.title} Content`,
+      subModuleId: activeSubModule.id,
+      blockType: blockConfigType,
+      content: "",
+      videoUrl: "",
+      pdfUrl: "",
+      imageUrl: "",
+    };
+
+    switch (blockConfigType) {
+      case "video":
+        base.content = `Content for ${activeSubModule.title}`;
+        base.videoUrl = videoUrl.trim();
+        break;
+      case "pdf":
+        base.content = `Content for ${activeSubModule.title}`;
+        base.pdfUrl = pdfUrl.trim();
+        break;
+      case "text":
+        base.content = textContent.trim();
+        break;
+      case "heading":
+        base.content = headingText.trim();
+        break;
+      case "quote":
+        base.content = quoteText.trim();
+        break;
+      case "divider":
+        base.content = dividerStyle || "solid";
+        break;
+      case "image":
+        base.imageUrl = downloadUrl.trim(); // reuse downloadUrl for uploaded image URL
+        base.content = JSON.stringify({ alt: imageAlt.trim(), caption: imageCaption.trim() });
+        break;
+      case "code":
+        base.content = JSON.stringify({ code: codeContent.trim(), language: codeLanguage || "javascript" });
+        break;
+      case "download":
+      case "file":
+        base.pdfUrl = downloadUrl.trim();
+        base.content = downloadDisplayName.trim() || "Downloadable File";
+        break;
+      case "link":
+      case "embed":
+        base.videoUrl = linkUrl.trim();
+        base.content = linkText.trim() || linkUrl.trim();
+        break;
+      case "callout":
+        base.content = textContent.trim();
+        break;
+      case "audio":
+        base.videoUrl = downloadUrl.trim();
+        base.content = downloadDisplayName.trim() || "Audio";
+        break;
+      default:
+        base.content = textContent.trim() || `Content for ${activeSubModule.title}`;
+        break;
+    }
+    return base;
   };
 
   const handleSaveBlock = async (e) => {
@@ -429,27 +555,13 @@ export default function useCurriculumBuilder() {
     setSubmittingSubModule(true);
     setSaveStatus("saving");
     try {
-      const tV = blockConfigType === "video" ? videoUrl.trim() : "";
-      const tP = blockConfigType === "pdf" ? pdfUrl.trim() : "";
-      const tT = blockConfigType === "text" ? textContent.trim() : `Content for ${activeSubModule.title}`;
+      const payload = buildBlockPayload();
 
       if (activeSubModule.content) {
-        await contentService.updateContent(activeSubModule.content.id, {
-          title: `${activeSubModule.title} Content`,
-          content: tT,
-          videoUrl: tV,
-          pdfUrl: tP,
-          subModuleId: activeSubModule.id
-        });
+        await contentService.updateContent(activeSubModule.content.id, payload);
         showToast("Block updated!");
       } else {
-        await contentService.createContent({
-          title: `${activeSubModule.title} Content`,
-          content: tT,
-          videoUrl: tV,
-          pdfUrl: tP,
-          subModuleId: activeSubModule.id
-        });
+        await contentService.createContent(payload);
         showToast("Block created!");
       }
       setBlockConfigOpen(false);
@@ -742,6 +854,28 @@ export default function useCurriculumBuilder() {
     setBlockConfigOpen,
     blockConfigType,
     setBlockConfigType,
+    headingText,
+    setHeadingText,
+    quoteText,
+    setQuoteText,
+    dividerStyle,
+    setDividerStyle,
+    imageAlt,
+    setImageAlt,
+    imageCaption,
+    setImageCaption,
+    codeContent,
+    setCodeContent,
+    codeLanguage,
+    setCodeLanguage,
+    downloadUrl,
+    setDownloadUrl,
+    downloadDisplayName,
+    setDownloadDisplayName,
+    linkUrl,
+    setLinkUrl,
+    linkText,
+    setLinkText,
     openEditBlockDialog,
     handleSelectBlockType,
     handleSaveBlock,

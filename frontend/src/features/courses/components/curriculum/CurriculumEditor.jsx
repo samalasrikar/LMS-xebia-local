@@ -11,6 +11,13 @@ import {
   Video,
   FileText,
   ExternalLink,
+  Heading,
+  Quote,
+  Minus,
+  Code2,
+  Download,
+  Volume2,
+  AlertCircle as CalloutIcon,
   LayoutTemplate,
   BookOpen,
   Plus,
@@ -96,86 +103,363 @@ export default function CurriculumEditor({
               <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
             </div>
 
-            {/* ── Text Block ─────────────────────────── */}
-            {activeSubModule.content?.content && (
-              <div className="group/block relative">
-                <ContentBlock
-                  icon={<AlignLeft size={14} />}
-                  label="Rich Text Content"
-                  onEdit={() => openEditBlockDialog(activeSubModule)}
-                  onDelete={() => requestDelete("block", activeSubModule)}
-                >
-                  <div
-                    className="text-[14px] text-slate-600 leading-relaxed prose max-w-none"
-                    dangerouslySetInnerHTML={{ __html: activeSubModule.content.content }}
-                  />
-                </ContentBlock>
-                <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
-              </div>
-            )}
+            {/* ── Dynamic Block Rendering ─────────── */}
+            {activeSubModule.content ? (() => {
+              const c = activeSubModule.content;
+              const bt = c.blockType || "";
 
-            {/* ── Video Block ────────────────────────── */}
-            {activeSubModule.content?.videoUrl && (
-              <div className="group/block relative">
-                <ContentBlock
-                  icon={<Video size={14} />}
-                  label="Video Lesson"
-                  badge="video"
-                  highlighted
-                  onEdit={() => openEditBlockDialog(activeSubModule)}
-                  onDelete={() => requestDelete("block", activeSubModule)}
-                >
-                  <div className="space-y-4">
-                    <p className="text-[13px] text-slate-500 font-medium">
-                      Lesson Link: <a href={activeSubModule.content.videoUrl} target="_blank" rel="noreferrer" className="text-[#6C1D5F] hover:underline font-semibold break-all">{activeSubModule.content.videoUrl}</a>
-                    </p>
-                    <div className="aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shadow-inner flex items-center justify-center">
-                      <SafeMediaEmbed url={activeSubModule.content.videoUrl} title={activeSubModule.title} />
-                    </div>
-                  </div>
-                </ContentBlock>
-                <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
-              </div>
-            )}
-
-            {/* ── PDF Document Block ─────────────────── */}
-            {activeSubModule.content?.pdfUrl && (
-              <div className="group/block relative">
-                <ContentBlock
-                  icon={<FileText size={14} />}
-                  label="Reading Document"
-                  badge="PDF Document"
-                  onEdit={() => openEditBlockDialog(activeSubModule)}
-                  onDelete={() => requestDelete("block", activeSubModule)}
-                >
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4.5 bg-slate-50 border border-slate-200 rounded-xl">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center border border-red-100 shrink-0">
-                        <FileText size={20} />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[13px] font-bold text-slate-700 truncate">Document Attachment</p>
-                        <p className="text-[10.5px] text-slate-400 font-semibold truncate max-w-[280px]">
-                          {activeSubModule.content.pdfUrl.split("/").pop()}
-                        </p>
-                      </div>
-                    </div>
-                    <a
-                      href={activeSubModule.content.pdfUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center justify-center gap-1.5 px-4 py-2 bg-white border border-slate-200 hover:border-[#6C1D5F] text-slate-600 hover:text-[#6C1D5F] rounded-lg text-[12px] font-bold shadow-sm transition-all shrink-0 cursor-pointer w-full sm:w-auto"
+              // Heading block
+              if (bt === "heading") {
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<Heading size={14} />}
+                      label="Section Heading"
+                      badge="heading"
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
                     >
-                      <ExternalLink size={13} /> View Document
-                    </a>
+                      <h2 className="text-2xl font-bold text-slate-800">{c.content}</h2>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
                   </div>
-                </ContentBlock>
-                <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
-              </div>
-            )}
+                );
+              }
 
-            {/* ── Empty Content Block State ──────────── */}
-            {!activeSubModule.content?.content && !activeSubModule.content?.videoUrl && !activeSubModule.content?.pdfUrl && (
+              // Quote block
+              if (bt === "quote") {
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<Quote size={14} />}
+                      label="Quote"
+                      badge="quote"
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
+                    >
+                      <div className="p-4 border-l-4 border-[#6C1D5F] bg-[#6C1D5F]/3 rounded-r-xl">
+                        <p className="text-[15px] text-slate-600 italic leading-relaxed">"{c.content}"</p>
+                      </div>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                  </div>
+                );
+              }
+
+              // Divider block
+              if (bt === "divider") {
+                const style = c.content || "solid";
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<Minus size={14} />}
+                      label="Divider"
+                      badge="divider"
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
+                    >
+                      <div className="py-4 flex items-center justify-center">
+                        <div className={`w-full h-0 border-t-2 ${
+                          style === "dashed" ? "border-dashed" :
+                          style === "dotted" ? "border-dotted" : "border-solid"
+                        } border-slate-300`} />
+                      </div>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                  </div>
+                );
+              }
+
+              // Image block
+              if (bt === "image") {
+                let alt = "", caption = "";
+                try { const meta = JSON.parse(c.content || "{}"); alt = meta.alt || ""; caption = meta.caption || ""; } catch {}
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<Image size={14} />}
+                      label="Image"
+                      badge="image"
+                      highlighted
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
+                    >
+                      <div className="space-y-2">
+                        {c.imageUrl && (
+                          <div className="rounded-xl overflow-hidden border border-slate-200 shadow-md">
+                            <img src={c.imageUrl} alt={alt} className="w-full max-h-[400px] object-contain bg-slate-100" />
+                          </div>
+                        )}
+                        {caption && <p className="text-[12px] text-slate-500 text-center italic">{caption}</p>}
+                      </div>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                  </div>
+                );
+              }
+
+              // Code block
+              if (bt === "code") {
+                let code = c.content || "", language = "javascript";
+                try { const meta = JSON.parse(c.content || "{}"); code = meta.code || ""; language = meta.language || "javascript"; } catch {}
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<Code2 size={14} />}
+                      label="Code Snippet"
+                      badge={language}
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
+                    >
+                      <div className="rounded-xl overflow-hidden border border-slate-700">
+                        <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{language}</span>
+                        </div>
+                        <pre className="p-4 bg-slate-900 text-slate-100 text-[13px] font-mono overflow-x-auto leading-relaxed whitespace-pre-wrap">
+                          <code>{code}</code>
+                        </pre>
+                      </div>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                  </div>
+                );
+              }
+
+              // Download / File block
+              if (bt === "download" || bt === "file") {
+                const fileUrl = c.pdfUrl || c.imageUrl || "";
+                const displayName = c.content || "Downloadable File";
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<Download size={14} />}
+                      label={bt === "file" ? "File Attachment" : "Downloadable Resource"}
+                      badge={bt}
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
+                    >
+                      <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 shrink-0">
+                            <Download size={20} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[13px] font-bold text-slate-700 truncate">{displayName}</p>
+                            {fileUrl && <p className="text-[10.5px] text-slate-400 font-medium truncate max-w-[280px]">{fileUrl.split("/").pop()}</p>}
+                          </div>
+                        </div>
+                        {fileUrl && (
+                          <a href={fileUrl} target="_blank" rel="noreferrer"
+                            className="flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 hover:border-[#6C1D5F] text-slate-600 hover:text-[#6C1D5F] rounded-lg text-[12px] font-bold shadow-sm transition-all shrink-0 cursor-pointer"
+                          >
+                            <Download size={13} /> Download
+                          </a>
+                        )}
+                      </div>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                  </div>
+                );
+              }
+
+              // Link block
+              if (bt === "link") {
+                const url = c.videoUrl || c.imageUrl || "";
+                const text = c.content || url;
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<Link2 size={14} />}
+                      label="External Link"
+                      badge="link"
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
+                    >
+                      <div className="flex items-center gap-3 p-4 bg-blue-50/50 border border-blue-100 rounded-xl">
+                        <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                          <ExternalLink size={16} />
+                        </div>
+                        <a href={url} target="_blank" rel="noreferrer" className="text-[14px] font-semibold text-blue-700 hover:underline break-all">{text}</a>
+                      </div>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                  </div>
+                );
+              }
+
+              // Embed block
+              if (bt === "embed") {
+                const url = c.videoUrl || c.imageUrl || "";
+                const title = c.content || "Embedded Content";
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<ExternalLink size={14} />}
+                      label="Embedded Resource"
+                      badge="embed"
+                      highlighted
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
+                    >
+                      <div className="space-y-3">
+                        <p className="text-[13px] text-slate-500 font-medium">{title}</p>
+                        {url && (
+                          <div className="aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shadow-inner">
+                            <SafeMediaEmbed url={url} title={title} />
+                          </div>
+                        )}
+                      </div>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                  </div>
+                );
+              }
+
+              // Callout block
+              if (bt === "callout") {
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<CalloutIcon size={14} />}
+                      label="Callout"
+                      badge="callout"
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
+                    >
+                      <div className="p-4 bg-blue-50 border border-blue-100 text-blue-800 rounded-xl text-[14px] flex gap-3 leading-relaxed">
+                        <CalloutIcon size={18} className="text-blue-500 shrink-0 mt-0.5" />
+                        <span>{c.content}</span>
+                      </div>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                  </div>
+                );
+              }
+
+              // Audio block
+              if (bt === "audio") {
+                const audioUrl = c.videoUrl || "";
+                const audioTitle = c.content || "Audio";
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<Volume2 size={14} />}
+                      label="Audio"
+                      badge="audio"
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
+                    >
+                      <div className="space-y-3">
+                        <p className="text-[13px] font-bold text-slate-700">{audioTitle}</p>
+                        {audioUrl && (
+                          <audio controls className="w-full rounded-lg" src={audioUrl}>
+                            Your browser does not support the audio element.
+                          </audio>
+                        )}
+                      </div>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                  </div>
+                );
+              }
+
+              // Fallback: legacy rendering for text / video / pdf (no blockType set)
+              return (
+                <>
+                  {c.content && (
+                    <div className="group/block relative">
+                      <ContentBlock
+                        icon={<AlignLeft size={14} />}
+                        label="Rich Text Content"
+                        onEdit={() => openEditBlockDialog(activeSubModule)}
+                        onDelete={() => requestDelete("block", activeSubModule)}
+                      >
+                        <div
+                          className="text-[14px] text-slate-600 leading-relaxed prose max-w-none"
+                          dangerouslySetInnerHTML={{ __html: c.content }}
+                        />
+                      </ContentBlock>
+                      <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                    </div>
+                  )}
+
+                  {c.videoUrl && (
+                    <div className="group/block relative">
+                      <ContentBlock
+                        icon={<Video size={14} />}
+                        label="Video Lesson"
+                        badge="video"
+                        highlighted
+                        onEdit={() => openEditBlockDialog(activeSubModule)}
+                        onDelete={() => requestDelete("block", activeSubModule)}
+                      >
+                        <div className="space-y-4">
+                          <p className="text-[13px] text-slate-500 font-medium">
+                            Lesson Link: <a href={c.videoUrl} target="_blank" rel="noreferrer" className="text-[#6C1D5F] hover:underline font-semibold break-all">{c.videoUrl}</a>
+                          </p>
+                          <div className="aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shadow-inner flex items-center justify-center">
+                            <SafeMediaEmbed url={c.videoUrl} title={activeSubModule.title} />
+                          </div>
+                        </div>
+                      </ContentBlock>
+                      <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                    </div>
+                  )}
+
+                  {c.pdfUrl && (
+                    <div className="group/block relative">
+                      <ContentBlock
+                        icon={<FileText size={14} />}
+                        label="Reading Document"
+                        badge="PDF Document"
+                        onEdit={() => openEditBlockDialog(activeSubModule)}
+                        onDelete={() => requestDelete("block", activeSubModule)}
+                      >
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4.5 bg-slate-50 border border-slate-200 rounded-xl">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center border border-red-100 shrink-0">
+                              <FileText size={20} />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[13px] font-bold text-slate-700 truncate">Document Attachment</p>
+                              <p className="text-[10.5px] text-slate-400 font-semibold truncate max-w-[280px]">
+                                {c.pdfUrl.split("/").pop()}
+                              </p>
+                            </div>
+                          </div>
+                          <a
+                            href={c.pdfUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-white border border-slate-200 hover:border-[#6C1D5F] text-slate-600 hover:text-[#6C1D5F] rounded-lg text-[12px] font-bold shadow-sm transition-all shrink-0 cursor-pointer w-full sm:w-auto"
+                          >
+                            <ExternalLink size={13} /> View Document
+                          </a>
+                        </div>
+                      </ContentBlock>
+                      <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                    </div>
+                  )}
+
+                  {/* Empty if no content at all in legacy mode */}
+                  {!c.content && !c.videoUrl && !c.pdfUrl && (
+                    <div className="group/block relative">
+                      <EmptyState
+                        size="sm"
+                        icon={LayoutTemplate}
+                        title="Empty Content Block"
+                        description="No content configured for this block."
+                        primaryAction={{
+                          label: "Configure Block",
+                          onClick: () => openEditBlockDialog(activeSubModule),
+                        }}
+                      />
+                    </div>
+                  )}
+                </>
+              );
+            })() : (
+              /* ── No content at all ── */
               <div className="group/block relative">
                 <EmptyState
                   size="sm"
@@ -189,7 +473,10 @@ export default function CurriculumEditor({
                           [
                             { color: "text-violet-500", label: "video" },
                             { color: "text-rose-500", label: "PDFs" },
-                            { color: "text-sky-500", label: "rich text content" }
+                            { color: "text-sky-500", label: "rich text" },
+                            { color: "text-amber-500", label: "headings" },
+                            { color: "text-emerald-500", label: "code" },
+                            { color: "text-pink-500", label: "images" },
                           ].map((item, i, arr) => (
                             <React.Fragment key={item.label}>
                               <strong className={`${item.color} font-bold`}>{item.label}</strong>

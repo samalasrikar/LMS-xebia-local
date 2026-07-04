@@ -163,6 +163,28 @@ export default function CurriculumBuilder() {
     setBlockConfigOpen,
     blockConfigType,
     setBlockConfigType,
+    headingText,
+    setHeadingText,
+    quoteText,
+    setQuoteText,
+    dividerStyle,
+    setDividerStyle,
+    imageAlt,
+    setImageAlt,
+    imageCaption,
+    setImageCaption,
+    codeContent,
+    setCodeContent,
+    codeLanguage,
+    setCodeLanguage,
+    downloadUrl,
+    setDownloadUrl,
+    downloadDisplayName,
+    setDownloadDisplayName,
+    linkUrl,
+    setLinkUrl,
+    linkText,
+    setLinkText,
     openEditBlockDialog,
     handleSelectBlockType,
     handleSaveBlock,
@@ -386,6 +408,29 @@ export default function CurriculumBuilder() {
         modules={modules}
         activeSubModule={activeSubModule}
         showToast={showToast}
+        // Block extra fields
+        headingText={headingText}
+        setHeadingText={setHeadingText}
+        quoteText={quoteText}
+        setQuoteText={setQuoteText}
+        dividerStyle={dividerStyle}
+        setDividerStyle={setDividerStyle}
+        imageAlt={imageAlt}
+        setImageAlt={setImageAlt}
+        imageCaption={imageCaption}
+        setImageCaption={setImageCaption}
+        codeContent={codeContent}
+        setCodeContent={setCodeContent}
+        codeLanguage={codeLanguage}
+        setCodeLanguage={setCodeLanguage}
+        downloadUrl={downloadUrl}
+        setDownloadUrl={setDownloadUrl}
+        downloadDisplayName={downloadDisplayName}
+        setDownloadDisplayName={setDownloadDisplayName}
+        linkUrl={linkUrl}
+        setLinkUrl={setLinkUrl}
+        linkText={linkText}
+        setLinkText={setLinkText}
         isModuleModalOpen={isModuleModalOpen}
         setIsModuleModalOpen={setIsModuleModalOpen}
         editingModule={editingModule}

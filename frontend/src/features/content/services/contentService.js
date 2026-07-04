@@ -20,6 +20,15 @@ const contentService = {
     const response = await api.delete(`/contents/${id}`, config);
     return response.data;
   },
+
+  uploadFile: async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await api.post("/files/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  },
 };
 
 export default contentService;
