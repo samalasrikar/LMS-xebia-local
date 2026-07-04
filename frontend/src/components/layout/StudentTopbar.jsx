@@ -142,11 +142,28 @@ export default function StudentTopbar() {
       ? location.pathname.slice(0, -1)
       : location.pathname;
 
-  const meta = PATH_METADATA[currentPath] || {
-    title: "Student Portal",
-    breadcrumb: "Home",
-    description: "",
+  const resolveMeta = (path) => {
+    // Exact match first
+    if (PATH_METADATA[path]) return PATH_METADATA[path];
+
+    // Dynamic route patterns
+    if (/^\/student\/courses\/[^/]+\/modules\/[^/]+\/lessons\/[^/]+$/.test(path)) {
+      return { title: "Lesson", breadcrumb: "Courses / Lesson", description: "Lesson content and resources." };
+    }
+    if (/^\/student\/courses\/[^/]+\/modules\/[^/]+$/.test(path)) {
+      return { title: "Module", breadcrumb: "Courses / Module", description: "Module details and lessons." };
+    }
+    if (/^\/student\/courses\/[^/]+\/completed$/.test(path)) {
+      return { title: "Course Completed", breadcrumb: "Courses / Completed", description: "Congratulations on finishing!" };
+    }
+    if (/^\/student\/courses\/[^/]+$/.test(path)) {
+      return { title: "Course Overview", breadcrumb: "Courses / Overview", description: "Course details and curriculum." };
+    }
+
+    return { title: "Student Portal", breadcrumb: "Home", description: "" };
   };
+
+  const meta = resolveMeta(currentPath);
 
   /* ── Scroll shadow ── */
   useEffect(() => {

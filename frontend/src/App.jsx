@@ -51,6 +51,10 @@ import StudentSettings from "./pages/student/StudentSettings";
 import StudentDownloads from "./pages/student/StudentDownloads";
 import StudentAssistant from "./pages/student/StudentAssistant";
 import StudentNotifications from "./pages/student/StudentNotifications";
+import StudentCourseOverview from "./pages/student/StudentCourseOverview";
+import StudentModuleDetail from "./pages/student/StudentModuleDetail";
+import StudentLessonDetail from "./pages/student/StudentLessonDetail";
+import StudentCourseCompletion from "./pages/student/StudentCourseCompletion";
  
 function App() {
   return (
@@ -92,6 +96,10 @@ function App() {
       <Route path="/student" element={<StudentLayout />}>
         <Route index element={<StudentDashboard />} />
         <Route path="courses" element={<StudentCourses />} />
+        <Route path="courses/:courseId" element={<StudentCourseOverview />} />
+        <Route path="courses/:courseId/completed" element={<StudentCourseCompletion />} />
+        <Route path="courses/:courseId/modules/:moduleId" element={<StudentModuleDetail />} />
+        <Route path="courses/:courseId/modules/:moduleId/lessons/:lessonId" element={<StudentLessonDetail />} />
         <Route path="calendar" element={<StudentCalendar />} />
         <Route path="assignments" element={<StudentAssignments />} />
         <Route path="grades" element={<StudentGrades />} />
