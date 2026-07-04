@@ -1,23 +1,32 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import {
-  Dashboard,
-  Categories,
-  CategoryDetail,
-  ContentLibrary,
-  Courses,
-  CreateCategory,
-  CreateCourse,
-  CurriculumBuilder,
-  DesignSystem,
-  Integrations,
-  Learners,
-  ModuleManagement,
-  SEOMeta,
-  Settings
-} from "./pages/admin";
+import Landing from "@/features/landing/pages/Landing";
+import Login from "@/features/auth/pages/Login";
 
+// Admin features
+import Dashboard from "@/features/admin/pages/Dashboard";
+import DesignSystem from "@/features/admin/pages/DesignSystem";
+import Integrations from "@/features/admin/pages/Integrations";
+import Learners from "@/features/admin/pages/Learners";
+import SEOMeta from "@/features/admin/pages/SEOMeta";
+import Settings from "@/features/admin/pages/Settings";
+
+// Categories Feature
+import Categories from "@/features/categories/pages/Categories";
+import CategoryDetail from "@/features/categories/pages/CategoryDetail";
+import CreateCategory from "@/features/categories/pages/CreateCategory";
+
+// Courses Feature
+import Courses from "@/features/courses/pages/Courses";
+import CreateCourse from "@/features/courses/pages/CreateCourse";
+import CurriculumBuilder from "@/features/courses/pages/CurriculumBuilder";
+
+// Modules Feature
+import ModuleManagement from "@/features/modules/pages/Modules";
+
+// Content Feature
+import ContentLibrary from "@/features/content/pages/ContentLibrary";
+
+// Analytics Feature
 import {
   ExecutiveSummary,
   TrainingEffectiveness,
@@ -33,11 +42,12 @@ import {
   Certifications,
   FlagshipPrograms,
   LearningChampions
-} from "./pages/analytics";
+} from "@/features/analytics/pages";
 
-import StudentLayout from "./components/layout/StudentLayout";
-import AnalyticsExplorerLayout from "./components/analytics/AnalyticsExplorerLayout";
+import StudentLayout from "@/app/layouts/StudentLayout";
+import AnalyticsExplorerLayout from "@/features/analytics/components/layout/AnalyticsExplorerLayout";
 
+// Student Feature Pages
 import {
   StudentDashboard,
   StudentCourses,
@@ -50,7 +60,7 @@ import {
   StudentDownloads,
   StudentAssistant,
   StudentNotifications
-} from "./pages/student";
+} from "@/features/student/pages";
  
 function App() {
   return (
