@@ -16,6 +16,8 @@ import com.lms.backend.learning.course.CourseRepository;
 import com.lms.backend.learning.module.Module;
 import com.lms.backend.learning.submodule.SubModule;
 import com.lms.backend.learning.content.Content;
+import com.lms.backend.learning.student.Student;
+import com.lms.backend.learning.student.StudentRepository;
 
 @Component
 public class StartupRunner implements CommandLineRunner {
@@ -24,15 +26,31 @@ public class StartupRunner implements CommandLineRunner {
 
     private final DataSource dataSource;
     private final CourseRepository courseRepository;
+    private final StudentRepository studentRepository;
 
-    public StartupRunner(DataSource dataSource, CourseRepository courseRepository) {
+    public StartupRunner(DataSource dataSource, CourseRepository courseRepository, StudentRepository studentRepository) {
         this.dataSource = dataSource;
         this.courseRepository = courseRepository;
+        this.studentRepository = studentRepository;
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public void run(String... args) throws Exception {
+        // Seed default student if empty
+        if (studentRepository.count() == 0) {
+            Student student = Student.builder()
+                .name("Alex")
+                .email("alex@xebia.com")
+                .avatar("https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150")
+                .department("Engineering")
+                .academicYear("2023-2024")
+                .gpa(3.8)
+                .studyStreak(14)
+                .build();
+            studentRepository.save(student);
+            log.info("Default student seeded successfully: {}", student.getEmail());
+        }
 
         try (Connection connection = dataSource.getConnection()) {
 

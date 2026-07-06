@@ -236,7 +236,7 @@ export default function StudentCourses() {
 
                     {/* Action button */}
                     <button
-                      onClick={() => navigate(`/courses/${c.id}/curriculum`)}
+                      onClick={() => navigate(`/student/courses/${c.id}`)}
                       className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-[12px] font-bold shadow-sm transition-all cursor-pointer outline-none border ${
                         progress === 100
                           ? "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200"
