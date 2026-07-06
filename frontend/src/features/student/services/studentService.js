@@ -3,20 +3,20 @@ import api from "@/shared/services/api";
 const studentService = {
   getGrades: async (config) => {
     const response = await api.get("/student/grades", config);
-    return response.data;
+    return response.data.data;
   },
   getCertificates: async (config) => {
     const response = await api.get("/student/certificates", config);
-    return response.data;
+    return response.data.data;
   },
   getResources: async (config) => {
     const response = await api.get("/student/resources", config);
-    return response.data;
+    return response.data.data;
   },
   getAnalytics: async (config) => {
     try {
       const response = await api.get("/student/analytics", config);
-      return response.data.data || response.data;
+      return response.data.data;
     } catch (err) {
       console.warn("Backend Student Analytics API failed, falling back to mock data:", err.message);
       return {
