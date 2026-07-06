@@ -1,4 +1,4 @@
-import { Download, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import AppLayout from "@/app/layouts/AppLayout";
 import StatsGrid from "@/features/dashboard/components/StatsGrid";
 import EnrollmentChart from "@/features/dashboard/components/EnrollmentChart";
@@ -30,9 +30,6 @@ export default function Dashboard() {
             <div className="flex items-center gap-1.5 text-[12px] text-slate-400 font-medium">
               Last updated: just now
             </div>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium text-slate-600 border border-slate-200 bg-white hover:bg-slate-50 transition-colors">
-              <Download size={13} /> Export
-            </button>
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium text-white bg-[#6C1D5F] hover:bg-[#4A1E47] transition-colors">
               <Plus size={13} /> Quick Create
             </button>

@@ -1,4 +1,4 @@
-import { Search, Download } from "lucide-react";
+import { Search } from "lucide-react";
 
 export default function CategoryToolbar({
   filterText,
@@ -47,11 +47,7 @@ export default function CategoryToolbar({
         </div>
       </div>
 
-      {/* Export */}
-      <button className="flex items-center gap-1.5 px-4 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
-        <Download size={14} />
-        Export
-      </button>
+
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, Search, Filter, Download } from "lucide-react";
+import { Plus, Search, Filter } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -21,7 +21,6 @@ export default function ContentLibraryHeader({
   setSelectedCourseId,
   courses,
   modules,
-  handleExportCSV,
   handleOpenModal,
   handleBulkDelete,
   selectedCount,
@@ -45,13 +44,7 @@ export default function ContentLibraryHeader({
             </Button>
           )}
 
-          <Button
-            variant="outline"
-            onClick={handleExportCSV}
-            className="gap-2 text-[13px] font-semibold border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer"
-          >
-            <Download size={14} /> Export CSV
-          </Button>
+
 
           <Button
             onClick={() => handleOpenModal()}

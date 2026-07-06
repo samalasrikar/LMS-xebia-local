@@ -41,7 +41,6 @@ export default function ContentLibrary() {
     filteredContents,
     handleToggleSelect,
     handleToggleAll,
-    handleExportCSV,
     handleOpenModal,
     handleSubmitForm: handleSaveContent,
     handleDeleteSingle: handleDeleteContent,
@@ -66,7 +65,6 @@ export default function ContentLibrary() {
           setSelectedCourseId={setSelectedCourseId}
           courses={courses}
           modules={modules}
-          handleExportCSV={handleExportCSV}
           handleOpenModal={handleOpenModal}
           handleBulkDelete={handleBulkDelete}
           selectedCount={selectedList.length}
