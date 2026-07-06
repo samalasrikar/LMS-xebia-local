@@ -2,6 +2,7 @@ package com.lms.backend.config;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.Objects;
 
 import javax.sql.DataSource;
 
@@ -48,7 +49,7 @@ public class StartupRunner implements CommandLineRunner {
                 .gpa(3.8)
                 .studyStreak(14)
                 .build();
-            studentRepository.save(student);
+            studentRepository.save(Objects.requireNonNull(student));
             log.info("Default student seeded successfully: {}", student.getEmail());
         }
 

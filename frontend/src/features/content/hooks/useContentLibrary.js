@@ -116,39 +116,7 @@ export default function useContentLibrary() {
     }
   };
 
-  // Action: Export CSV
-  const handleExportCSV = () => {
-    if (filteredContents.length === 0) {
-      showToast("No content to export.", "error");
-      return;
-    }
 
-    const headers = ["ID", "Title", "Type", "Submodule ID", "Video URL", "PDF URL", "Body Content"];
-    const rows = filteredContents.map((item) => [
-      item.id,
-      item.title,
-      getContentItemType(item),
-      item.subModuleId,
-      item.videoUrl || "",
-      item.pdfUrl || "",
-      (item.content || "").replace(/"/g, '""')
-    ]);
-
-    const csvContent = [
-      headers.join(","),
-      ...rows.map((row) => row.map((val) => `"${val}"`).join(","))
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `Xebia_Content_Builder_${new Date().toISOString().split("T")[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast("CSV exported successfully.", "success");
-  };
 
   // Action: Add / Edit Open
   const handleOpenModal = (item = null) => {
@@ -284,7 +252,6 @@ export default function useContentLibrary() {
     filteredContents,
     handleToggleSelect,
     handleToggleAll,
-    handleExportCSV,
     handleOpenModal,
     handleSubmitForm,
     handleDeleteSingle,

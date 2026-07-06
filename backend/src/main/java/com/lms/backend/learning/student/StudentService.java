@@ -57,7 +57,7 @@ public class StudentService {
     public List<CertificateResponse> getCertificates() {
         List<Course> courses = courseRepository.findAll();
         return courses.stream()
-            .filter(Course::isHasCertificate)
+            .filter(c -> c.isHasCertificate())
             .map(course -> {
                 int offset = course.getId().intValue();
                 String date = "October " + (10 + (offset % 20)) + ", 2024";
@@ -81,9 +81,9 @@ public class StudentService {
         
         // Fetch student profile stats from database
         Optional<Student> studentOpt = studentRepository.findAll().stream().findFirst();
-        double currentGpa = studentOpt.map(Student::getGpa).orElse(3.8);
-        int streak = studentOpt.map(Student::getStudyStreak).orElse(14);
-        String name = studentOpt.map(Student::getName).orElse("Alex");
+        double currentGpa = studentOpt.map(s -> s.getGpa()).orElse(3.8);
+        int streak = studentOpt.map(s -> s.getStudyStreak()).orElse(14);
+        String name = studentOpt.map(s -> s.getName()).orElse("Alex");
 
         // 1. Trend Data
         List<Map<String, Object>> trendData = List.of(
@@ -136,7 +136,7 @@ public class StudentService {
         // 5. KPIs
         int totalCreditsEarned = grades.stream()
             .filter(g -> "Completed".equals(g.getStatus()))
-            .mapToInt(GradeResponse::getCredits)
+            .mapToInt(g -> g.getCredits())
             .sum();
 
         int creditsTotal = 120;
@@ -153,7 +153,7 @@ public class StudentService {
         );
 
         // 6. Insights
-        String catNames = categories.stream().map(Category::getName).collect(Collectors.joining(", "));
+        String catNames = categories.stream().map(c -> c.getName()).collect(Collectors.joining(", "));
         String performanceText = "Welcome back, " + name + "! Your consistent performance in your enrolled courses suggests a strong academic aptitude. "
             + "With active categories like [" + (catNames.isEmpty() ? "General Studies" : catNames) + "], "
             + "consider focusing your upcoming term electives on these subject areas.";
