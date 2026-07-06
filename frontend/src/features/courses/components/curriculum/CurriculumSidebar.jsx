@@ -18,6 +18,8 @@ import {
   Layers,
   Copy,
   RefreshCw,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/button";
@@ -57,6 +59,8 @@ export default function CurriculumSidebar({
   handleDuplicateCourse,
   handleDuplicateModule,
   handleDuplicateSubModule,
+  handleMoveModule,
+  handleMoveSubModule,
   loadCurriculumData,
 }) {
   return (
@@ -319,6 +323,13 @@ export default function CurriculumSidebar({
                                         <Copy size={11} className="mr-2" /> Duplicate Module
                                       </ShadcnDropdownMenuItem>
                                       <ShadcnDropdownMenuSeparator />
+                                      <ShadcnDropdownMenuItem onClick={() => handleMoveModule(mod, "up")}>
+                                        <ArrowUp size={11} className="mr-2" /> Move Up
+                                      </ShadcnDropdownMenuItem>
+                                      <ShadcnDropdownMenuItem onClick={() => handleMoveModule(mod, "down")}>
+                                        <ArrowDown size={11} className="mr-2" /> Move Down
+                                      </ShadcnDropdownMenuItem>
+                                      <ShadcnDropdownMenuSeparator />
                                       <ShadcnDropdownMenuItem
                                         onClick={() => requestDelete("module", mod)}
                                         className="text-red-600 focus:text-red-600"
@@ -431,6 +442,13 @@ export default function CurriculumSidebar({
                                                 </ShadcnDropdownMenuItem>
                                                 <ShadcnDropdownMenuItem onClick={() => handleDuplicateSubModule(sub)}>
                                                   <Copy size={11} className="mr-2" /> Duplicate Sub-module
+                                                </ShadcnDropdownMenuItem>
+                                                <ShadcnDropdownMenuSeparator />
+                                                <ShadcnDropdownMenuItem onClick={() => handleMoveSubModule(sub, "up")}>
+                                                  <ArrowUp size={11} className="mr-2" /> Move Up
+                                                </ShadcnDropdownMenuItem>
+                                                <ShadcnDropdownMenuItem onClick={() => handleMoveSubModule(sub, "down")}>
+                                                  <ArrowDown size={11} className="mr-2" /> Move Down
                                                 </ShadcnDropdownMenuItem>
                                                 <ShadcnDropdownMenuSeparator />
                                                 <ShadcnDropdownMenuItem

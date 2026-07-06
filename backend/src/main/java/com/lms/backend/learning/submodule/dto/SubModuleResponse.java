@@ -5,6 +5,7 @@ public class SubModuleResponse {
     private Long id;
     private String title;
     private String description;
+    private Integer sortOrder;
 
     private Long moduleId;
     private String moduleTitle;
@@ -15,12 +16,14 @@ public class SubModuleResponse {
             Long id,
             String title,
             String description,
+            Integer sortOrder,
             Long moduleId,
             String moduleTitle) {
 
         this.id = id;
         this.title = title;
         this.description = description;
+        this.sortOrder = sortOrder;
         this.moduleId = moduleId;
         this.moduleTitle = moduleTitle;
     }
@@ -47,6 +50,14 @@ public class SubModuleResponse {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(Integer sortOrder) {
+        this.sortOrder = sortOrder;
     }
 
     public Long getModuleId() {

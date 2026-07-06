@@ -1,6 +1,7 @@
 package com.lms.backend.learning.module;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -81,6 +82,20 @@ public class ModuleController {
         return ResponseEntity.ok(
                 ResponseBuilder.success(
                         "Module deleted successfully",
+                        null,
+                        HttpStatus.OK.value()));
+    }
+
+    @Operation(summary = "Reorder modules")
+    @PutMapping("/reorder")
+    public ResponseEntity<ApiResponse<Void>> reorderModules(
+            @RequestBody List<Map<String, Long>> reorderList) {
+
+        service.reorderModules(reorderList);
+
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Modules reordered successfully",
                         null,
                         HttpStatus.OK.value()));
     }

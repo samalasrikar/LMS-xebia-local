@@ -18,6 +18,7 @@ public class ModuleMapper {
         Module module = new Module();
         module.setTitle(request.getTitle());
         module.setDescription(request.getDescription());
+        module.setSortOrder(request.getSortOrder() != null ? request.getSortOrder() : 0);
         module.setCourse(course);
 
         return module;
@@ -33,6 +34,7 @@ public class ModuleMapper {
                 module.getId(),
                 module.getTitle(),
                 module.getDescription(),
+                module.getSortOrder(),
                 module.getCourse().getId(),
                 module.getCourse().getTitle()
         );
@@ -45,6 +47,9 @@ public class ModuleMapper {
 
         module.setTitle(request.getTitle());
         module.setDescription(request.getDescription());
+        if (request.getSortOrder() != null) {
+            module.setSortOrder(request.getSortOrder());
+        }
         module.setCourse(course);
     }
 }

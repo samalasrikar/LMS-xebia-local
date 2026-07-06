@@ -20,6 +20,8 @@ public class ContentMapper {
         content.setContent(request.getContent());
         content.setVideoUrl(request.getVideoUrl());
         content.setPdfUrl(request.getPdfUrl());
+        content.setBlockType(request.getBlockType());
+        content.setImageUrl(request.getImageUrl());
         content.setSubModule(subModule);
 
         return content;
@@ -37,6 +39,8 @@ public class ContentMapper {
                 content.getContent(),
                 content.getVideoUrl(),
                 content.getPdfUrl(),
+                content.getBlockType(),
+                content.getImageUrl(),
                 content.getSubModule().getId(),
                 content.getSubModule().getTitle()
         );
@@ -51,6 +55,8 @@ public class ContentMapper {
         content.setContent(request.getContent());
         content.setVideoUrl(request.getVideoUrl());
         content.setPdfUrl(request.getPdfUrl());
+        content.setBlockType(request.getBlockType());
+        content.setImageUrl(request.getImageUrl());
         content.setSubModule(subModule);
     }
 }

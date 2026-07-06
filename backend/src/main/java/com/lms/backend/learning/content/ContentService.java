@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import com.lms.backend.exception.ResourceAlreadyExistsException;
 import com.lms.backend.exception.ResourceNotFoundException;
 import com.lms.backend.learning.content.dto.ContentRequest;
 import com.lms.backend.learning.content.dto.ContentResponse;
@@ -48,14 +47,10 @@ public class ContentService {
     @Transactional
     public ContentResponse createContent(ContentRequest request) {
 
-        if (repository.existsByTitleAndSubModule_Id(request.getTitle(), request.getSubModuleId())) {
-            throw new ResourceAlreadyExistsException("Content with this title already exists in this submodule");
-        }
-
         SubModule subModule = subModuleRepository.findById(Objects.requireNonNull(request.getSubModuleId()))
                 .orElseThrow(() -> new ResourceNotFoundException("SubModule not found"));
 
-        log.info("Creating content {}", request.getTitle());
+        log.info("Creating content '{}' (type={}) for submodule {}", request.getTitle(), request.getBlockType(), request.getSubModuleId());
 
         Content entity = mapper.toEntity(request, subModule);
         Content saved = repository.save(Objects.requireNonNull(entity));

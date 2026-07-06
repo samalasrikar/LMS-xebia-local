@@ -31,6 +31,9 @@ public class Module {
     @Column(length = 1000)
     private String description;
 
+    @Column(nullable = false)
+    private Integer sortOrder = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
@@ -71,6 +74,14 @@ public class Module {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public Integer getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(Integer sortOrder) {
+        this.sortOrder = sortOrder;
     }
 
     public List<SubModule> getSubModules() {

@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   X,
@@ -43,6 +44,30 @@ export default function CurriculumDialogs({
   handleSelectBlockType,
   handleSaveBlock,
   showToast,
+
+  // Block extra fields
+  headingText,
+  setHeadingText,
+  quoteText,
+  setQuoteText,
+  dividerStyle,
+  setDividerStyle,
+  imageAlt,
+  setImageAlt,
+  imageCaption,
+  setImageCaption,
+  codeContent,
+  setCodeContent,
+  codeLanguage,
+  setCodeLanguage,
+  downloadUrl,
+  setDownloadUrl,
+  downloadDisplayName,
+  setDownloadDisplayName,
+  linkUrl,
+  setLinkUrl,
+  linkText,
+  setLinkText,
 
   // Module modal
   isModuleModalOpen,
@@ -105,7 +130,69 @@ export default function CurriculumDialogs({
   // Toast
   toast,
   setToast,
+
+  // Quiz & Assignment fields
+  quizQuestions,
+  setQuizQuestions,
+  assignmentInstructions,
+  setAssignmentInstructions,
+  assignmentDueDate,
+  setAssignmentDueDate,
+  assignmentSubmissionType,
+  setAssignmentSubmissionType,
+  assignmentMaxScore,
+  setAssignmentMaxScore,
 }) {
+  const navigate = useNavigate();
+  // Image upload handler
+  const imageInputRef = React.useRef(null);
+  const fileInputRef = React.useRef(null);
+  const audioInputRef = React.useRef(null);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const contentServiceMod = (await import("@/features/content/services/contentService")).default;
+      const result = await contentServiceMod.uploadFile(file);
+      setDownloadUrl(result.url);
+      setUploadedFileName(result.filename || file.name);
+      showToast("Image uploaded!");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to upload image.", "error");
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const contentServiceMod = (await import("@/features/content/services/contentService")).default;
+      const result = await contentServiceMod.uploadFile(file);
+      setDownloadUrl(result.url);
+      setDownloadDisplayName(result.filename || file.name);
+      showToast("File uploaded!");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to upload file.", "error");
+    }
+  };
+
+  const handleAudioUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const contentServiceMod = (await import("@/features/content/services/contentService")).default;
+      const result = await contentServiceMod.uploadFile(file);
+      setDownloadUrl(result.url);
+      setDownloadDisplayName(result.filename || file.name);
+      showToast("Audio uploaded!");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to upload audio.", "error");
+    }
+  };
   return (
     <>
       {/* ══════════════════════════════════════════════════════════
@@ -137,7 +224,7 @@ export default function CurriculumDialogs({
           </div>
 
           {/* Categories */}
-          <ScrollArea className="max-h-[400px]">
+          <ScrollArea className="max-h-[550px]">
             <div className="p-3 space-y-4">
               {filteredBlockCategories.map(cat => (
                 <div key={cat.label}>
@@ -305,13 +392,23 @@ export default function CurriculumDialogs({
               </div>
               <div className="flex flex-col text-left">
                 <h3 className="text-base font-bold text-slate-800 capitalize leading-tight">
-                  {blockConfigType === "text" ? "Article Settings" : `${blockConfigType} Block Settings`}
+                  {(blockConfigType === "text" || blockConfigType === "paragraph") ? "Paragraph Settings" : `${blockConfigType} Block Settings`}
                 </h3>
                 <p className="text-[11px] text-slate-400 font-medium leading-none mt-1">
                   {blockConfigType === "video" && "Configure your multimedia video settings"}
                   {blockConfigType === "pdf" && "Configure your downloadable PDF settings"}
-                  {blockConfigType === "text" && "Configure your rich text content"}
-                  {!["video", "pdf", "text"].includes(blockConfigType) && `Configure your interactive ${blockConfigType} block settings (Simulation Mode)`}
+                  {(blockConfigType === "text" || blockConfigType === "paragraph") && "Configure your rich text content"}
+                  {blockConfigType === "heading" && "Configure your section heading"}
+                  {blockConfigType === "quote" && "Configure your inspirational quote block"}
+                  {blockConfigType === "divider" && "Configure your visual divider"}
+                  {blockConfigType === "image" && "Upload and configure your image"}
+                  {blockConfigType === "code" && "Configure your code snippet block"}
+                  {blockConfigType === "callout" && "Configure your callout/highlight block"}
+                  {blockConfigType === "download" && "Configure your downloadable file"}
+                  {blockConfigType === "file" && "Upload and configure your file attachment"}
+                  {blockConfigType === "link" && "Configure your external link"}
+                  {blockConfigType === "embed" && "Configure your embedded external resource"}
+                  {blockConfigType === "audio" && "Configure your audio content"}
                 </p>
               </div>
             </div>
@@ -421,7 +518,7 @@ export default function CurriculumDialogs({
             )}
 
             {/* 3. Text/Article Form */}
-            {blockConfigType === "text" && (
+            {(blockConfigType === "text" || blockConfigType === "paragraph") && (
               <div className="space-y-4 text-left">
                 <div className="space-y-1.5">
                   <Label htmlFor="articleContent" className="text-[12px] font-bold text-slate-500">ARTICLE CONTENT</Label>
@@ -437,39 +534,85 @@ export default function CurriculumDialogs({
               </div>
             )}
 
-            {/* 4. Image Block Form (Simulation Mode) */}
+            {/* 4. Heading Block Form */}
+            {blockConfigType === "heading" && (
+              <div className="space-y-4 text-left">
+                <div className="space-y-1.5">
+                  <Label htmlFor="headingText" className="text-[12px] font-bold text-slate-500">HEADING TEXT</Label>
+                  <Input
+                    id="headingText"
+                    value={headingText}
+                    onChange={e => setHeadingText(e.target.value)}
+                    placeholder="Enter a section heading..."
+                    className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]"
+                  />
+                </div>
+                {headingText && (
+                  <div className="space-y-1.5">
+                    <Label className="text-[12px] font-bold text-slate-500">PREVIEW</Label>
+                    <div className="p-4 bg-slate-50/80 rounded-xl border border-slate-200">
+                      <h2 className="text-xl font-bold text-slate-800">{headingText}</h2>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 5. Image Block Form */}
             {blockConfigType === "image" && (
               <div className="space-y-4 text-left">
-                <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:bg-slate-50/50 transition-all cursor-pointer space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-[#6C1D5F]/5 flex items-center justify-center text-[#6C1D5F] mx-auto">
-                    <Plus size={18} />
+                <input type="file" ref={imageInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
+                {downloadUrl ? (
+                  <div className="space-y-2">
+                    <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-md">
+                      <img src={downloadUrl} alt={imageAlt || "Uploaded image"} className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[11px] text-slate-500 font-medium truncate">{uploadedFileName}</p>
+                      <button type="button" onClick={() => { setDownloadUrl(""); setUploadedFileName(""); if (imageInputRef.current) imageInputRef.current.value = ""; }} className="px-2.5 py-1 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg text-[10px] font-bold border border-slate-200 bg-white cursor-pointer">
+                        Remove
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-xs font-bold text-slate-700">Upload Image</p>
-                  <p className="text-[10px] text-slate-400">Drag and drop your JPG, PNG or WebP image here, or click to browse</p>
-                  <Button type="button" className="bg-[#6C1D5F] hover:bg-[#521347] text-white text-[11px] font-bold px-3 py-1 h-7">Select File</Button>
-                </div>
+                ) : (
+                  <div onClick={() => imageInputRef.current?.click()} className="border-2 border-dashed border-slate-200 hover:border-[#6C1D5F] rounded-xl p-8 text-center hover:bg-slate-50/50 transition-all cursor-pointer space-y-2">
+                    <div className="w-10 h-10 rounded-full bg-[#6C1D5F]/5 flex items-center justify-center text-[#6C1D5F] mx-auto">
+                      <Plus size={18} />
+                    </div>
+                    <p className="text-xs font-bold text-slate-700">Upload Image</p>
+                    <p className="text-[10px] text-slate-400">Drag and drop your JPG, PNG or WebP image here, or click to browse</p>
+                  </div>
+                )}
                 <div className="space-y-1.5">
                   <Label className="text-[12px] font-bold text-slate-500">Alt Text (Required for accessibility)</Label>
-                  <Input placeholder="Describe the image for screen readers..." className="text-[13px] h-10" />
+                  <Input value={imageAlt} onChange={e => setImageAlt(e.target.value)} placeholder="Describe the image for screen readers..." className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]" />
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-[12px] font-bold text-slate-500">Caption</Label>
-                  <Input placeholder="Add a visible caption beneath the image" className="text-[13px] h-10" />
+                  <Input value={imageCaption} onChange={e => setImageCaption(e.target.value)} placeholder="Add a visible caption beneath the image" className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]" />
                 </div>
               </div>
             )}
 
-            {/* 5. Code Block Form (Simulation Mode) */}
+            {/* 6. Code Block Form */}
             {blockConfigType === "code" && (
               <div className="space-y-4 text-left">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label className="text-[12px] font-bold text-slate-500">LANGUAGE SPECIFICATION</Label>
-                    <select className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[12px] focus:ring-1 focus:ring-[#6C1D5F]/30 text-slate-700">
-                      <option>JavaScript (Node.js)</option>
-                      <option>Python</option>
-                      <option>HTML / CSS</option>
-                      <option>Java</option>
+                    <select
+                      value={codeLanguage}
+                      onChange={e => setCodeLanguage(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[12px] focus:ring-1 focus:ring-[#6C1D5F]/30 text-slate-700"
+                    >
+                      <option value="javascript">JavaScript (Node.js)</option>
+                      <option value="python">Python</option>
+                      <option value="html">HTML / CSS</option>
+                      <option value="java">Java</option>
+                      <option value="csharp">C#</option>
+                      <option value="typescript">TypeScript</option>
+                      <option value="sql">SQL</option>
+                      <option value="bash">Bash</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-4 pt-6">
@@ -486,6 +629,8 @@ export default function CurriculumDialogs({
                 <div className="space-y-1.5">
                   <Label className="text-[12px] font-bold text-slate-500">SNIPPET EDITOR</Label>
                   <Textarea
+                    value={codeContent}
+                    onChange={e => setCodeContent(e.target.value)}
                     placeholder="function initializeLMS() { ... }"
                     className="text-[13px] min-h-[140px] font-mono bg-slate-900 text-slate-100 focus:ring-1 focus:ring-[#6C1D5F]"
                     rows={6}
@@ -494,19 +639,39 @@ export default function CurriculumDialogs({
               </div>
             )}
 
-            {/* 6. Audio Block Form (Simulation Mode) */}
+            {/* 7. Audio Block Form */}
             {blockConfigType === "audio" && (
               <div className="space-y-4 text-left">
                 <div className="space-y-1.5">
                   <Label className="text-[12px] font-bold text-slate-500">AUDIO TITLE</Label>
-                  <Input placeholder="e.g., Introduction to SEO Principles" className="text-[13px] h-10" />
+                  <Input value={downloadDisplayName} onChange={e => setDownloadDisplayName(e.target.value)} placeholder="e.g., Introduction to SEO Principles" className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] font-bold text-slate-500">AUDIO SOURCE</Label>
-                  <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:bg-slate-50/50 transition-all cursor-pointer">
-                    <p className="text-xs font-bold text-slate-700">Click to upload or drag and drop</p>
-                    <p className="text-[10px] text-slate-400 mt-1">MP3, WAV or OGG (max. 50MB)</p>
-                  </div>
+                  <Label className="text-[12px] font-bold text-slate-500">AUDIO SOURCE URL</Label>
+                  <Input value={downloadUrl} onChange={e => setDownloadUrl(e.target.value)} placeholder="https://example.com/audio.mp3" className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-[12px] font-bold text-slate-500">OR UPLOAD AUDIO FILE</Label>
+                  <input type="file" ref={audioInputRef} onChange={handleAudioUpload} accept="audio/*" className="hidden" />
+                  {downloadUrl ? (
+                    <div className="border border-emerald-200 rounded-xl p-3 bg-emerald-50/30 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 bg-emerald-100 rounded-lg"><FileText size={14} className="text-emerald-700" /></div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-800 truncate max-w-[240px]">{downloadDisplayName || "audio file"}</p>
+                          <p className="text-[10px] text-emerald-700 font-bold">Attached</p>
+                        </div>
+                      </div>
+                      <button type="button" onClick={() => { setDownloadUrl(""); setDownloadDisplayName(""); if (audioInputRef.current) audioInputRef.current.value = ""; }} className="px-2.5 py-1 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg text-[10px] font-bold border border-slate-200 bg-white cursor-pointer">
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div onClick={() => audioInputRef.current?.click()} className="border-2 border-dashed border-slate-200 hover:border-[#6C1D5F] rounded-xl p-6 text-center hover:bg-slate-50/50 transition-all cursor-pointer">
+                      <p className="text-xs font-bold text-slate-700">Click to upload or drag and drop</p>
+                      <p className="text-[10px] text-slate-400 mt-1">MP3, WAV or OGG (max. 50MB)</p>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center justify-between p-3 border border-slate-100 rounded-xl bg-slate-50/50">
                   <div>
@@ -518,39 +683,37 @@ export default function CurriculumDialogs({
               </div>
             )}
 
-            {/* 7. Quote Block Form (Simulation Mode) */}
+            {/* 8. Quote Block Form */}
             {blockConfigType === "quote" && (
               <div className="space-y-4 text-left">
                 <div className="space-y-1.5">
                   <Label className="text-[12px] font-bold text-slate-500">QUOTE TEXT</Label>
-                  <Textarea placeholder="Enter the wisdom you wish to share..." className="text-[13px]" rows={3} />
+                  <Textarea value={quoteText} onChange={e => setQuoteText(e.target.value)} placeholder="Enter the wisdom you wish to share..." className="text-[13px] focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]" rows={3} />
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[12px] font-bold text-slate-500">AUTHOR/SOURCE</Label>
-                  <Input placeholder="e.g. Marcus Aurelius" className="text-[13px] h-10" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[12px] font-bold text-slate-500">BLOCK PREVIEW</Label>
-                  <div className="p-4 border-l-4 border-[#6C1D5F] bg-slate-50/80 rounded-r-xl italic text-slate-600 text-xs">
-                    "The happiness of your life depends upon the quality of your thoughts..."
-                    <span className="block mt-1.5 text-[10px] not-italic font-bold text-slate-400">— Meditations</span>
+                {quoteText && (
+                  <div className="space-y-1.5">
+                    <Label className="text-[12px] font-bold text-slate-500">BLOCK PREVIEW</Label>
+                    <div className="p-4 border-l-4 border-[#6C1D5F] bg-slate-50/80 rounded-r-xl italic text-slate-600 text-xs">
+                      "{quoteText}"
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
-            {/* 8. Divider Block Form (Simulation Mode) */}
+            {/* 9. Divider Block Form */}
             {blockConfigType === "divider" && (
               <div className="space-y-4 text-left">
                 <div className="space-y-1.5">
                   <Label className="text-[12px] font-bold text-slate-500 font-sans">Divider Settings</Label>
                   <div className="flex gap-2">
-                    {["Solid", "Dashed", "Dotted"].map((style, i) => (
+                    {["solid", "dashed", "dotted"].map((style) => (
                       <button
                         key={style}
                         type="button"
-                        className={`flex-1 py-2 text-[12px] font-bold rounded-xl border ${
-                          i === 0
+                        onClick={() => setDividerStyle(style)}
+                        className={`flex-1 py-2 text-[12px] font-bold rounded-xl border capitalize cursor-pointer ${
+                          dividerStyle === style
                             ? "border-[#6C1D5F] bg-[#6C1D5F]/5 text-[#6C1D5F]"
                             : "border-slate-200 text-slate-600 hover:bg-slate-50"
                         }`}
@@ -561,95 +724,272 @@ export default function CurriculumDialogs({
                   </div>
                 </div>
                 <div className="p-6 bg-slate-50 rounded-xl flex items-center justify-center">
-                  <div className="w-full h-0.5 bg-slate-300" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <span className="text-[11.5px] font-bold text-slate-500 block">Weight</span>
-                    <input type="range" min="1" max="10" defaultValue="2" className="w-full accent-[#6C1D5F]" />
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-[11.5px] font-bold text-slate-500 block">Spacing / Margin</span>
-                    <input type="range" min="8" max="64" defaultValue="24" className="w-full accent-[#6C1D5F]" />
-                  </div>
+                  <div className={`w-full h-0.5 bg-slate-300 ${
+                    dividerStyle === "dashed" ? "border-t-2 border-dashed border-slate-300 bg-transparent h-0" :
+                    dividerStyle === "dotted" ? "border-t-2 border-dotted border-slate-300 bg-transparent h-0" : ""
+                  }`} />
                 </div>
               </div>
             )}
 
-            {/* 9. Callout Block Form (Simulation Mode) */}
+            {/* 10. Callout Block Form */}
             {blockConfigType === "callout" && (
               <div className="space-y-4 text-left">
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] font-bold text-slate-500">CALLOUT TYPE</Label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[
-                      { type: "Info", color: "bg-blue-50 text-blue-600 border-blue-200" },
-                      { type: "Warning", color: "bg-amber-50 text-amber-600 border-amber-200" },
-                      { type: "Tip", color: "bg-emerald-50 text-emerald-600 border-emerald-200" },
-                      { type: "Note", color: "bg-purple-50 text-purple-600 border-purple-200" },
-                    ].map((item, i) => (
-                      <button
-                        key={item.type}
-                        type="button"
-                        className={`flex flex-col items-center justify-center p-3 rounded-xl border text-[11px] font-bold transition-all ${
-                          i === 0 ? "ring-2 ring-[#6C1D5F] border-transparent" : "border-slate-200 bg-white hover:bg-slate-50"
-                        }`}
-                      >
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-1 ${item.color}`}>
-                          {item.type[0]}
+                  <Label className="text-[12px] font-bold text-slate-500">CALLOUT MESSAGE</Label>
+                  <Textarea value={textContent} onChange={e => setTextContent(e.target.value)} placeholder="Type your callout message here..." className="text-[13px] focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]" rows={3} />
+                </div>
+                {textContent && (
+                  <div className="space-y-1.5">
+                    <Label className="text-[12px] font-bold text-slate-500">LIVE PREVIEW</Label>
+                    <div className="p-3 bg-blue-50 border border-blue-100 text-blue-800 rounded-xl text-xs flex gap-2">
+                      <span className="font-bold">Info</span>
+                      <span>{textContent}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 11. File/Download Block Form */}
+            {(blockConfigType === "file" || blockConfigType === "download") && (
+              <div className="space-y-4 text-left">
+                <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+                <div className="space-y-1.5">
+                  <Label className="text-[12px] font-bold text-slate-500">FILE URL</Label>
+                  <Input value={downloadUrl} onChange={e => setDownloadUrl(e.target.value)} placeholder="https://example.com/file.pdf" className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-[12px] font-bold text-slate-500">OR UPLOAD FILE</Label>
+                  {downloadUrl ? (
+                    <div className="border border-emerald-200 rounded-xl p-3 bg-emerald-50/30 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 bg-emerald-100 rounded-lg"><FileText size={14} className="text-emerald-700" /></div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-800 truncate max-w-[240px]">{downloadDisplayName || "file"}</p>
+                          <p className="text-[10px] text-emerald-700 font-bold">Attached</p>
                         </div>
-                        {item.type}
+                      </div>
+                      <button type="button" onClick={() => { setDownloadUrl(""); setDownloadDisplayName(""); if (fileInputRef.current) fileInputRef.current.value = ""; }} className="px-2.5 py-1 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg text-[10px] font-bold border border-slate-200 bg-white cursor-pointer">
+                        Remove
                       </button>
-                    ))}
-                  </div>
+                    </div>
+                  ) : (
+                    <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-slate-200 hover:border-[#6C1D5F] rounded-xl p-8 text-center hover:bg-slate-50/50 transition-all cursor-pointer">
+                      <p className="text-xs font-bold text-slate-700">Drag and drop file here</p>
+                      <p className="text-[10px] text-slate-400 mt-1">Max file size: 50MB. Supported formats: PDF, DOCX, ZIP, MP4.</p>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] font-bold text-slate-500">MESSAGE (Markdown supported)</Label>
-                  <Textarea placeholder="Type your callout message here..." className="text-[13px]" rows={3} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[12px] font-bold text-slate-500">LIVE PREVIEW</Label>
-                  <div className="p-3 bg-blue-50 border border-blue-100 text-blue-800 rounded-xl text-xs flex gap-2">
-                    <span className="font-bold">Info</span>
-                    <span>Your message will appear here in the live course view...</span>
-                  </div>
+                  <Label className="text-[12px] font-bold text-slate-500">DISPLAY NAME</Label>
+                  <Input value={downloadDisplayName} onChange={e => setDownloadDisplayName(e.target.value)} placeholder="Add a brief name for this file..." className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]" />
                 </div>
               </div>
             )}
 
-            {/* 10. File Block Form (Simulation Mode) */}
-            {blockConfigType === "file" && (
+            {/* 12. Link Block Form */}
+            {blockConfigType === "link" && (
               <div className="space-y-4 text-left">
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] font-bold text-slate-500">UPLOAD FILE</Label>
-                  <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:bg-slate-50/50 transition-all cursor-pointer">
-                    <p className="text-xs font-bold text-slate-700">Drag and drop file here</p>
-                    <p className="text-[10px] text-slate-400 mt-1">Max file size: 50MB. Supported formats: PDF, DOCX, ZIP, MP4.</p>
-                  </div>
+                  <Label className="text-[12px] font-bold text-slate-500">LINK URL</Label>
+                  <Input value={linkUrl} onChange={e => setLinkUrl(e.target.value)} placeholder="https://example.com" className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] font-bold text-slate-500">FILE DESCRIPTION (Optional)</Label>
-                  <Textarea placeholder="Add a brief summary of what this file contains for the learners..." className="text-[13px]" rows={3} />
+                  <Label className="text-[12px] font-bold text-slate-500">LINK TEXT</Label>
+                  <Input value={linkText} onChange={e => setLinkText(e.target.value)} placeholder="Display text for the link" className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]" />
                 </div>
               </div>
             )}
 
-            {/* 11. Embed URL Block Form (Simulation Mode) */}
+            {/* 13. Embed URL Block Form */}
             {blockConfigType === "embed" && (
               <div className="space-y-4 text-left">
                 <div className="space-y-1.5">
                   <Label className="text-[12px] font-bold text-slate-500">EXTERNAL RESOURCE URL</Label>
-                  <Input placeholder="https://youtube.com/watch?v=..." className="text-[13px] h-10" />
+                  <Input value={linkUrl} onChange={e => setLinkUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]" />
                   <p className="text-[10px] text-slate-400">Paste a link from YouTube, Vimeo, Loom, or other supported platforms</p>
                 </div>
-                <div className="border border-slate-200 bg-slate-50 rounded-xl p-8 text-center text-slate-400 text-xs">
-                  No Preview Available
-                  <span className="block text-[10px] text-slate-300 mt-1">Enter a valid URL and click 'Preview' to see the content here.</span>
+                <div className="space-y-1.5">
+                  <Label className="text-[12px] font-bold text-slate-500">DISPLAY TITLE</Label>
+                  <Input value={linkText} onChange={e => setLinkText(e.target.value)} placeholder="e.g. Product Demo Video" className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]" />
                 </div>
                 <div className="flex gap-1.5 flex-wrap">
                   {["YOUTUBE", "VIMEO", "LOOM", "SOUNDCLOUD", "WHIMSICAL"].map(tag => (
                     <span key={tag} className="text-[9px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{tag}</span>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* 14. Quiz Block Form */}
+            {blockConfigType === "quiz" && (
+              <div className="space-y-6 text-left">
+                <div className="flex items-center justify-between">
+                  <Label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Quiz Questions</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setQuizQuestions([...quizQuestions, { text: "", options: [{ text: "", isCorrect: false }, { text: "", isCorrect: false }] }])}
+                    className="text-[11.5px] font-bold text-[#6C1D5F] border-[#6C1D5F]/20 hover:bg-[#6C1D5F]/5"
+                  >
+                    <Plus size={12} className="mr-1" /> Add Question
+                  </Button>
+                </div>
+
+                {quizQuestions.length === 0 ? (
+                  <div className="py-8 text-center border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                    <HelpCircle size={24} className="mx-auto mb-2 text-slate-300 pointer-events-none" />
+                    <p className="text-xs font-semibold text-slate-500">No questions added yet</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Click "Add Question" above to start building your quiz</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
+                    {quizQuestions.map((q, qIdx) => (
+                      <div key={qIdx} className="p-4 border border-slate-200 rounded-xl bg-slate-50/30 relative space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-slate-400">QUESTION {qIdx + 1}</span>
+                          <button
+                            type="button"
+                            onClick={() => setQuizQuestions(quizQuestions.filter((_, idx) => idx !== qIdx))}
+                            className="text-red-500 hover:text-red-700 text-xs font-semibold"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        
+                        <div className="space-y-1.5">
+                          <Input
+                            value={q.text || ""}
+                            onChange={e => {
+                              const newQList = [...quizQuestions];
+                              newQList[qIdx].text = e.target.value;
+                              setQuizQuestions(newQList);
+                            }}
+                            placeholder="Type the question..."
+                            className="text-[13px] h-9 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F] bg-white"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10.5px] font-semibold text-slate-500 font-sans">Options</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newQList = [...quizQuestions];
+                                newQList[qIdx].options.push({ text: "", isCorrect: false });
+                                setQuizQuestions(newQList);
+                              }}
+                              className="text-[10.5px] font-bold text-[#6C1D5F] hover:underline"
+                            >
+                              + Add Option
+                            </button>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            {q.options?.map((opt, oIdx) => (
+                              <div key={oIdx} className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={!!opt.isCorrect}
+                                  onChange={e => {
+                                    const newQList = [...quizQuestions];
+                                    newQList[qIdx].options = newQList[qIdx].options.map((o, idx) => ({
+                                      ...o,
+                                      isCorrect: idx === oIdx ? e.target.checked : o.isCorrect
+                                    }));
+                                    setQuizQuestions(newQList);
+                                  }}
+                                  title="Mark as correct answer"
+                                  className="w-4 h-4 rounded text-[#6C1D5F] focus:ring-[#6C1D5F]"
+                                />
+                                <Input
+                                  value={opt.text || ""}
+                                  onChange={e => {
+                                    const newQList = [...quizQuestions];
+                                    newQList[qIdx].options[oIdx].text = e.target.value;
+                                    setQuizQuestions(newQList);
+                                  }}
+                                  placeholder={`Option ${oIdx + 1}`}
+                                  className="text-[12px] h-8 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F] bg-white flex-1"
+                                />
+                                {q.options.length > 2 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const newQList = [...quizQuestions];
+                                      newQList[qIdx].options = newQList[qIdx].options.filter((_, idx) => idx !== oIdx);
+                                      setQuizQuestions(newQList);
+                                    }}
+                                    className="text-slate-400 hover:text-red-500 p-1 bg-transparent border-none outline-none cursor-pointer"
+                                  >
+                                    <X size={12} />
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 15. Assignment Block Form */}
+            {blockConfigType === "assignment" && (
+              <div className="space-y-4 text-left">
+                <div className="space-y-1.5">
+                  <Label htmlFor="assignInstructions" className="text-[12px] font-bold text-slate-500">ASSIGNMENT INSTRUCTIONS</Label>
+                  <Textarea
+                    id="assignInstructions"
+                    value={assignmentInstructions}
+                    onChange={e => setAssignmentInstructions(e.target.value)}
+                    placeholder="Provide clear instructions for the assignment..."
+                    className="text-[13px] min-h-[120px] focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]"
+                    rows={4}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="assignDueDate" className="text-[12px] font-bold text-slate-500">DUE DATE (OPTIONAL)</Label>
+                    <Input
+                      id="assignDueDate"
+                      type="date"
+                      value={assignmentDueDate}
+                      onChange={e => setAssignmentDueDate(e.target.value)}
+                      className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="assignMaxScore" className="text-[12px] font-bold text-slate-500">MAX SCORE</Label>
+                    <Input
+                      id="assignMaxScore"
+                      type="number"
+                      value={assignmentMaxScore}
+                      onChange={e => setAssignmentMaxScore(parseInt(e.target.value) || 0)}
+                      className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="assignSubmissionType" className="text-[12px] font-bold text-slate-500">SUBMISSION TYPE</Label>
+                  <select
+                    id="assignSubmissionType"
+                    value={assignmentSubmissionType}
+                    onChange={e => setAssignmentSubmissionType(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[12px] focus:ring-1 focus:ring-[#6C1D5F]/30 text-slate-700 h-10 outline-none"
+                  >
+                    <option value="file">File Upload (PDF, ZIP, Word)</option>
+                    <option value="text">Text Response / Written Answer</option>
+                    <option value="link">URL Link Submission</option>
+                  </select>
                 </div>
               </div>
             )}
@@ -667,14 +1007,7 @@ export default function CurriculumDialogs({
             </Button>
             <Button
               type="button"
-              onClick={(e) => {
-                if (["video", "pdf", "text"].includes(blockConfigType)) {
-                  handleSaveBlock(e);
-                } else {
-                  showToast(`${blockConfigType} block simulated successfully!`, "success");
-                  setBlockConfigOpen(false);
-                }
-              }}
+              onClick={(e) => handleSaveBlock(e)}
               disabled={submittingSubModule}
               className="bg-[#6C1D5F] hover:bg-[#521347] text-white text-[12.5px] font-semibold px-6 shadow-sm cursor-pointer"
             >
@@ -709,7 +1042,14 @@ export default function CurriculumDialogs({
               ].map(tab => (
                 <button
                   key={tab.id}
-                  onClick={() => setCourseDialogTab(tab.id)}
+                  onClick={() => {
+                    if (tab.id === "create") {
+                      setCourseDialogOpen(false);
+                      navigate("/courses/create");
+                    } else {
+                      setCourseDialogTab(tab.id);
+                    }
+                  }}
                   className={`flex-1 py-1.5 text-[12px] font-bold rounded-md transition-all cursor-pointer ${
                     courseDialogTab === tab.id
                       ? "bg-white shadow-sm text-[#6C1D5F]"
@@ -769,7 +1109,10 @@ export default function CurriculumDialogs({
                         description={courseSearch ? `No results for "${courseSearch}"` : "Create your first course"}
                         primaryAction={{
                           label: "Create New Course",
-                          onClick: () => setCourseDialogTab("create"),
+                          onClick: () => {
+                            setCourseDialogOpen(false);
+                            navigate("/courses/create");
+                          },
                         }}
                       />
                     );
@@ -828,7 +1171,10 @@ export default function CurriculumDialogs({
                   {allCourses.length} course{allCourses.length !== 1 ? "s" : ""} available
                 </span>
                 <button
-                  onClick={() => setCourseDialogTab("create")}
+                  onClick={() => {
+                    setCourseDialogOpen(false);
+                    navigate("/courses/create");
+                  }}
                   className="flex items-center gap-1.5 text-[12px] font-semibold text-[#6C1D5F] hover:underline cursor-pointer"
                 >
                   <Plus size={12} /> Create New

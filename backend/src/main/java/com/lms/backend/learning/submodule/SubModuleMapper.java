@@ -18,6 +18,7 @@ public class SubModuleMapper {
         SubModule subModule = new SubModule();
         subModule.setTitle(request.getTitle());
         subModule.setDescription(request.getDescription());
+        subModule.setSortOrder(request.getSortOrder() != null ? request.getSortOrder() : 0);
         subModule.setModule(module);
 
         return subModule;
@@ -33,6 +34,7 @@ public class SubModuleMapper {
                 subModule.getId(),
                 subModule.getTitle(),
                 subModule.getDescription(),
+                subModule.getSortOrder(),
                 subModule.getModule().getId(),
                 subModule.getModule().getTitle()
         );
@@ -45,6 +47,9 @@ public class SubModuleMapper {
 
         subModule.setTitle(request.getTitle());
         subModule.setDescription(request.getDescription());
+        if (request.getSortOrder() != null) {
+            subModule.setSortOrder(request.getSortOrder());
+        }
         subModule.setModule(module);
     }
 }
