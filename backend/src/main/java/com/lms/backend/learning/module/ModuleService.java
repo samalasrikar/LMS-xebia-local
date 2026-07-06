@@ -1,6 +1,7 @@
 package com.lms.backend.learning.module;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -83,5 +84,20 @@ public class ModuleService {
     @Transactional
     public void deleteModule(@NonNull Long id) {
         repository.deleteById(id);
+    }
+
+    @Transactional
+    public void reorderModules(List<Map<String, Long>> reorderList) {
+        for (Map<String, Long> item : reorderList) {
+            Long moduleId = item.get("id");
+            Long sortOrderLong = item.get("sortOrder");
+            if (moduleId == null || sortOrderLong == null) continue;
+
+            Module module = repository.findById(moduleId).orElse(null);
+            if (module != null) {
+                module.setSortOrder(sortOrderLong.intValue());
+                repository.save(module);
+            }
+        }
     }
 }

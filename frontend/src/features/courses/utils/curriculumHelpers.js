@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, Video, AlignLeft, BookOpen, Heading, Quote, Minus, Image, Code2, Download, Link2, ExternalLink, Volume2, AlertCircle } from "lucide-react";
+import { FileText, Video, AlignLeft, BookOpen, Heading, Quote, Minus, Image, Code2, Download, Link2, ExternalLink, Volume2, AlertCircle, HelpCircle, CheckSquare } from "lucide-react";
 
 const BLOCK_TYPE_MAP = {
   video: { label: "Video", icon: Video },
@@ -16,6 +16,8 @@ const BLOCK_TYPE_MAP = {
   embed: { label: "Embed", icon: ExternalLink },
   callout: { label: "Callout", icon: AlertCircle },
   audio: { label: "Audio", icon: Volume2 },
+  quiz: { label: "Quiz", icon: HelpCircle },
+  assignment: { label: "Assignment", icon: CheckSquare },
 };
 
 export const getContentType = (sub) => {

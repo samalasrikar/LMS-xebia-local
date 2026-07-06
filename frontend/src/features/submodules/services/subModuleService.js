@@ -20,6 +20,11 @@ const subModuleService = {
     const response = await api.delete(`/submodules/${id}`, config);
     return response.data;
   },
+
+  reorderSubModules: async (reorderList) => {
+    const response = await api.put("/submodules/reorder", reorderList);
+    return response.data;
+  },
 };
 
 export default subModuleService;

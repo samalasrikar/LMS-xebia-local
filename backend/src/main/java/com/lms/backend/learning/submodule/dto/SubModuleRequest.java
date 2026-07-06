@@ -16,6 +16,8 @@ public class SubModuleRequest {
     @NotNull(message = "Module is required")
     private Long moduleId;
 
+    private Integer sortOrder;
+
     public SubModuleRequest() {}
 
     public String getTitle() {
@@ -40,5 +42,13 @@ public class SubModuleRequest {
 
     public void setModuleId(Long moduleId) {
         this.moduleId = moduleId;
+    }
+
+    public Integer getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(Integer sortOrder) {
+        this.sortOrder = sortOrder;
     }
 }

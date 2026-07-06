@@ -27,6 +27,8 @@ import {
   GripVertical,
   Edit,
   Trash2,
+  HelpCircle,
+  CheckSquare,
 } from "lucide-react";
 import { getContentIcon, getContentLabel, getContentType } from "@/features/courses/utils/curriculumHelpers";
 import EmptyState from "@/shared/components/EmptyState";
@@ -355,6 +357,139 @@ export default function CurriculumEditor({
                           <audio controls className="w-full rounded-lg" src={audioUrl}>
                             Your browser does not support the audio element.
                           </audio>
+                        )}
+                      </div>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                  </div>
+                );
+              }
+
+              // Paragraph/Text block
+              if (bt === "paragraph" || bt === "text") {
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<AlignLeft size={14} />}
+                      label="Paragraph"
+                      badge="paragraph"
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
+                    >
+                      <div className="text-[14px] text-slate-600 leading-relaxed whitespace-pre-wrap">
+                        {c.content}
+                      </div>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                  </div>
+                );
+              }
+
+              // Quiz block
+              if (bt === "quiz") {
+                let questions = [];
+                try {
+                  const parsed = JSON.parse(c.content || "[]");
+                  questions = Array.isArray(parsed) ? parsed : parsed.questions || [];
+                } catch {}
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<HelpCircle size={14} />}
+                      label="Quiz Assessment"
+                      badge="quiz"
+                      highlighted
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
+                    >
+                      <div className="space-y-4">
+                        <div className="pb-2 border-b border-slate-100 flex items-center justify-between">
+                          <span className="text-[12px] font-bold text-slate-500">{questions.length} Questions</span>
+                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Active</span>
+                        </div>
+                        {questions.length === 0 ? (
+                          <p className="text-[12.5px] text-slate-400 italic">No questions added yet. Click edit to configure.</p>
+                        ) : (
+                          <div className="space-y-4">
+                            {questions.map((q, qIdx) => (
+                              <div key={qIdx} className="space-y-2 p-3 bg-slate-50/50 rounded-xl border border-slate-100">
+                                <p className="text-[13px] font-bold text-slate-800">
+                                  {qIdx + 1}. {q.text || <span className="text-slate-400 italic">Untitled question</span>}
+                                </p>
+                                <div className="grid grid-cols-2 gap-2 pl-4">
+                                  {q.options?.map((opt, oIdx) => (
+                                    <div key={oIdx} className={`flex items-center gap-2 p-2 rounded-lg text-[12px] border ${
+                                      opt.isCorrect
+                                        ? "bg-emerald-50/50 border-emerald-200 text-emerald-800 font-semibold"
+                                        : "bg-white border-slate-200/80 text-slate-600"
+                                    }`}>
+                                      <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 border ${
+                                        opt.isCorrect
+                                          ? "bg-emerald-600 border-emerald-600 text-white"
+                                          : "border-slate-300"
+                                      }`}>
+                                        {opt.isCorrect && <span className="text-[8px]">✓</span>}
+                                      </div>
+                                      <span className="truncate">{opt.text || <span className="text-slate-300 italic">Empty option</span>}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </ContentBlock>
+                    <AddBlockDivider onClick={() => { setBlockPickerOpen(true); setBlockSearch(""); }} />
+                  </div>
+                );
+              }
+
+              // Assignment block
+              if (bt === "assignment") {
+                let parsed = { instructions: "", dueDate: "", submissionType: "file", maxScore: 100 };
+                try {
+                  parsed = JSON.parse(c.content || "{}");
+                } catch {
+                  parsed.instructions = c.content || "";
+                }
+                return (
+                  <div className="group/block relative">
+                    <ContentBlock
+                      icon={<CheckSquare size={14} />}
+                      label="Course Assignment"
+                      badge="assignment"
+                      highlighted
+                      onEdit={() => openEditBlockDialog(activeSubModule)}
+                      onDelete={() => requestDelete("block", activeSubModule)}
+                    >
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
+                            <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Max Score</span>
+                            <span className="text-[16px] font-bold text-[#6C1D5F] mt-0.5 block">{parsed.maxScore || 100} pts</span>
+                          </div>
+                          <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
+                            <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Submission</span>
+                            <span className="text-[12px] font-semibold text-slate-700 mt-1.5 block capitalize truncate">
+                              {parsed.submissionType === "file" ? "File upload" : parsed.submissionType === "text" ? "Text input" : "URL Link"}
+                            </span>
+                          </div>
+                          <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
+                            <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Due Date</span>
+                            <span className="text-[12px] font-semibold text-slate-700 mt-1.5 block truncate">
+                              {parsed.dueDate ? new Date(parsed.dueDate).toLocaleDateString() : "No due date"}
+                            </span>
+                          </div>
+                        </div>
+
+                        {parsed.instructions && (
+                          <div className="space-y-1.5">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Instructions</span>
+                            <div className="p-4 bg-white border border-slate-200/80 rounded-xl text-[13.5px] text-slate-600 leading-relaxed whitespace-pre-wrap">
+                              {parsed.instructions}
+                            </div>
+                          </div>
                         )}
                       </div>
                     </ContentBlock>

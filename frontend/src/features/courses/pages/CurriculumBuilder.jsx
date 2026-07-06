@@ -192,6 +192,19 @@ export default function CurriculumBuilder() {
     handleDuplicateCourse,
     handleDuplicateModule,
     handleDuplicateSubModule,
+    handleMoveModule,
+    handleMoveSubModule,
+    // Quiz & Assignment state
+    quizQuestions,
+    setQuizQuestions,
+    assignmentInstructions,
+    setAssignmentInstructions,
+    assignmentDueDate,
+    setAssignmentDueDate,
+    assignmentSubmissionType,
+    setAssignmentSubmissionType,
+    assignmentMaxScore,
+    setAssignmentMaxScore,
     loadCurriculumData,
     // Multi course props
     loadedCourses,
@@ -357,6 +370,8 @@ export default function CurriculumBuilder() {
           handleDuplicateCourse={handleDuplicateCourse}
           handleDuplicateModule={handleDuplicateModule}
           handleDuplicateSubModule={handleDuplicateSubModule}
+          handleMoveModule={handleMoveModule}
+          handleMoveSubModule={handleMoveSubModule}
           loadCurriculumData={loadCurriculumData}
         />
 
@@ -431,6 +446,16 @@ export default function CurriculumBuilder() {
         setLinkUrl={setLinkUrl}
         linkText={linkText}
         setLinkText={setLinkText}
+        quizQuestions={quizQuestions}
+        setQuizQuestions={setQuizQuestions}
+        assignmentInstructions={assignmentInstructions}
+        setAssignmentInstructions={setAssignmentInstructions}
+        assignmentDueDate={assignmentDueDate}
+        setAssignmentDueDate={setAssignmentDueDate}
+        assignmentSubmissionType={assignmentSubmissionType}
+        setAssignmentSubmissionType={setAssignmentSubmissionType}
+        assignmentMaxScore={assignmentMaxScore}
+        setAssignmentMaxScore={setAssignmentMaxScore}
         isModuleModalOpen={isModuleModalOpen}
         setIsModuleModalOpen={setIsModuleModalOpen}
         editingModule={editingModule}

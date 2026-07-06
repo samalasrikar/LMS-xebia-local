@@ -20,6 +20,11 @@ const moduleService = {
     const response = await api.delete(`/modules/${id}`, config);
     return response.data;
   },
+
+  reorderModules: async (reorderList) => {
+    const response = await api.put("/modules/reorder", reorderList);
+    return response.data;
+  },
 };
 
 export default moduleService;

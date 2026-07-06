@@ -129,6 +129,18 @@ export default function CurriculumDialogs({
   // Toast
   toast,
   setToast,
+
+  // Quiz & Assignment fields
+  quizQuestions,
+  setQuizQuestions,
+  assignmentInstructions,
+  setAssignmentInstructions,
+  assignmentDueDate,
+  setAssignmentDueDate,
+  assignmentSubmissionType,
+  setAssignmentSubmissionType,
+  assignmentMaxScore,
+  setAssignmentMaxScore,
 }) {
   // Image upload handler
   const imageInputRef = React.useRef(null);
@@ -378,12 +390,12 @@ export default function CurriculumDialogs({
               </div>
               <div className="flex flex-col text-left">
                 <h3 className="text-base font-bold text-slate-800 capitalize leading-tight">
-                  {blockConfigType === "text" ? "Article Settings" : `${blockConfigType} Block Settings`}
+                  {(blockConfigType === "text" || blockConfigType === "paragraph") ? "Paragraph Settings" : `${blockConfigType} Block Settings`}
                 </h3>
                 <p className="text-[11px] text-slate-400 font-medium leading-none mt-1">
                   {blockConfigType === "video" && "Configure your multimedia video settings"}
                   {blockConfigType === "pdf" && "Configure your downloadable PDF settings"}
-                  {blockConfigType === "text" && "Configure your rich text content"}
+                  {(blockConfigType === "text" || blockConfigType === "paragraph") && "Configure your rich text content"}
                   {blockConfigType === "heading" && "Configure your section heading"}
                   {blockConfigType === "quote" && "Configure your inspirational quote block"}
                   {blockConfigType === "divider" && "Configure your visual divider"}
@@ -504,7 +516,7 @@ export default function CurriculumDialogs({
             )}
 
             {/* 3. Text/Article Form */}
-            {blockConfigType === "text" && (
+            {(blockConfigType === "text" || blockConfigType === "paragraph") && (
               <div className="space-y-4 text-left">
                 <div className="space-y-1.5">
                   <Label htmlFor="articleContent" className="text-[12px] font-bold text-slate-500">ARTICLE CONTENT</Label>
@@ -804,6 +816,178 @@ export default function CurriculumDialogs({
                   {["YOUTUBE", "VIMEO", "LOOM", "SOUNDCLOUD", "WHIMSICAL"].map(tag => (
                     <span key={tag} className="text-[9px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{tag}</span>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* 14. Quiz Block Form */}
+            {blockConfigType === "quiz" && (
+              <div className="space-y-6 text-left">
+                <div className="flex items-center justify-between">
+                  <Label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Quiz Questions</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setQuizQuestions([...quizQuestions, { text: "", options: [{ text: "", isCorrect: false }, { text: "", isCorrect: false }] }])}
+                    className="text-[11.5px] font-bold text-[#6C1D5F] border-[#6C1D5F]/20 hover:bg-[#6C1D5F]/5"
+                  >
+                    <Plus size={12} className="mr-1" /> Add Question
+                  </Button>
+                </div>
+
+                {quizQuestions.length === 0 ? (
+                  <div className="py-8 text-center border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                    <HelpCircle size={24} className="mx-auto mb-2 text-slate-300 pointer-events-none" />
+                    <p className="text-xs font-semibold text-slate-500">No questions added yet</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Click "Add Question" above to start building your quiz</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
+                    {quizQuestions.map((q, qIdx) => (
+                      <div key={qIdx} className="p-4 border border-slate-200 rounded-xl bg-slate-50/30 relative space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-slate-400">QUESTION {qIdx + 1}</span>
+                          <button
+                            type="button"
+                            onClick={() => setQuizQuestions(quizQuestions.filter((_, idx) => idx !== qIdx))}
+                            className="text-red-500 hover:text-red-700 text-xs font-semibold"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        
+                        <div className="space-y-1.5">
+                          <Input
+                            value={q.text || ""}
+                            onChange={e => {
+                              const newQList = [...quizQuestions];
+                              newQList[qIdx].text = e.target.value;
+                              setQuizQuestions(newQList);
+                            }}
+                            placeholder="Type the question..."
+                            className="text-[13px] h-9 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F] bg-white"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10.5px] font-semibold text-slate-500 font-sans">Options</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newQList = [...quizQuestions];
+                                newQList[qIdx].options.push({ text: "", isCorrect: false });
+                                setQuizQuestions(newQList);
+                              }}
+                              className="text-[10.5px] font-bold text-[#6C1D5F] hover:underline"
+                            >
+                              + Add Option
+                            </button>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            {q.options?.map((opt, oIdx) => (
+                              <div key={oIdx} className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={!!opt.isCorrect}
+                                  onChange={e => {
+                                    const newQList = [...quizQuestions];
+                                    newQList[qIdx].options = newQList[qIdx].options.map((o, idx) => ({
+                                      ...o,
+                                      isCorrect: idx === oIdx ? e.target.checked : o.isCorrect
+                                    }));
+                                    setQuizQuestions(newQList);
+                                  }}
+                                  title="Mark as correct answer"
+                                  className="w-4 h-4 rounded text-[#6C1D5F] focus:ring-[#6C1D5F]"
+                                />
+                                <Input
+                                  value={opt.text || ""}
+                                  onChange={e => {
+                                    const newQList = [...quizQuestions];
+                                    newQList[qIdx].options[oIdx].text = e.target.value;
+                                    setQuizQuestions(newQList);
+                                  }}
+                                  placeholder={`Option ${oIdx + 1}`}
+                                  className="text-[12px] h-8 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F] bg-white flex-1"
+                                />
+                                {q.options.length > 2 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const newQList = [...quizQuestions];
+                                      newQList[qIdx].options = newQList[qIdx].options.filter((_, idx) => idx !== oIdx);
+                                      setQuizQuestions(newQList);
+                                    }}
+                                    className="text-slate-400 hover:text-red-500 p-1 bg-transparent border-none outline-none cursor-pointer"
+                                  >
+                                    <X size={12} />
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 15. Assignment Block Form */}
+            {blockConfigType === "assignment" && (
+              <div className="space-y-4 text-left">
+                <div className="space-y-1.5">
+                  <Label htmlFor="assignInstructions" className="text-[12px] font-bold text-slate-500">ASSIGNMENT INSTRUCTIONS</Label>
+                  <Textarea
+                    id="assignInstructions"
+                    value={assignmentInstructions}
+                    onChange={e => setAssignmentInstructions(e.target.value)}
+                    placeholder="Provide clear instructions for the assignment..."
+                    className="text-[13px] min-h-[120px] focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]"
+                    rows={4}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="assignDueDate" className="text-[12px] font-bold text-slate-500">DUE DATE (OPTIONAL)</Label>
+                    <Input
+                      id="assignDueDate"
+                      type="date"
+                      value={assignmentDueDate}
+                      onChange={e => setAssignmentDueDate(e.target.value)}
+                      className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="assignMaxScore" className="text-[12px] font-bold text-slate-500">MAX SCORE</Label>
+                    <Input
+                      id="assignMaxScore"
+                      type="number"
+                      value={assignmentMaxScore}
+                      onChange={e => setAssignmentMaxScore(parseInt(e.target.value) || 0)}
+                      className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="assignSubmissionType" className="text-[12px] font-bold text-slate-500">SUBMISSION TYPE</Label>
+                  <select
+                    id="assignSubmissionType"
+                    value={assignmentSubmissionType}
+                    onChange={e => setAssignmentSubmissionType(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[12px] focus:ring-1 focus:ring-[#6C1D5F]/30 text-slate-700 h-10 outline-none"
+                  >
+                    <option value="file">File Upload (PDF, ZIP, Word)</option>
+                    <option value="text">Text Response / Written Answer</option>
+                    <option value="link">URL Link Submission</option>
+                  </select>
                 </div>
               </div>
             )}

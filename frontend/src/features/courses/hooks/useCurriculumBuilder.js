@@ -200,13 +200,23 @@ export default function useCurriculumBuilder() {
   const toggleSubModuleExpand = (subId) =>
     setExpandedSubModules(p => ({ ...p, [subId]: !p[subId] }));
 
+  /* ── Quiz & Assignment State ── */
+  const [quizQuestions, setQuizQuestions] = useState([]);
+  const [assignmentInstructions, setAssignmentInstructions] = useState("");
+  const [assignmentDueDate, setAssignmentDueDate] = useState("");
+  const [assignmentSubmissionType, setAssignmentSubmissionType] = useState("file");
+  const [assignmentMaxScore, setAssignmentMaxScore] = useState(100);
+
   /* ── Load Modules for Course Helper ── */
   const loadCurriculumForCourse = async (courseId, allModules, allSubModules, allContents) => {
-    const courseModules = allModules.filter(m => m.courseId === Number(courseId));
+    const courseModules = allModules
+      .filter(m => m.courseId === Number(courseId))
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
     return courseModules.map(mod => ({
       ...mod,
       subModules: allSubModules
         .filter(sm => sm.moduleId === mod.id)
+        .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
         .map(sm => ({ ...sm, content: allContents.find(c => c.subModuleId === sm.id) })),
     }));
   };
@@ -393,6 +403,54 @@ export default function useCurriculumBuilder() {
     } finally { setSubmittingSubModule(false); }
   };
 
+  /* ── Move Up / Move Down Handlers ── */
+  const handleMoveModule = async (mod, direction) => {
+    const activeCourse = loadedCourses.find(c => c.id === activeCourseId);
+    if (!activeCourse) return;
+    const mods = [...activeCourse.modules].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    const idx = mods.findIndex(m => m.id === mod.id);
+    const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= mods.length) return;
+    // Swap sort orders
+    const reorderList = mods.map((m, i) => {
+      if (i === idx) return { id: m.id, sortOrder: targetIdx };
+      if (i === targetIdx) return { id: m.id, sortOrder: idx };
+      return { id: m.id, sortOrder: i };
+    });
+    try {
+      await moduleService.reorderModules(reorderList);
+      showToast(`Module moved ${direction}!`);
+      await reloadAllLoadedCourses();
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to reorder modules.", "error");
+    }
+  };
+
+  const handleMoveSubModule = async (sub, direction) => {
+    const activeCourse = loadedCourses.find(c => c.id === activeCourseId);
+    if (!activeCourse) return;
+    const parentMod = activeCourse.modules.find(m => m.subModules?.some(s => s.id === sub.id));
+    if (!parentMod) return;
+    const subs = [...parentMod.subModules].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    const idx = subs.findIndex(s => s.id === sub.id);
+    const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= subs.length) return;
+    const reorderList = subs.map((s, i) => {
+      if (i === idx) return { id: s.id, sortOrder: targetIdx };
+      if (i === targetIdx) return { id: s.id, sortOrder: idx };
+      return { id: s.id, sortOrder: i };
+    });
+    try {
+      await subModuleService.reorderSubModules(reorderList);
+      showToast(`Block moved ${direction}!`);
+      await reloadAllLoadedCourses();
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to reorder blocks.", "error");
+    }
+  };
+
   /* ── Block Actions ── */
   const resetAllBlockFields = () => {
     setVideoUrl("");
@@ -412,6 +470,11 @@ export default function useCurriculumBuilder() {
     setDownloadDisplayName("");
     setLinkUrl("");
     setLinkText("");
+    setQuizQuestions([]);
+    setAssignmentInstructions("");
+    setAssignmentDueDate("");
+    setAssignmentSubmissionType("file");
+    setAssignmentMaxScore(100);
   };
 
   const openEditBlockDialog = (subMod) => {
@@ -462,6 +525,26 @@ export default function useCurriculumBuilder() {
         setBlockConfigType("audio");
         setDownloadUrl(c.videoUrl || "");
         setDownloadDisplayName(c.content || "");
+      } else if (bt === "paragraph" || bt === "text") {
+        setBlockConfigType("paragraph");
+        setTextContent(c.content || "");
+      } else if (bt === "quiz") {
+        setBlockConfigType("quiz");
+        try {
+          const parsed = JSON.parse(c.content || "[]");
+          setQuizQuestions(Array.isArray(parsed) ? parsed : parsed.questions || []);
+        } catch { setQuizQuestions([]); }
+      } else if (bt === "assignment") {
+        setBlockConfigType("assignment");
+        try {
+          const parsed = JSON.parse(c.content || "{}");
+          setAssignmentInstructions(parsed.instructions || "");
+          setAssignmentDueDate(parsed.dueDate || "");
+          setAssignmentSubmissionType(parsed.submissionType || "file");
+          setAssignmentMaxScore(parsed.maxScore ?? 100);
+        } catch {
+          setAssignmentInstructions(c.content || "");
+        }
       } else if (c.pdfUrl) {
         setBlockConfigType("pdf");
         setPdfUrl(c.pdfUrl);
@@ -506,6 +589,7 @@ export default function useCurriculumBuilder() {
         base.content = `Content for ${activeSubModule.title}`;
         base.pdfUrl = pdfUrl.trim();
         break;
+      case "paragraph":
       case "text":
         base.content = textContent.trim();
         break;
@@ -541,6 +625,17 @@ export default function useCurriculumBuilder() {
       case "audio":
         base.videoUrl = downloadUrl.trim();
         base.content = downloadDisplayName.trim() || "Audio";
+        break;
+      case "quiz":
+        base.content = JSON.stringify(quizQuestions);
+        break;
+      case "assignment":
+        base.content = JSON.stringify({
+          instructions: assignmentInstructions.trim(),
+          dueDate: assignmentDueDate || null,
+          submissionType: assignmentSubmissionType,
+          maxScore: assignmentMaxScore,
+        });
         break;
       default:
         base.content = textContent.trim() || `Content for ${activeSubModule.title}`;
@@ -888,6 +983,19 @@ export default function useCurriculumBuilder() {
     handleDuplicateCourse,
     handleDuplicateModule,
     handleDuplicateSubModule,
+    handleMoveModule,
+    handleMoveSubModule,
+    // Quiz & Assignment state
+    quizQuestions,
+    setQuizQuestions,
+    assignmentInstructions,
+    setAssignmentInstructions,
+    assignmentDueDate,
+    setAssignmentDueDate,
+    assignmentSubmissionType,
+    setAssignmentSubmissionType,
+    assignmentMaxScore,
+    setAssignmentMaxScore,
     // Multi course props
     loadedCourses,
     setLoadedCourses,
