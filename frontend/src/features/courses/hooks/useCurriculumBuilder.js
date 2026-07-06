@@ -114,6 +114,11 @@ export default function useCurriculumBuilder() {
   };
 
   const openCourseDialog = (tab = "select") => {
+    if (tab === "create") {
+      setCourseDialogOpen(false);
+      navigate("/courses/create");
+      return;
+    }
     setCourseSearch("");
     setCourseDialogTab(tab);
     setNewCourseTitle("");

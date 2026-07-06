@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   X,
@@ -142,6 +143,7 @@ export default function CurriculumDialogs({
   assignmentMaxScore,
   setAssignmentMaxScore,
 }) {
+  const navigate = useNavigate();
   // Image upload handler
   const imageInputRef = React.useRef(null);
   const fileInputRef = React.useRef(null);
@@ -1040,7 +1042,14 @@ export default function CurriculumDialogs({
               ].map(tab => (
                 <button
                   key={tab.id}
-                  onClick={() => setCourseDialogTab(tab.id)}
+                  onClick={() => {
+                    if (tab.id === "create") {
+                      setCourseDialogOpen(false);
+                      navigate("/courses/create");
+                    } else {
+                      setCourseDialogTab(tab.id);
+                    }
+                  }}
                   className={`flex-1 py-1.5 text-[12px] font-bold rounded-md transition-all cursor-pointer ${
                     courseDialogTab === tab.id
                       ? "bg-white shadow-sm text-[#6C1D5F]"
@@ -1100,7 +1109,10 @@ export default function CurriculumDialogs({
                         description={courseSearch ? `No results for "${courseSearch}"` : "Create your first course"}
                         primaryAction={{
                           label: "Create New Course",
-                          onClick: () => setCourseDialogTab("create"),
+                          onClick: () => {
+                            setCourseDialogOpen(false);
+                            navigate("/courses/create");
+                          },
                         }}
                       />
                     );
@@ -1159,7 +1171,10 @@ export default function CurriculumDialogs({
                   {allCourses.length} course{allCourses.length !== 1 ? "s" : ""} available
                 </span>
                 <button
-                  onClick={() => setCourseDialogTab("create")}
+                  onClick={() => {
+                    setCourseDialogOpen(false);
+                    navigate("/courses/create");
+                  }}
                   className="flex items-center gap-1.5 text-[12px] font-semibold text-[#6C1D5F] hover:underline cursor-pointer"
                 >
                   <Plus size={12} /> Create New
