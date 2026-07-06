@@ -431,7 +431,7 @@ export default function StudentDownloads() {
                         <div className="absolute right-0 top-8 w-36 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-20 text-[12px] text-slate-600 font-bold">
                           <button
                             onClick={() => {
-                              navigator.clipboard.writeText(`http://localhost:5173/student/resource/${res.id}`);
+                              navigator.clipboard.writeText(`${window.location.origin}/student/resource/${res.id}`);
                               setOpenDropdown(null);
                             }}
                             className="w-full text-left px-3.5 py-1.5 hover:bg-slate-50 hover:text-[#6C1D5F] cursor-pointer border-none bg-transparent"
