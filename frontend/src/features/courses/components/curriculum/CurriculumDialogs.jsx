@@ -222,7 +222,7 @@ export default function CurriculumDialogs({
           </div>
 
           {/* Categories */}
-          <ScrollArea className="max-h-[400px]">
+          <ScrollArea className="max-h-[550px]">
             <div className="p-3 space-y-4">
               {filteredBlockCategories.map(cat => (
                 <div key={cat.label}>
