@@ -62,22 +62,44 @@ public class SubModuleController {
     @Operation(summary = "Update submodule")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<SubModuleResponse>> updateSubModule(
-            @PathVariable @NonNull Long id,
+            @PathVariable String id,
             @Valid @RequestBody SubModuleRequest request) {
+
+        if (id == null || "undefined".equalsIgnoreCase(id) || id.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponseBuilder.failure("Invalid SubModule ID", HttpStatus.BAD_REQUEST.value()));
+        }
+
+        Long parsedId;
+        try {
+            parsedId = Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body(ResponseBuilder.failure("Invalid SubModule ID format", HttpStatus.BAD_REQUEST.value()));
+        }
 
         return ResponseEntity.ok(
                 ResponseBuilder.success(
                         "SubModule updated successfully",
-                        service.updateSubModule(id, request),
+                        service.updateSubModule(parsedId, request),
                         HttpStatus.OK.value()));
     }
 
     @Operation(summary = "Delete submodule")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteSubModule(
-            @PathVariable @NonNull Long id) {
+            @PathVariable String id) {
 
-        service.deleteSubModule(id);
+        if (id == null || "undefined".equalsIgnoreCase(id) || id.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponseBuilder.failure("Invalid SubModule ID", HttpStatus.BAD_REQUEST.value()));
+        }
+
+        Long parsedId;
+        try {
+            parsedId = Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body(ResponseBuilder.failure("Invalid SubModule ID format", HttpStatus.BAD_REQUEST.value()));
+        }
+
+        service.deleteSubModule(parsedId);
 
         return ResponseEntity.ok(
                 ResponseBuilder.success(

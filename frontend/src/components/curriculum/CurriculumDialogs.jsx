@@ -112,7 +112,7 @@ export default function CurriculumDialogs({
           BLOCK PICKER DIALOG
       ══════════════════════════════════════════════════════════ */}
       <Dialog open={blockPickerOpen} onOpenChange={setBlockPickerOpen}>
-        <DialogContent className="max-w-[520px] rounded-xl shadow-2xl bg-white border border-slate-200 p-0 overflow-hidden">
+        <DialogContent className="max-w-[520px] rounded-xl shadow-2xl bg-white border border-slate-200 p-0 overflow-hidden flex flex-col h-[85vh]">
           {/* Search */}
           <div className="p-4 border-b border-slate-100">
             <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus-within:border-[#6C1D5F] focus-within:ring-1 focus-within:ring-[#6C1D5F]/30 transition-all">
@@ -137,7 +137,7 @@ export default function CurriculumDialogs({
           </div>
 
           {/* Categories */}
-          <ScrollArea className="max-h-[400px]">
+          <ScrollArea className="flex-1 overflow-y-auto">
             <div className="p-3 space-y-4">
               {filteredBlockCategories.map(cat => (
                 <div key={cat.label}>
