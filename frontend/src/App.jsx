@@ -2,6 +2,21 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Landing from "@/features/landing/pages/Landing";
 import Login from "@/features/auth/pages/Login";
 
+// Manager features
+import ManagerLayout from "@/app/layouts/ManagerLayout";
+import ManagerDashboard from "@/features/manager/pages/ManagerDashboard";
+import LearningDashboard from "@/features/manager/pages/LearningDashboard";
+import AdminDashboard from "@/features/manager/pages/AdminDashboard";
+import CoursesManagement from "@/features/manager/pages/CoursesManagement";
+import ReportsAnalytics from "@/features/manager/pages/ReportsAnalytics";
+import CategoriesManagement from "@/features/manager/pages/CategoriesManagement";
+import TrainersManagement from "@/features/manager/pages/TrainersManagement";
+import LearnersManagement from "@/features/manager/pages/LearnersManagement";
+import Assessments from "@/features/manager/pages/Assessments";
+import ManagerSettings from "@/features/manager/pages/Settings";
+import BatchManagement from "@/features/manager/pages/BatchManagement";
+import ApprovalCenter from "@/features/manager/pages/ApprovalCenter";
+
 // Admin features
 import Dashboard from "@/features/admin/pages/Dashboard";
 import DesignSystem from "@/features/admin/pages/DesignSystem";
@@ -73,6 +88,23 @@ function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
+      
+      {/* Manager Console routes */}
+      <Route path="/manager" element={<ManagerLayout />}>
+        <Route index element={<ManagerDashboard />} />
+        <Route path="learning" element={<LearningDashboard />} />
+        <Route path="admin-dashboard" element={<AdminDashboard />} />
+        <Route path="courses" element={<CoursesManagement />} />
+        <Route path="analytics" element={<ReportsAnalytics />} />
+        <Route path="categories" element={<CategoriesManagement />} />
+        <Route path="trainers" element={<TrainersManagement />} />
+        <Route path="learners" element={<LearnersManagement />} />
+        <Route path="assessments" element={<Assessments />} />
+        <Route path="settings" element={<ManagerSettings />} />
+        <Route path="batches" element={<BatchManagement />} />
+        <Route path="approvals" element={<ApprovalCenter />} />
+      </Route>
+
       <Route path="/admin" element={<Dashboard />} />
 
       {/* Stitch-integrated Admin pages */}

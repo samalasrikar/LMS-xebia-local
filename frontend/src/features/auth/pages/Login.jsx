@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { GraduationCap, Eye, EyeOff, Shield, Users, ArrowLeft, ArrowRight, Lock, Mail, CheckCircle2 } from "lucide-react";
+import { GraduationCap, Eye, EyeOff, Shield, Users, ArrowLeft, ArrowRight, Lock, Mail, CheckCircle2, Briefcase } from "lucide-react";
 
 const DEMO_CREDS = {
   admin: { email: "admin@xebia.com", password: "Xebia@2024", role: "admin", label: "Admin Console", route: "/admin" },
   student: { email: "student@xebia.com", password: "Xebia@2024", role: "student", label: "Student Portal", route: "/student" },
+  manager: { email: "manager@xebia.com", password: "Xebia@2024", role: "manager", label: "Manager Console", route: "/manager" },
 };
 
 export default function Login() {
@@ -40,10 +41,13 @@ export default function Login() {
     setError("");
     const adminCred = DEMO_CREDS.admin;
     const studentCred = DEMO_CREDS.student;
+    const managerCred = DEMO_CREDS.manager;
     if (email === adminCred.email && password === adminCred.password) {
       doLogin(adminCred.route);
     } else if (email === studentCred.email && password === studentCred.password) {
       doLogin(studentCred.route);
+    } else if (email === managerCred.email && password === managerCred.password) {
+      doLogin(managerCred.route);
     } else {
       setError("Invalid credentials. Please check your email and password.");
     }
@@ -134,10 +138,10 @@ export default function Login() {
           {/* ── Quick Access Cards ── */}
           <div style={{ marginBottom: "24px" }}>
             <div style={{ fontSize: "11px", fontWeight: 700, color: "rgba(27,28,28,0.45)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>Quick Access</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
               {/* Admin card */}
               <button type="button" onClick={() => handleQuickLogin("admin")}
-                style={{ padding: "14px", borderRadius: "12px", background: activeCard === "admin" ? "rgba(108,29,95,0.08)" : "#f8f7fa", border: activeCard === "admin" ? "1px solid rgba(108,29,95,0.4)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
+                style={{ padding: "14px 10px", borderRadius: "12px", background: activeCard === "admin" ? "rgba(108,29,95,0.08)" : "#f8f7fa", border: activeCard === "admin" ? "1px solid rgba(108,29,95,0.4)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
                 onMouseEnter={e => { if (activeCard !== "admin") { e.currentTarget.style.background = "rgba(108,29,95,0.05)"; e.currentTarget.style.border = "1px solid rgba(108,29,95,0.25)"; } }}
                 onMouseLeave={e => { if (activeCard !== "admin") { e.currentTarget.style.background = "#f8f7fa"; e.currentTarget.style.border = "1px solid rgba(0,0,0,0.08)"; } }}
               >
@@ -148,9 +152,22 @@ export default function Login() {
                 <div style={{ fontSize: "10px", color: "rgba(27,28,28,0.45)" }}>admin@xebia.com</div>
               </button>
 
+              {/* Manager card */}
+              <button type="button" onClick={() => handleQuickLogin("manager")}
+                style={{ padding: "14px 10px", borderRadius: "12px", background: activeCard === "manager" ? "rgba(132,17,124,0.08)" : "#f8f7fa", border: activeCard === "manager" ? "1px solid rgba(132,17,124,0.4)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
+                onMouseEnter={e => { if (activeCard !== "manager") { e.currentTarget.style.background = "rgba(132,17,124,0.05)"; e.currentTarget.style.border = "1px solid rgba(132,17,124,0.25)"; } }}
+                onMouseLeave={e => { if (activeCard !== "manager") { e.currentTarget.style.background = "#f8f7fa"; e.currentTarget.style.border = "1px solid rgba(0,0,0,0.08)"; } }}
+              >
+                <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(132,17,124,0.1)", border: "1px solid rgba(132,17,124,0.2)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
+                  <Briefcase size={15} color="#84117C" />
+                </div>
+                <div style={{ fontSize: "12px", fontWeight: 700, color: "#1b1c1c", marginBottom: "3px" }}>Manager Console</div>
+                <div style={{ fontSize: "10px", color: "rgba(27,28,28,0.45)" }}>manager@xebia.com</div>
+              </button>
+
               {/* Student card */}
               <button type="button" onClick={() => handleQuickLogin("student")}
-                style={{ padding: "14px", borderRadius: "12px", background: activeCard === "student" ? "rgba(1,172,159,0.08)" : "#f8f7fa", border: activeCard === "student" ? "1px solid rgba(1,172,159,0.35)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
+                style={{ padding: "14px 10px", borderRadius: "12px", background: activeCard === "student" ? "rgba(1,172,159,0.08)" : "#f8f7fa", border: activeCard === "student" ? "1px solid rgba(1,172,159,0.35)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
                 onMouseEnter={e => { if (activeCard !== "student") { e.currentTarget.style.background = "rgba(1,172,159,0.05)"; e.currentTarget.style.border = "1px solid rgba(1,172,159,0.2)"; } }}
                 onMouseLeave={e => { if (activeCard !== "student") { e.currentTarget.style.background = "#f8f7fa"; e.currentTarget.style.border = "1px solid rgba(0,0,0,0.08)"; } }}
               >
@@ -176,16 +193,21 @@ export default function Login() {
             <div>
               <label style={{ fontSize: "11px", fontWeight: 700, color: "rgba(27,28,28,0.45)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "8px" }}>Login Profile</label>
               <div style={{ display: "flex", gap: "6px", background: "#f8f7fa", border: "1px solid rgba(0,0,0,0.08)", borderRadius: "10px", padding: "4px" }}>
-                {["student", "admin"].map(r => (
-                  <button key={r} type="button" onClick={() => { setRole(r); setEmail(DEMO_CREDS[r].email); setPassword(""); }}
-                    style={{ flex: 1, padding: "7px 0", borderRadius: "7px", fontSize: "12px", fontWeight: 700, cursor: "pointer", border: "none", transition: "all 0.2s",
-                      background: role === r ? (r === "admin" ? "#6C1D5F" : "#01ac9f") : "transparent",
-                      color: role === r ? "#fff" : "rgba(27,28,28,0.45)"
-                    }}
-                  >
-                    {r === "student" ? "Student" : "Administrator"}
-                  </button>
-                ))}
+                {["student", "manager", "admin"].map(r => {
+                  let activeBg = "#01ac9f"; // student
+                  if (r === "admin") activeBg = "#6C1D5F";
+                  if (r === "manager") activeBg = "#84117C";
+                  return (
+                    <button key={r} type="button" onClick={() => { setRole(r); setEmail(DEMO_CREDS[r].email); setPassword(""); }}
+                      style={{ flex: 1, padding: "7px 0", borderRadius: "7px", fontSize: "12px", fontWeight: 700, cursor: "pointer", border: "none", transition: "all 0.2s",
+                        background: role === r ? activeBg : "transparent",
+                        color: role === r ? "#fff" : "rgba(27,28,28,0.45)"
+                      }}
+                    >
+                      {r === "student" ? "Student" : r === "manager" ? "Manager" : "Administrator"}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -234,8 +256,8 @@ export default function Login() {
             {/* Submit */}
             <button type="submit" disabled={loading}
               style={{ width: "100%", padding: "13px", borderRadius: "10px", fontSize: "13px", fontWeight: 700, color: "#fff", cursor: loading ? "not-allowed" : "pointer", border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", transition: "opacity 0.2s",
-                background: role === "admin" ? "linear-gradient(to right, #6C1D5F, #84117C)" : "linear-gradient(to right, #009e92, #01ac9f)",
-                boxShadow: role === "admin" ? "0 6px 20px rgba(108,29,95,0.25)" : "0 6px 20px rgba(1,172,159,0.2)",
+                background: role === "admin" ? "linear-gradient(to right, #6C1D5F, #84117C)" : role === "manager" ? "linear-gradient(to right, #84117C, #a8249f)" : "linear-gradient(to right, #009e92, #01ac9f)",
+                boxShadow: role === "admin" ? "0 6px 20px rgba(108,29,95,0.25)" : role === "manager" ? "0 6px 20px rgba(132,17,124,0.2)" : "0 6px 20px rgba(1,172,159,0.2)",
                 opacity: loading ? 0.7 : 1 }}>
               {loading ? (
                 <>
