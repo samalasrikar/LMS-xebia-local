@@ -1,7 +1,7 @@
 export { default as StudentDashboard } from "./StudentDashboard";
 export { default as StudentCourses } from "./StudentCourses";
 export { default as StudentCalendar } from "./StudentCalendar";
-export { default as StudentAssignments } from "./StudentAssignments";
+export { default as StudentAssessments } from "./StudentAssessments";
 export { default as StudentGrades } from "./StudentGrades";
 export { default as StudentAnalytics } from "./StudentAnalytics";
 export { default as StudentProfile } from "./StudentProfile";
