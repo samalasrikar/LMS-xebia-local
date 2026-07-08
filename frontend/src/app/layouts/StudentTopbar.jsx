@@ -47,10 +47,20 @@ const PATH_METADATA = {
     breadcrumb: "Calendar",
     description: "Deadlines, sessions, and events.",
   },
+  "/student/assessments": {
+    title: "Assessments Dashboard",
+    breadcrumb: "Assessments",
+    description: "Unified dashboard for assignments and quiz tests.",
+  },
   "/student/assignments": {
-    title: "Assignments",
-    breadcrumb: "Assignments",
-    description: "Pending, graded, and submitted work.",
+    title: "Assessments Dashboard",
+    breadcrumb: "Assessments",
+    description: "Unified dashboard for assignments and quiz tests.",
+  },
+  "/student/quizzes": {
+    title: "Assessments Dashboard",
+    breadcrumb: "Assessments",
+    description: "Unified dashboard for assignments and quiz tests.",
   },
   "/student/grades": {
     title: "Academic Record",
