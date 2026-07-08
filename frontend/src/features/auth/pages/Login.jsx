@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { GraduationCap, Eye, EyeOff, Shield, Users, ArrowLeft, ArrowRight, Lock, Mail, CheckCircle2 } from "lucide-react";
+import { GraduationCap, Eye, EyeOff, Shield, Users, ArrowLeft, ArrowRight, Lock, Mail, CheckCircle2, BookOpen } from "lucide-react";
 
 const DEMO_CREDS = {
   admin: { email: "admin@xebia.com", password: "Xebia@2024", role: "admin", label: "Admin Console", route: "/admin" },
+  trainer: { email: "trainer@xebia.com", password: "Xebia@2024", role: "trainer", label: "Trainer Workspace", route: "/trainer" },
   student: { email: "student@xebia.com", password: "Xebia@2024", role: "student", label: "Student Portal", route: "/student" },
 };
 
@@ -39,9 +40,12 @@ export default function Login() {
     e.preventDefault();
     setError("");
     const adminCred = DEMO_CREDS.admin;
+    const trainerCred = DEMO_CREDS.trainer;
     const studentCred = DEMO_CREDS.student;
     if (email === adminCred.email && password === adminCred.password) {
       doLogin(adminCred.route);
+    } else if (email === trainerCred.email && password === trainerCred.password) {
+      doLogin(trainerCred.route);
     } else if (email === studentCred.email && password === studentCred.password) {
       doLogin(studentCred.route);
     } else {
@@ -134,31 +138,44 @@ export default function Login() {
           {/* ── Quick Access Cards ── */}
           <div style={{ marginBottom: "24px" }}>
             <div style={{ fontSize: "11px", fontWeight: 700, color: "rgba(27,28,28,0.45)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>Quick Access</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px" }}>
               {/* Admin card */}
               <button type="button" onClick={() => handleQuickLogin("admin")}
-                style={{ padding: "14px", borderRadius: "12px", background: activeCard === "admin" ? "rgba(108,29,95,0.08)" : "#f8f7fa", border: activeCard === "admin" ? "1px solid rgba(108,29,95,0.4)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
+                style={{ padding: "12px 8px", borderRadius: "12px", background: activeCard === "admin" ? "rgba(108,29,95,0.08)" : "#f8f7fa", border: activeCard === "admin" ? "1px solid rgba(108,29,95,0.4)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
                 onMouseEnter={e => { if (activeCard !== "admin") { e.currentTarget.style.background = "rgba(108,29,95,0.05)"; e.currentTarget.style.border = "1px solid rgba(108,29,95,0.25)"; } }}
                 onMouseLeave={e => { if (activeCard !== "admin") { e.currentTarget.style.background = "#f8f7fa"; e.currentTarget.style.border = "1px solid rgba(0,0,0,0.08)"; } }}
               >
                 <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(108,29,95,0.1)", border: "1px solid rgba(108,29,95,0.2)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
                   <Shield size={15} color="#84117C" />
                 </div>
-                <div style={{ fontSize: "12px", fontWeight: 700, color: "#1b1c1c", marginBottom: "3px" }}>Admin Console</div>
-                <div style={{ fontSize: "10px", color: "rgba(27,28,28,0.45)" }}>admin@xebia.com</div>
+                <div style={{ fontSize: "11px", fontWeight: 700, color: "#1b1c1c", marginBottom: "3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Admin Console</div>
+                <div style={{ fontSize: "9px", color: "rgba(27,28,28,0.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>admin@xebia.com</div>
+              </button>
+
+              {/* Trainer card */}
+              <button type="button" onClick={() => handleQuickLogin("trainer")}
+                style={{ padding: "12px 8px", borderRadius: "12px", background: activeCard === "trainer" ? "rgba(108,29,95,0.08)" : "#f8f7fa", border: activeCard === "trainer" ? "1px solid rgba(108,29,95,0.4)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
+                onMouseEnter={e => { if (activeCard !== "trainer") { e.currentTarget.style.background = "rgba(108,29,95,0.05)"; e.currentTarget.style.border = "1px solid rgba(108,29,95,0.25)"; } }}
+                onMouseLeave={e => { if (activeCard !== "trainer") { e.currentTarget.style.background = "#f8f7fa"; e.currentTarget.style.border = "1px solid rgba(0,0,0,0.08)"; } }}
+              >
+                <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(108,29,95,0.1)", border: "1px solid rgba(108,29,95,0.2)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
+                  <BookOpen size={15} color="#84117C" />
+                </div>
+                <div style={{ fontSize: "11px", fontWeight: 700, color: "#1b1c1c", marginBottom: "3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Trainer Workspace</div>
+                <div style={{ fontSize: "9px", color: "rgba(27,28,28,0.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>trainer@xebia.com</div>
               </button>
 
               {/* Student card */}
               <button type="button" onClick={() => handleQuickLogin("student")}
-                style={{ padding: "14px", borderRadius: "12px", background: activeCard === "student" ? "rgba(1,172,159,0.08)" : "#f8f7fa", border: activeCard === "student" ? "1px solid rgba(1,172,159,0.35)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
+                style={{ padding: "12px 8px", borderRadius: "12px", background: activeCard === "student" ? "rgba(1,172,159,0.08)" : "#f8f7fa", border: activeCard === "student" ? "1px solid rgba(1,172,159,0.35)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
                 onMouseEnter={e => { if (activeCard !== "student") { e.currentTarget.style.background = "rgba(1,172,159,0.05)"; e.currentTarget.style.border = "1px solid rgba(1,172,159,0.2)"; } }}
                 onMouseLeave={e => { if (activeCard !== "student") { e.currentTarget.style.background = "#f8f7fa"; e.currentTarget.style.border = "1px solid rgba(0,0,0,0.08)"; } }}
               >
                 <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(1,172,159,0.1)", border: "1px solid rgba(1,172,159,0.2)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
                   <Users size={15} color="#01ac9f" />
                 </div>
-                <div style={{ fontSize: "12px", fontWeight: 700, color: "#1b1c1c", marginBottom: "3px" }}>Student Portal</div>
-                <div style={{ fontSize: "10px", color: "rgba(27,28,28,0.45)" }}>student@xebia.com</div>
+                <div style={{ fontSize: "11px", fontWeight: 700, color: "#1b1c1c", marginBottom: "3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Student Portal</div>
+                <div style={{ fontSize: "9px", color: "rgba(27,28,28,0.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>student@xebia.com</div>
               </button>
             </div>
           </div>
@@ -176,14 +193,14 @@ export default function Login() {
             <div>
               <label style={{ fontSize: "11px", fontWeight: 700, color: "rgba(27,28,28,0.45)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "8px" }}>Login Profile</label>
               <div style={{ display: "flex", gap: "6px", background: "#f8f7fa", border: "1px solid rgba(0,0,0,0.08)", borderRadius: "10px", padding: "4px" }}>
-                {["student", "admin"].map(r => (
+                {["student", "trainer", "admin"].map(r => (
                   <button key={r} type="button" onClick={() => { setRole(r); setEmail(DEMO_CREDS[r].email); setPassword(""); }}
                     style={{ flex: 1, padding: "7px 0", borderRadius: "7px", fontSize: "12px", fontWeight: 700, cursor: "pointer", border: "none", transition: "all 0.2s",
-                      background: role === r ? (r === "admin" ? "#6C1D5F" : "#01ac9f") : "transparent",
+                      background: role === r ? (r === "student" ? "#01ac9f" : "#6C1D5F") : "transparent",
                       color: role === r ? "#fff" : "rgba(27,28,28,0.45)"
                     }}
                   >
-                    {r === "student" ? "Student" : "Administrator"}
+                    {r === "student" ? "Student" : r === "trainer" ? "Trainer" : "Administrator"}
                   </button>
                 ))}
               </div>

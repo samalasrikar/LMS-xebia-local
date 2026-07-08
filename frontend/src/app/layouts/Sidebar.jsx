@@ -23,6 +23,7 @@ import {
   Clock,
   LineChart,
   X,
+  ArrowRight,
 
   Briefcase,
   Target,
@@ -206,7 +207,17 @@ export default function Sidebar() {
       </nav>
 
       {/* ── Student Panel Switch ── */}
-      <div className="flex-shrink-0 border-t border-slate-200 p-3 bg-slate-50/50">
+      <div className="flex-shrink-0 border-t border-slate-200 p-3 bg-slate-50/50 flex flex-col gap-1.5">
+        <NavLink
+          to="/trainer"
+          className="flex items-center justify-between px-3 py-2 rounded-xl text-[12px] font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all cursor-pointer border-none outline-none text-left"
+        >
+          <span className="flex items-center gap-2">
+            <BookOpen size={14} className="shrink-0 text-slate-400" />
+            <span>Trainer Workspace</span>
+          </span>
+          <ArrowRight size={12} className="opacity-40" />
+        </NavLink>
         <NavLink
           to="/student"
           className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[#6C1D5F] hover:bg-[#521347] text-white text-[12px] font-semibold transition-all shadow-sm shadow-[#6C1D5F]/15 hover:shadow-md cursor-pointer text-center w-full"
