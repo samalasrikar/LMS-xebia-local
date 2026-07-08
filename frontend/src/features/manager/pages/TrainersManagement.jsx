@@ -1,33 +1,40 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Users, Activity, BookOpen, Star, Grid, List, Search, Filter, Plus, ChevronRight, CheckCircle2, X } from "lucide-react";
+import api from "@/shared/services/api";
 
 export default function TrainersManagement() {
   const [viewMode, setViewMode] = useState("grid"); // grid | table
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [statusFilter, setStatusFilter] = useState("All");
+  const [trainers, setTrainers] = useState([]);
 
-  const [trainers, setTrainers] = useState([
-    { id: 1, name: "Sarah Jenkins", email: "sarah.j@xebia.com", role: "Principal Cloud Architect", dept: "Cloud Solutions", courses: 5, learners: 142, rating: 4.9, status: "Active", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAIZr0LRIIOHn5Tor1jKROb_uV0N7jiTS_EmnANLYYtaaODkc9-6cx8VgZMPiDaUWSRXN7a3Ev5U6x3acj5_mK4DzaMtq0xqgWoY1uVktrATOB4xmA_s9E0VKkHSCt3U4xrbLZLOzIUVqiTTSI6uwIS7gEnscufRV4Wp3HmH3s0U0bx2-3XjuOcJxpvrvgixE7NdrbaVrOYMcUWqlAELCdkMkPV6gYpyqIzXfV3LHzh_FOPAPu3-mxt" },
-    { id: 2, name: "Arjun Mehta", email: "arjun.m@xebia.com", role: "Lead UI Developer", dept: "Frontend", courses: 4, learners: 98, rating: 4.8, status: "Active", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCZ-wfoVKzjz8mDvh_Dbr4DZsza2fpyo0b2NiLuk5niJigK0dddYhKfKGOZjB2n3ndjZWuIdU-4mgI_hvjdlVllki5mYmHb5SfNCUfnDltkzD-015_rKmqJkprOk7fTZ5TgN8pcwciGSV2TlFQzr5P3_0pIzYJqe5fcfopHQxb_BR5b4RRlMo1B4_LIlR0iXeuO74RxQXEnFKALh8wHi8svA7-rcbxf6RTBxlRytFbykZmAMtAhOyNY" },
-    { id: 3, name: "Maria Davis", email: "maria.d@xebia.com", role: "DevOps Engineer", dept: "Infrastructure", courses: 3, learners: 110, rating: 4.7, status: "Active", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDRqpARmZg898FoUjt21toSwzIdd0PMIZ_arBdrr_oLXa-NMuqDppAkyUDs17U8VNQiTs_fb2_butGGkSaR4LYLn8NKC8DH63IypX7i-LgumBT2WM_lyS5Z99dBA2nTwfdkEcl9mki1DRRnIv5qbsc6Cye2YuHkPsuydo-g-NVpszOjwYP5OxWBYTlE9qQ2TU_MeQy6w1wR6bP_kyTgAXAEN5mvOdFHF-2Rnh5l0omNlAotjjOA-VeO" },
-    { id: 4, name: "John Smith", email: "john.s@xebia.com", role: "Agile Coach", dept: "Leadership", courses: 3, learners: 62, rating: 4.6, status: "Active", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBDZ9b5KArlUculclZMgPJT7zhsKCumI2oZhFvm2W_7wuOpcKt6Fb_YP7ifCT2r_x7vsUAUYi0kEAkyO8gspnKk5kjK7m2ez2OHvZUPnWweXp99nw12fqYlKCNcEOKqfBb7hbx0ntfKw6SlAkYB7DFJP6y61rjHUSW5SrtKO5ddew6CLQd8jJadm7eHX0aHDLo6jHVgpKpVS3-m4NBGn543Yw57qSSRaN1lHeZ-o544Z3KNB--UGI4f" },
-    { id: 5, name: "David Wilson", email: "david.w@xebia.com", role: "Security Principal", dept: "Cybersecurity", courses: 2, learners: 45, rating: 4.5, status: "Inactive", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAQBouY11sIe98dyNj6ggomSHNq_L2nBIIFp4Eeq-iFKb_Wvvi4TrP-1cxroOfNpBBXOmPa8ELZJ6G--ZI0nvf6iQ8lyt5y72c02YfIDuK08Ky4B9pD91vRkmGv5fZ1wwD9IhlLrcMtupOMuMPZkowLJEjAG7EaMGNWgRA-Rl6QXRG3GGouoiV-u6j2Dz7QiiAjR4Q5rZX-_8n4ODPhJbHF3I_45GqbLrDshGko5fXMqhA9hS7PgUTp" }
-  ]);
+  useEffect(() => {
+    api.get("/trainers").then(response => {
+      if (response.data && response.data.data) {
+        setTrainers(response.data.data);
+      }
+    }).catch(() => {});
+  }, [showAddModal]);
 
   const [newTrainer, setNewTrainer] = useState({ name: "", email: "", role: "", dept: "", courses: 1, learners: 0, rating: 5.0, status: "Active" });
 
   const filteredTrainers = trainers.filter((t) => {
-    const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase()) || t.dept.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (t.name || "").toLowerCase().includes(searchQuery.toLowerCase()) || (t.dept || "").toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "All" || t.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   const handleAddTrainer = (e) => {
     e.preventDefault();
-    setTrainers([...trainers, { ...newTrainer, id: Date.now(), img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBDZ9b5KArlUculclZMgPJT7zhsKCumI2oZhFvm2W_7wuOpcKt6Fb_YP7ifCT2r_x7vsUAUYi0kEAkyO8gspnKk5kjK7m2ez2OHvZUPnWweXp99nw12fqYlKCNcEOKqfBb7hbx0ntfKw6SlAkYB7DFJP6y61rjHUSW5SrtKO5ddew6CLQd8jJadm7eHX0aHDLo6jHVgpKpVS3-m4NBGn543Yw57qSSRaN1lHeZ-o544Z3KNB--UGI4f" }]);
-    setShowAddModal(false);
-    setNewTrainer({ name: "", email: "", role: "", dept: "", courses: 1, learners: 0, rating: 5.0, status: "Active" });
+    const trainerData = {
+      ...newTrainer,
+      img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150"
+    };
+    api.post("/trainers", trainerData).then(() => {
+      setShowAddModal(false);
+      setNewTrainer({ name: "", email: "", role: "", dept: "", courses: 1, learners: 0, rating: 5.0, status: "Active" });
+    }).catch(() => {});
   };
 
   return (

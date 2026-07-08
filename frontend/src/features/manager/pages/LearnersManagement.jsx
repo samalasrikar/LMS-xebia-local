@@ -1,32 +1,56 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Users, Activity, CheckCircle, Clock, Search, Filter, Plus, Download, Upload, X, CheckCircle2 } from "lucide-react";
+import assignmentService from "@/features/assignments/services/assignmentService";
 
 export default function LearnersManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [deptFilter, setDeptFilter] = useState("All Departments");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [learners, setLearners] = useState([]);
 
-  const [learners, setLearners] = useState([
-    { id: 1, name: "John Doe", email: "john.doe@xebia.com", dept: "Engineering", course: "Advanced Cloud Architecture", progress: 72, hours: "24h", status: "Active" },
-    { id: 2, name: "Maria Davis", email: "maria.davis@xebia.com", dept: "Design", course: "Advanced UI Design Systems", progress: 100, hours: "12h", status: "Completed" },
-    { id: 3, name: "Arjun Mehta", email: "arjun.mehta@xebia.com", dept: "Engineering", course: "AWS Cloud Deployments", progress: 45, hours: "18h", status: "Active" },
-    { id: 4, name: "Sarah Jenkins", email: "sarah.jenkins@xebia.com", dept: "Leadership", course: "Managing Remote Teams", progress: 90, hours: "8h", status: "Active" },
-    { id: 5, name: "Jane Smith", email: "jane.smith@xebia.com", dept: "Marketing", course: "Inbound Marketing Strategy", progress: 10, hours: "2h", status: "Active" }
-  ]);
+  useEffect(() => {
+    assignmentService.getStudents().then(data => {
+      if (data) {
+        setLearners(data.map(l => ({
+          id: l.id,
+          name: l.name,
+          email: l.email || `${l.name.toLowerCase().replace(" ", ".")}@xebia.com`,
+          dept: l.dept || "Engineering",
+          course: l.course || "Cloud Native Engineering",
+          progress: l.progress || 0,
+          hours: l.hours || "0h",
+          status: l.status || "Active"
+        })));
+      }
+    });
+  }, [showAddModal]);
 
   const [newLearner, setNewLearner] = useState({ name: "", email: "", dept: "Engineering", course: "", progress: 0, hours: "0h", status: "Active" });
 
   const filteredLearners = learners.filter((l) => {
-    const matchesSearch = l.name.toLowerCase().includes(searchQuery.toLowerCase()) || l.email.toLowerCase().includes(searchQuery.toLowerCase()) || l.course.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (l.name || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (l.email || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (l.course || "").toLowerCase().includes(searchQuery.toLowerCase());
     const matchesDept = deptFilter === "All Departments" || l.dept === deptFilter;
     return matchesSearch && matchesDept;
   });
 
   const handleAddLearner = (e) => {
     e.preventDefault();
-    setLearners([...learners, { ...newLearner, id: Date.now() }]);
-    setShowAddModal(false);
-    setNewLearner({ name: "", email: "", dept: "Engineering", course: "", progress: 0, hours: "0h", status: "Active" });
+    const studentData = {
+      name: newLearner.name,
+      email: newLearner.email,
+      dept: newLearner.dept,
+      course: newLearner.course,
+      progress: newLearner.progress,
+      hours: newLearner.hours,
+      status: newLearner.status,
+      batch: "Cohort A (Q3)"
+    };
+    assignmentService.createStudent(studentData).then(() => {
+      setShowAddModal(false);
+      setNewLearner({ name: "", email: "", dept: "Engineering", course: "", progress: 0, hours: "0h", status: "Active" });
+    });
   };
 
   return (
