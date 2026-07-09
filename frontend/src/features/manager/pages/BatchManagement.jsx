@@ -1,30 +1,64 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PlayCircle, Calendar, CheckCircle2, AlertCircle, Plus, Search, Filter, Download, X } from "lucide-react";
+import assignmentService from "@/features/assignments/services/assignmentService";
 
 export default function BatchManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [batches, setBatches] = useState([]);
 
-  const [batches, setBatches] = useState([
-    { id: 1, name: "Cohort A (Q3)", course: "Advanced Cloud Architecture", trainer: "Sarah Jenkins", learners: 42, timeline: "Oct 01 - Dec 24, 2026", status: "Active" },
-    { id: 2, name: "UI Bootcamp (Batch 4)", course: "Advanced UI Design Systems", trainer: "Arjun Mehta", learners: 35, timeline: "Oct 10 - Nov 28, 2026", status: "Active" },
-    { id: 3, name: "AWS Foundations", course: "AWS Cloud Deployments", trainer: "Maria Davis", learners: 80, timeline: "Nov 05 - Dec 15, 2026", status: "Upcoming" },
-    { id: 4, name: "Leadership 101", course: "Leadership & Empathy", trainer: "John Smith", learners: 25, timeline: "Sep 01 - Sep 30, 2026", status: "Completed" }
-  ]);
+  useEffect(() => {
+    assignmentService.getBatches().then(data => {
+      if (data) {
+        // Map the backend fields to what the frontend expects
+        const mapped = data.map(b => ({
+          id: b.id,
+          name: b.name || b.title,
+          course: b.course,
+          trainer: b.instructor,
+          learners: b.enrolled || (b.studentIds ? b.studentIds.length : 0),
+          timeline: b.startDate && b.endDate ? `${b.startDate} - ${b.endDate}` : "TBD",
+          status: b.status
+        }));
+        setBatches(mapped);
+      }
+    });
+  }, [showCreateModal]);
 
   const [newBatch, setNewBatch] = useState({ name: "", course: "", trainer: "", learners: 0, timeline: "", status: "Active" });
 
   const handleCreateBatch = (e) => {
     e.preventDefault();
-    setBatches([...batches, { ...newBatch, id: Date.now() }]);
-    setShowCreateModal(false);
-    setNewBatch({ name: "", course: "", trainer: "", learners: 0, timeline: "", status: "Active" });
+    // Parse timeline or use generic dates
+    let startDate = "2026-10-01";
+    let endDate = "2026-12-24";
+    if (newBatch.timeline && newBatch.timeline.includes("-")) {
+      const parts = newBatch.timeline.split("-");
+      startDate = parts[0].trim();
+      endDate = parts[1].trim();
+    }
+
+    const batchData = {
+      name: newBatch.name,
+      title: newBatch.name,
+      course: newBatch.course,
+      instructor: newBatch.trainer,
+      enrolled: newBatch.learners,
+      startDate: startDate,
+      endDate: endDate,
+      status: newBatch.status
+    };
+
+    assignmentService.createBatch(batchData).then(() => {
+      setShowCreateModal(false);
+      setNewBatch({ name: "", course: "", trainer: "", learners: 0, timeline: "", status: "Active" });
+    });
   };
 
   const filteredBatches = batches.filter((b) =>
-    b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    b.course.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    b.trainer.toLowerCase().includes(searchQuery.toLowerCase())
+    (b.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (b.course || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (b.trainer || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
