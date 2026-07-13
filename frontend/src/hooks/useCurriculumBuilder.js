@@ -4,6 +4,7 @@ import courseService from "../services/courseService";
 import moduleService from "../services/moduleService";
 import subModuleService from "../services/subModuleService";
 import contentService from "../services/contentService";
+import categoryService from "../services/categoryService";
 
 export default function useCurriculumBuilder() {
   const { id } = useParams();
@@ -21,6 +22,31 @@ export default function useCurriculumBuilder() {
   /* ── Multi-Course State ── */
   const [loadedCourses, setLoadedCourses] = useState([]);
   const [activeCourseId, setActiveCourseId] = useState(null);
+
+  const changeLoadedCourses = (val) => {
+    setLoadedCourses(prev => {
+      const nextCourses = typeof val === "function" ? val(prev) : val;
+      if (nextCourses && nextCourses.length > 0) {
+        const ids = nextCourses.map(c => c.id);
+        localStorage.setItem("curriculum_builder_loaded_course_ids", JSON.stringify(ids));
+      } else {
+        localStorage.removeItem("curriculum_builder_loaded_course_ids");
+      }
+      return nextCourses;
+    });
+  };
+
+  const changeActiveCourseId = (val) => {
+    setActiveCourseId(prev => {
+      const nextId = typeof val === "function" ? val(prev) : val;
+      if (nextId !== null && nextId !== undefined) {
+        localStorage.setItem("curriculum_builder_active_course_id", String(nextId));
+      } else {
+        localStorage.removeItem("curriculum_builder_active_course_id");
+      }
+      return nextId;
+    });
+  };
 
   const course = loadedCourses.find(c => c.id === activeCourseId) || null;
   const modules = course?.modules || [];
@@ -118,9 +144,9 @@ export default function useCurriculumBuilder() {
     const alreadyExists = loadedCourses.some(c => c.id === selectedCourse.id);
     if (alreadyExists) {
       // Focus and expand that course instead of adding it again
-      setActiveCourseId(selectedCourse.id);
+      changeActiveCourseId(selectedCourse.id);
       setExpandedCourses(prev => ({ ...prev, [selectedCourse.id]: true }));
-      
+
       const existingCourse = loadedCourses.find(c => c.id === selectedCourse.id);
       if (existingCourse && existingCourse.modules?.[0]?.subModules?.[0]) {
         setActiveSubModule(existingCourse.modules[0].subModules[0]);
@@ -143,8 +169,8 @@ export default function useCurriculumBuilder() {
         modules: courseModules,
       };
 
-      setLoadedCourses(prev => [...prev, newCourseObj]);
-      setActiveCourseId(selectedCourse.id);
+      changeLoadedCourses(prev => [...prev, newCourseObj]);
+      changeActiveCourseId(selectedCourse.id);
       setExpandedCourses(prev => ({ ...prev, [selectedCourse.id]: true }));
 
       const expandMap = {};
@@ -166,12 +192,40 @@ export default function useCurriculumBuilder() {
   const handleCreateAndSelectCourse = async (e) => {
     e.preventDefault();
     if (!newCourseTitle.trim()) { showToast("Course title is required.", "error"); return; }
+    if (!newCourseCategory.trim()) { showToast("Category is required.", "error"); return; }
     setCreatingCourse(true);
     try {
+      // 1. Fetch categories to check if the entered category exists
+      const categories = await categoryService.getAllCategories();
+      let matchedCategory = categories?.find(
+        c => c.name.toLowerCase() === newCourseCategory.trim().toLowerCase()
+      );
+
+      let targetCategoryId;
+      if (matchedCategory) {
+        targetCategoryId = matchedCategory.id;
+      } else {
+        // 2. Create the category if it doesn't exist
+        const fd = new FormData();
+        fd.append("name", newCourseCategory.trim());
+        fd.append("description", `Automatically created category for course ${newCourseTitle.trim()}`);
+        fd.append("publishState", "Published");
+        fd.append("status", "Active");
+
+        const slug = newCourseCategory.trim().toLowerCase()
+          .replace(/[^a-z0-9 ]/g, '')
+          .replace(/\s+/g, '-');
+        fd.append("slug", slug);
+
+        const newCat = await categoryService.createCategory(fd);
+        targetCategoryId = newCat.id;
+      }
+
+      // 3. Create the course with the resolved categoryId
       const created = await courseService.createCourse({
         title: newCourseTitle.trim(),
         description: newCourseDescription.trim(),
-        category: newCourseCategory.trim(),
+        categoryId: targetCategoryId,
         status: "Draft",
       });
       showToast("Course created!");
@@ -219,7 +273,7 @@ export default function useCurriculumBuilder() {
         })
       );
 
-      setLoadedCourses(updatedCourses);
+      changeLoadedCourses(updatedCourses);
 
       const expandMap = {};
       updatedCourses.forEach(c => {
@@ -238,69 +292,141 @@ export default function useCurriculumBuilder() {
     }
   };
 
-  /* ── Data Loading ── */
+  /* ── Data Loading & Persistence ── */
   useEffect(() => {
-    if (id) {
-      const initLoad = async () => {
-        setLoadingCourse(true);
-        setLoadingCurriculum(true);
+    const initLoad = async () => {
+      setLoadingCourse(true);
+      setLoadingCurriculum(true);
+      try {
+        let savedIds = [];
         try {
-          const courseData = await courseService.getCourseById(id);
-          setActiveCourseId(Number(id));
-          setExpandedCourses(prev => ({ ...prev, [Number(id)]: true }));
-
-          const [allModules, allSubModules, allContents] = await Promise.all([
-            moduleService.getAllModules(),
-            subModuleService.getAllSubModules(),
-            contentService.getAllContents(),
-          ]);
-
-          const courseModules = await loadCurriculumForCourse(id, allModules, allSubModules, allContents);
-
-          const initialCourse = {
-            ...courseData,
-            modules: courseModules,
-          };
-          setLoadedCourses([initialCourse]);
-
-          const expandMap = {};
-          courseModules.forEach(m => { expandMap[m.id] = true; });
-          setExpandedModules(prev => ({ ...expandMap, ...prev }));
-
-          // Pre-selection logic
-          if (preselectedSubModuleId) {
-            const flat = courseModules.flatMap(m => m.subModules);
-            const t = flat.find(s => s.id === preselectedSubModuleId);
-            if (t) { setActiveSubModule(t); return; }
-          }
-          if (preselectedModuleId) {
-            const tm = courseModules.find(m => m.id === preselectedModuleId);
-            if (tm?.subModules?.[0]) { setActiveSubModule(tm.subModules[0]); return; }
-          }
-          if (courseModules[0]?.subModules?.[0]) {
-            setActiveSubModule(courseModules[0].subModules[0]);
+          const savedIdsStr = localStorage.getItem("curriculum_builder_loaded_course_ids");
+          if (savedIdsStr) {
+            savedIds = JSON.parse(savedIdsStr);
           }
         } catch (err) {
-          console.error(err);
-          showToast("Could not load initial course and curriculum.", "error");
-        } finally {
-          setLoadingCourse(false);
-          setLoadingCurriculum(false);
+          console.error("Failed to parse saved loaded course IDs:", err);
         }
-      };
-      initLoad();
-    } else {
-      setLoadingCourse(false);
-      setLoadingCurriculum(false);
-    }
+
+        // If id is in useParams(), ensure it is in the loaded list
+        if (id) {
+          const numericId = Number(id);
+          if (!savedIds.includes(numericId)) {
+            savedIds = [...savedIds, numericId];
+          }
+        }
+
+        if (savedIds.length === 0) {
+          changeLoadedCourses([]);
+          changeActiveCourseId(null);
+          return;
+        }
+
+        // Fetch all modules, submodules, and contents in parallel
+        const [allModules, allSubModules, allContents] = await Promise.all([
+          moduleService.getAllModules(),
+          subModuleService.getAllSubModules(),
+          contentService.getAllContents(),
+        ]);
+
+        const coursesData = await Promise.all(
+          savedIds.map(async (courseId) => {
+            try {
+              const courseData = await courseService.getCourseById(courseId);
+              const courseModules = await loadCurriculumForCourse(courseId, allModules, allSubModules, allContents);
+              return {
+                ...courseData,
+                modules: courseModules,
+              };
+            } catch (err) {
+              console.error(`Failed to load course ${courseId}:`, err);
+              return null;
+            }
+          })
+        );
+
+        const validCourses = coursesData.filter(Boolean);
+        changeLoadedCourses(validCourses);
+
+        const expandMap = {};
+        validCourses.forEach(c => {
+          c.modules.forEach(m => {
+            expandMap[m.id] = true;
+          });
+        });
+        setExpandedModules(prev => ({ ...expandMap, ...prev }));
+
+        // Resolve active course ID
+        let resolvedActiveId = null;
+        if (id) {
+          resolvedActiveId = Number(id);
+        } else {
+          // Restore last active course from localStorage or fallback
+          const savedActiveIdStr = localStorage.getItem("curriculum_builder_active_course_id");
+          if (savedActiveIdStr) {
+            const savedActiveId = Number(savedActiveIdStr);
+            if (validCourses.some(c => c.id === savedActiveId)) {
+              resolvedActiveId = savedActiveId;
+            }
+          }
+          // If resolvedActiveId is still null, default to the only course if size is 1, or fallback to the first course
+          if (resolvedActiveId === null && validCourses.length > 0) {
+            resolvedActiveId = validCourses[0].id;
+          }
+        }
+
+        if (resolvedActiveId) {
+          changeActiveCourseId(resolvedActiveId);
+          setExpandedCourses(prev => ({ ...prev, [resolvedActiveId]: true }));
+
+          const activeCourseObj = validCourses.find(c => c.id === resolvedActiveId);
+          if (activeCourseObj) {
+            const activeCourseModules = activeCourseObj.modules || [];
+
+            // Only perform pre-selection if id was matched in useParams()
+            if (id) {
+              if (preselectedSubModuleId) {
+                const flat = activeCourseModules.flatMap(m => m.subModules || []);
+                const t = flat.find(s => s.id === preselectedSubModuleId);
+                if (t) { setActiveSubModule(t); return; }
+              }
+              if (preselectedModuleId) {
+                const tm = activeCourseModules.find(m => m.id === preselectedModuleId);
+                if (tm?.subModules?.[0]) { setActiveSubModule(tm.subModules[0]); return; }
+              }
+            }
+
+            if (activeCourseModules[0]?.subModules?.[0]) {
+              setActiveSubModule(activeCourseModules[0].subModules[0]);
+            }
+          }
+        } else {
+          changeActiveCourseId(null);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Could not load course and curriculum.", "error");
+      } finally {
+        setLoadingCourse(false);
+        setLoadingCurriculum(false);
+      }
+    };
+
+    initLoad();
   }, [id, preselectedModuleId, preselectedSubModuleId, showToast]);
 
 
 
   /* ── Module Actions ── */
   const openAddModuleModal = (courseId) => {
-    setTargetCourseId(courseId || activeCourseId);
-    setEditingModule(null); setModuleTitle(""); setModuleDescription(""); setIsModuleModalOpen(true);
+    const resolvedId = (courseId && !isNaN(Number(courseId)) && typeof courseId !== "object")
+      ? Number(courseId)
+      : (activeCourseId || Number(id));
+    setTargetCourseId(resolvedId);
+    setEditingModule(null);
+    setModuleTitle("");
+    setModuleDescription("");
+    setIsModuleModalOpen(true);
   };
   const openEditModuleModal = (mod) => {
     setEditingModule(mod); setModuleTitle(mod.title); setModuleDescription(mod.description || ""); setIsModuleModalOpen(true);
@@ -318,10 +444,16 @@ export default function useCurriculumBuilder() {
         });
         showToast("Module updated!");
       } else {
+        const finalCourseId = Number(targetCourseId || activeCourseId || id);
+        if (!finalCourseId || isNaN(finalCourseId)) {
+          showToast("Course is required.", "error");
+          setSubmittingModule(false);
+          return;
+        }
         await moduleService.createModule({
           title: moduleTitle.trim(),
           description: moduleDescription.trim(),
-          courseId: Number(targetCourseId || activeCourseId || id)
+          courseId: finalCourseId
         });
         showToast("Module created!");
       }
@@ -424,6 +556,9 @@ export default function useCurriculumBuilder() {
   };
 
   const handleSaveBlock = async (e) => {
+    console.log("handleSaveBlock called");
+    console.log(activeSubModule);
+    console.log(blockConfigType);
     if (e) e.preventDefault();
     if (!activeSubModule) return;
     setSubmittingSubModule(true);
@@ -443,6 +578,7 @@ export default function useCurriculumBuilder() {
         });
         showToast("Block updated!");
       } else {
+        console.log("Creating content...");
         await contentService.createContent({
           title: `${activeSubModule.title} Content`,
           content: tT,
@@ -756,9 +892,9 @@ export default function useCurriculumBuilder() {
     handleDuplicateSubModule,
     // Multi course props
     loadedCourses,
-    setLoadedCourses,
+    setLoadedCourses: changeLoadedCourses,
     activeCourseId,
-    setActiveCourseId,
+    setActiveCourseId: changeActiveCourseId,
     expandedCourses,
     setExpandedCourses,
   };
