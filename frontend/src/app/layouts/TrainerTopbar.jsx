@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import {
   Bell,
@@ -20,6 +20,7 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
 import { Separator } from "@/shared/components/ui/separator";
+import api from "@/shared/services/api";
 import adminProfileIcon from "../../assets/admin_profile_icon.svg";
 
 const PATH_METADATA = {
@@ -54,6 +55,133 @@ export default function TrainerTopbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
+
+  // Search states
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+
+  const searchRef = useRef(null);
+  const searchWrapperRef = useRef(null);
+
+  const isMac =
+    typeof navigator !== "undefined" &&
+    /Mac|iPhone|iPad/.test(navigator.userAgent);
+
+  // Keyboard focus Ctrl+K
+  const handleKeyDown = useCallback((e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+      e.preventDefault();
+      searchRef.current?.focus();
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
+  // Click outside listener for search dropdown
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchWrapperRef.current && !searchWrapperRef.current.contains(event.target)) {
+        setShowSearchDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Debounced API search for Trainer Portal
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      setShowSearchDropdown(false);
+      return;
+    }
+
+    setLoading(true);
+    setShowSearchDropdown(true);
+
+    const delayDebounceFn = setTimeout(async () => {
+      try {
+        const lowercaseQuery = searchQuery.toLowerCase();
+        const getArray = (val) => {
+          if (!val) return [];
+          if (Array.isArray(val)) return val;
+          if (val.content && Array.isArray(val.content)) return val.content;
+          if (val.data && Array.isArray(val.data)) return val.data;
+          return [];
+        };
+
+        const endpoints = [
+          api.get("/assignments").then(r => ({ category: "Assignments", data: getArray(r.data.data), type: "assignment" })),
+          api.get("/quizzes").then(r => ({ category: "Quizzes", data: getArray(r.data.data), type: "quiz" })),
+          api.get("/batches?all=true").then(r => ({ category: "Batches", data: getArray(r.data.data), type: "batch" })),
+          api.get("/events").then(r => ({ category: "Events", data: getArray(r.data.data), type: "event" })),
+          api.get("/submissions").then(r => ({ category: "Submissions", data: getArray(r.data.data), type: "submission" })),
+        ];
+
+        const responses = await Promise.allSettled(endpoints);
+        const resultsGrouped = [];
+
+        responses.forEach(res => {
+          if (res.status === "fulfilled") {
+            const { category, data, type } = res.value;
+
+            const filtered = data.filter(item => {
+              if (!item) return false;
+              const name = (
+                item.name || 
+                item.title || 
+                item.assignmentTitle || 
+                item.studentName || 
+                item.code || 
+                ""
+              ).toLowerCase();
+              const desc = (item.description || item.subject || "").toLowerCase();
+              return name.includes(lowercaseQuery) || desc.includes(lowercaseQuery);
+            });
+
+            if (filtered.length > 0) {
+              resultsGrouped.push({
+                category,
+                items: filtered.slice(0, 5).map(item => {
+                  let title = item.name || item.title || item.assignmentTitle || item.studentName || "Unnamed";
+                  let description = item.description || item.code || item.subject || (item.score !== undefined ? `Score: ${item.score}` : "");
+                  let path = "/trainer";
+
+                  if (type === "assignment") {
+                    path = `/trainer/assignments`;
+                  } else if (type === "quiz") {
+                    path = `/trainer/quizzes`;
+                  } else if (type === "batch") {
+                    path = `/trainer/batches`;
+                  } else if (type === "event") {
+                    path = `/trainer/events`;
+                  } else if (type === "submission") {
+                    path = `/trainer/gradebook`;
+                  }
+
+                  return { title, description, path };
+                })
+              });
+            }
+          }
+        });
+
+        setSearchResults(resultsGrouped);
+      } catch (err) {
+        console.error("Trainer Search error:", err);
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
 
   /* ── Resolve current page metadata ── */
   const currentPath =
@@ -114,29 +242,100 @@ export default function TrainerTopbar() {
         </div>
       </div>
 
-      {/* ── Right: Actions ── */}
-      <div className="flex items-center gap-1.5 ml-auto shrink-0">
-        {/* Autosave status indicator */}
-        <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400 font-semibold px-2.5 py-1 rounded-full border border-slate-100 bg-slate-50/50">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0 animate-pulse" />
-          Workspace Sync Online
+      {/* ── Center: Global Search ─────────────────────────────── */}
+      <div ref={searchWrapperRef} className="hidden md:flex flex-1 max-w-md mx-auto relative">
+        <div
+          className={`w-full flex items-center gap-2 rounded-lg border px-3 h-8 transition-all duration-150 ${
+            searchFocused
+              ? "border-[#6C1D5F]/40 ring-2 ring-[#6C1D5F]/8 bg-white"
+              : "border-slate-200 bg-slate-50/80 hover:bg-slate-100/60 hover:border-slate-300"
+          }`}
+        >
+          <Search size={14} className="text-slate-400 shrink-0" />
+          <input
+            ref={searchRef}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => {
+              setSearchFocused(true);
+              if (searchQuery.trim().length >= 2) setShowSearchDropdown(true);
+            }}
+            placeholder="Search assignments, quizzes, batches, events..."
+            className="flex-1 bg-transparent border-none outline-none text-[13px] text-slate-700 placeholder:text-slate-400 p-0"
+          />
+          {!searchFocused && (
+            <kbd className="hidden lg:inline-flex items-center gap-0.5 rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-medium text-slate-400 leading-none">
+              {isMac ? "⌘" : "Ctrl"}
+              <span className="text-[9px]">K</span>
+            </kbd>
+          )}
         </div>
 
-        <Separator orientation="vertical" className="hidden sm:block h-5 mx-1" />
+        {/* ── Search Dropdown ── */}
+        {showSearchDropdown && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-2xl z-[9999] max-h-80 overflow-y-auto p-1">
+            {loading ? (
+              <div className="px-4 py-6 text-center text-[13px] text-slate-500 flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                Searching...
+              </div>
+            ) : searchResults.length === 0 ? (
+              <div className="px-4 py-6 text-center text-[13px] text-slate-400">
+                No results found.
+              </div>
+            ) : (
+              <div className="py-1">
+                {searchResults.map((group) => (
+                  <div key={group.category} className="mb-2 last:mb-0">
+                    <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      {group.category}
+                    </div>
+                    {group.items.map((item, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          navigate(item.path);
+                          setShowSearchDropdown(false);
+                          setSearchQuery("");
+                        }}
+                        className="w-full flex flex-col items-start px-3 py-2 hover:bg-slate-50 transition-colors text-left rounded-lg cursor-pointer border-none bg-transparent"
+                      >
+                        <span className="text-[12.5px] font-semibold text-slate-700 truncate w-full">
+                          {item.title}
+                        </span>
+                        {item.description && (
+                          <span className="text-[11px] text-slate-400 truncate w-full mt-0.5">
+                            {item.description}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ── Right: Actions ── */}
+      <div className="flex items-center gap-3 ml-auto shrink-0">
+
+        {/* Bell btn */}
+        <button className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors relative border-none bg-transparent cursor-pointer">
+          <Bell size={16} />
+          <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-red-500" />
+        </button>
 
         {/* ── Profile dropdown ── */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-lg px-1.5 py-1 hover:bg-slate-50 transition-colors cursor-pointer outline-none select-none border-none bg-transparent">
+            <button className="flex items-center justify-center rounded-full w-8 h-8 hover:bg-slate-50 transition-colors cursor-pointer outline-none select-none border-none bg-transparent">
               <Avatar className="h-7 w-7">
                 <AvatarImage src={adminProfileIcon} alt="Lead Instructor" />
                 <AvatarFallback className="text-xs bg-[#6C1D5F] text-white">LI</AvatarFallback>
               </Avatar>
-              <div className="hidden lg:flex flex-col items-start leading-tight">
-                <span className="text-[12.5px] font-semibold text-slate-700">Lead Instructor</span>
-                <span className="text-[10.5px] text-[#6C1D5F] font-bold">Trainer</span>
-              </div>
-              <ChevronDown size={12} className="text-slate-400 hidden lg:block" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -180,6 +379,7 @@ export default function TrainerTopbar() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
       </div>
     </header>
   );

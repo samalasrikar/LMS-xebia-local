@@ -65,6 +65,13 @@ import CreateBatch from "@/features/batches/pages/CreateBatch";
 // Trainer Feature
 import TrainerDashboard from "@/features/trainer/pages/TrainerDashboard";
 
+// Events Feature
+import EventsManagement from "@/features/events/pages/EventsManagement";
+import CreateEvent from "@/features/events/pages/CreateEvent";
+import EventRegistrations from "@/features/events/pages/EventRegistrations";
+import EventsCatalog from "@/features/events/pages/EventsCatalog";
+import EventDetail from "@/features/events/pages/EventDetail";
+
 // Analytics Feature
 import {
   ExecutiveSummary,
@@ -139,6 +146,10 @@ function App() {
       <Route path="/integrations" element={<Integrations />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/design-system" element={<DesignSystem />} />
+      <Route path="/admin/events" element={<EventsManagement />} />
+      <Route path="/admin/events/create" element={<CreateEvent />} />
+      <Route path="/admin/events/edit/:id" element={<CreateEvent />} />
+      <Route path="/admin/events/:id/registrations" element={<EventRegistrations />} />
 
       {/* Categories */}
       <Route path="/categories" element={<Categories />} />
@@ -171,6 +182,8 @@ function App() {
       <Route path="/trainer/batches/create" element={<CreateBatch />} />
       <Route path="/trainer/batches/edit/:id" element={<CreateBatch />} />
       <Route path="/trainer/profile" element={<StudentProfile />} />
+      <Route path="/trainer/events" element={<EventsCatalog />} />
+      <Route path="/trainer/events/:id" element={<EventDetail />} />
 
       {/* ── Student Portal (sidebar layout) ── */}
       <Route path="/student" element={<StudentLayout />}>
@@ -195,6 +208,8 @@ function App() {
         <Route path="notifications" element={<StudentNotifications />} />
         <Route path="profile" element={<StudentProfile />} />
         <Route path="settings" element={<StudentSettings />} />
+        <Route path="events" element={<EventsCatalog />} />
+        <Route path="events/:id" element={<EventDetail />} />
       </Route>
 
       {/* Quiz Player */}

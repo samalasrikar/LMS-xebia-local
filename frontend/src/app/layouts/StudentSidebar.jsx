@@ -31,6 +31,7 @@ const MAIN_MENU = [
   { title: "Dashboard",    path: "/student",              icon: LayoutDashboard },
   { title: "Courses",      path: "/student/courses",      icon: BookOpen },
   { title: "Calendar",     path: "/student/calendar",     icon: Calendar },
+  { title: "Events",       path: "/student/events",       icon: Calendar },
   { title: "Assessments",  path: "/student/assessments",   icon: ClipboardList },
   { title: "Grades",       path: "/student/grades",       icon: Award },
   { title: "Analytics",    path: "/student/analytics",    icon: BarChart3 },
@@ -41,7 +42,6 @@ const MAIN_MENU = [
 const BOTTOM_MENU = [
   { title: "Notifications", path: "/student/notifications", icon: Bell },
   { title: "Profile",       path: "/student/profile",       icon: User },
-  { title: "Settings",      path: "/student/settings",      icon: Settings },
 ];
 
 /* ─── Tooltip on hover ─── */
@@ -201,6 +201,7 @@ export default function StudentSidebar() {
         <div className="py-2 space-y-0.5">
           {BOTTOM_MENU.map(renderLink)}
         </div>
+
 
         {/* Toggle button */}
         <div className={`border-t border-slate-200/80 py-2.5 ${collapsed ? "flex justify-center" : "px-2"}`}>

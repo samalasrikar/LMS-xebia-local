@@ -14,7 +14,8 @@ import {
   Bell,
   User,
   ShieldAlert,
-  ArrowRight
+  ArrowRight,
+  Calendar
 } from "lucide-react";
 import adminProfileIcon from "../../assets/admin_profile_icon.svg";
 
@@ -28,11 +29,10 @@ const MAIN_MENU = [
   { title: "Quizzes",      path: "/trainer/quizzes",      icon: HelpCircle },
   { title: "Batches",      path: "/trainer/batches",      icon: Layers },
   { title: "Gradebook",    path: "/trainer/gradebook",    icon: Award },
+  { title: "Events",       path: "/trainer/events",       icon: Calendar },
 ];
 
-const BOTTOM_MENU = [
-  { title: "Settings",      path: "/settings",             icon: Settings },
-];
+const BOTTOM_MENU = [];
 
 /* ─── Tooltip on hover ─── */
 function NavTooltip({ label, children }) {

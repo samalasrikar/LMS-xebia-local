@@ -6,6 +6,7 @@ import TrainerSidebar from "./TrainerSidebar";
 import TrainerTopbar from "./TrainerTopbar";
 
 const TRAINER_STORAGE_KEY = "lms-trainer-sidebar-collapsed";
+const ADMIN_STORAGE_KEY = "lms-admin-sidebar-collapsed";
 
 export default function AppLayout({ children }) {
   const location = useLocation();
@@ -20,24 +21,38 @@ export default function AppLayout({ children }) {
     }
   });
 
+  const [adminCollapsed, setAdminCollapsed] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(ADMIN_STORAGE_KEY)) ?? false;
+    } catch {
+      return false;
+    }
+  });
+
   useEffect(() => {
     try {
       localStorage.setItem(TRAINER_STORAGE_KEY, JSON.stringify(trainerCollapsed));
     } catch { /* ignore */ }
   }, [trainerCollapsed]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminCollapsed));
+    } catch { /* ignore */ }
+  }, [adminCollapsed]);
+
   let marginLeft = "";
   if (!isAnalytics) {
     if (isTrainer) {
       marginLeft = trainerCollapsed ? "md:ml-[72px]" : "md:ml-[250px]";
     } else {
-      marginLeft = "md:ml-[220px]";
+      marginLeft = adminCollapsed ? "md:ml-[72px]" : "md:ml-[220px]";
     }
   }
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      {!isAnalytics && !isTrainer && <Sidebar />}
+      {!isAnalytics && !isTrainer && <Sidebar collapsed={adminCollapsed} setCollapsed={setAdminCollapsed} />}
       {isTrainer && <TrainerSidebar collapsed={trainerCollapsed} setCollapsed={setTrainerCollapsed} />}
 
       <div className={`${marginLeft} flex flex-col flex-1 min-w-0 transition-all duration-300 ease-in-out`}>
