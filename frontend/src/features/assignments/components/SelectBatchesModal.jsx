@@ -6,7 +6,7 @@ import assignmentService from "../services/assignmentService";
 export default function SelectBatchesModal({ isOpen, onClose, selectedBatches, onApply }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [localSelection, setLocalSelection] = useState([]);
-  
+
   // Dynamic backend states
   const [batches, setBatches] = useState([]);
   const [students, setStudents] = useState([]);
@@ -174,13 +174,12 @@ export default function SelectBatchesModal({ isOpen, onClose, selectedBatches, o
           ) : filteredBatches.map((batch) => {
             const isSelected = localSelection.includes(batch.id);
             const batchStudentsCount = students.filter(s => s.batch?.toLowerCase() === batch.id?.toLowerCase()).length;
-            
+
             return (
               <label
                 key={batch.id}
-                className={`group flex items-center p-4 rounded-lg hover:bg-slate-50 cursor-pointer transition-all border border-transparent hover:border-slate-100 active:scale-[0.99] ${
-                  isSelected ? "bg-[#6C1D5F]/5 border-[#6C1D5F]/20" : ""
-                }`}
+                className={`group flex items-center p-4 rounded-lg hover:bg-slate-50 cursor-pointer transition-all border border-transparent hover:border-slate-100 active:scale-[0.99] ${isSelected ? "bg-[#6C1D5F]/5 border-[#6C1D5F]/20" : ""
+                  }`}
               >
                 <div className="relative flex items-center">
                   <input
@@ -196,7 +195,7 @@ export default function SelectBatchesModal({ isOpen, onClose, selectedBatches, o
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider text-[#653660] bg-[#ffd7f5]">
                         {batch.id}
                       </span>
-                      <h3 className="text-[14px] font-bold text-slate-800 mt-1.5">{batch.title}</h3>
+                      <h3 className="text-[14px] font-bold text-slate-800 mt-1.5">{batch.name || batch.title}</h3>
                     </div>
                     <div className="flex flex-col items-end">
                       <div className="flex items-center gap-1 text-slate-500">

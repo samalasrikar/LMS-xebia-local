@@ -33,8 +33,8 @@ public class StudentService {
         }
     }
 
-    public Page<Student> getStudentsPaginated(String query, String dept, String batch, Pageable pageable) {
-        return studentRepository.findAll((root, criteriaQuery, cb) -> {
+    private org.springframework.data.jpa.domain.Specification<Student> getSpec(String query, String dept, String batch) {
+        return (root, criteriaQuery, cb) -> {
             java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
             
             if (query != null && !query.trim().isEmpty()) {
@@ -55,7 +55,15 @@ public class StudentService {
             }
             
             return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
-        }, pageable);
+        };
+    }
+
+    public Page<Student> getStudentsPaginated(String query, String dept, String batch, Pageable pageable) {
+        return studentRepository.findAll(getSpec(query, dept, batch), pageable);
+    }
+
+    public List<Student> getStudents(String query, String dept, String batch, org.springframework.data.domain.Sort sort) {
+        return studentRepository.findAll(getSpec(query, dept, batch), sort);
     }
 
     public List<Student> getAllStudents() {

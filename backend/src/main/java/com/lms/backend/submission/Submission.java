@@ -72,7 +72,8 @@ public class Submission {
     @OneToMany(
             mappedBy = "submission",
             cascade = CascadeType.ALL,
-            orphanRemoval = true
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
     )
     private List<SubmissionFile> files = new ArrayList<>();
 

@@ -8,7 +8,7 @@ const assignmentService = {
   },
 
   getBatches: async (config) => {
-    const response = await api.get("/batches", config);
+    const response = await api.get("/batches?all=true", config);
     return response.data.data;
   },
 
@@ -79,7 +79,7 @@ const assignmentService = {
   },
 
   getStudents: async (batch, config) => {
-    const url = batch ? `/students?batch=${batch}` : "/students";
+    const url = batch ? `/students?batch=${batch}&all=true` : "/students?all=true";
     const response = await api.get(url, config);
     return response.data.data;
   },

@@ -23,13 +23,18 @@ public class StudentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir) {
+            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(defaultValue = "false") boolean all) {
         
         org.springframework.data.domain.Sort sort = sortDir.equalsIgnoreCase("desc")
                 ? org.springframework.data.domain.Sort.by(sortBy).descending()
                 : org.springframework.data.domain.Sort.by(sortBy).ascending();
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
         
+        if (all) {
+            return new ApiResponse<>(studentService.getStudents(q, dept, batch, sort));
+        }
+        
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
         return new ApiResponse<>(studentService.getStudentsPaginated(q, dept, batch, pageable));
     }
 

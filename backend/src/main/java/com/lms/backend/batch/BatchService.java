@@ -79,8 +79,8 @@ public class BatchService {
         }
     }
 
-    public Page<Batch> getBatchesPaginated(String query, String status, Pageable pageable) {
-        return batchRepository.findAll((root, criteriaQuery, cb) -> {
+    private org.springframework.data.jpa.domain.Specification<Batch> getSpec(String query, String status) {
+        return (root, criteriaQuery, cb) -> {
             java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
             
             if (query != null && !query.trim().isEmpty()) {
@@ -97,7 +97,15 @@ public class BatchService {
             }
             
             return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
-        }, pageable);
+        };
+    }
+
+    public Page<Batch> getBatchesPaginated(String query, String status, Pageable pageable) {
+        return batchRepository.findAll(getSpec(query, status), pageable);
+    }
+
+    public List<Batch> getBatches(String query, String status, org.springframework.data.domain.Sort sort) {
+        return batchRepository.findAll(getSpec(query, status), sort);
     }
 
     public List<Batch> getAllBatches() {
