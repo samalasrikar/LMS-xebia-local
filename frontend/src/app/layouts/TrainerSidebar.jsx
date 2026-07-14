@@ -14,7 +14,8 @@ import {
   Bell,
   User,
   ShieldAlert,
-  ArrowRight
+  ArrowRight,
+  Calendar
 } from "lucide-react";
 import adminProfileIcon from "../../assets/admin_profile_icon.svg";
 
@@ -28,11 +29,10 @@ const MAIN_MENU = [
   { title: "Quizzes",      path: "/trainer/quizzes",      icon: HelpCircle },
   { title: "Batches",      path: "/trainer/batches",      icon: Layers },
   { title: "Gradebook",    path: "/trainer/gradebook",    icon: Award },
+  { title: "Events",       path: "/trainer/events",       icon: Calendar },
 ];
 
-const BOTTOM_MENU = [
-  { title: "Settings",      path: "/settings",             icon: Settings },
-];
+const BOTTOM_MENU = [];
 
 /* ─── Tooltip on hover ─── */
 function NavTooltip({ label, children }) {
@@ -178,71 +178,9 @@ export default function TrainerSidebar({ collapsed, setCollapsed }) {
           {BOTTOM_MENU.map(renderLink)}
         </div>
 
-        {/* Portals switcher */}
-        <div className={`border-t border-slate-200/80 px-2 py-3 space-y-1.5 ${collapsed ? "flex flex-col items-center" : ""}`}>
-          {collapsed ? (
-            <>
-              <NavTooltip label="Admin Portal">
-                <button
-                  onClick={() => navigate("/admin")}
-                  className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-750 flex items-center justify-center transition-all cursor-pointer border-none outline-none"
-                >
-                  <ShieldAlert size={15} />
-                </button>
-              </NavTooltip>
-              <NavTooltip label="Student Panel">
-                <button
-                  onClick={() => navigate("/student")}
-                  className="w-9 h-9 rounded-xl bg-[#6C1D5F]/10 hover:bg-[#6C1D5F]/20 text-[#6C1D5F] flex items-center justify-center transition-all cursor-pointer border-none outline-none"
-                >
-                  <GraduationCap size={15} />
-                </button>
-              </NavTooltip>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => navigate("/admin")}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-[12px] font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all cursor-pointer border-none outline-none text-left"
-              >
-                <span className="flex items-center gap-2">
-                  <ShieldAlert size={14} className="shrink-0" />
-                  <span>Admin Portal</span>
-                </span>
-                <ArrowRight size={12} className="opacity-40" />
-              </button>
-              <button
-                onClick={() => navigate("/student")}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-[12px] font-semibold bg-[#6C1D5F] hover:bg-[#521347] text-white transition-all cursor-pointer border-none outline-none shadow-sm shadow-[#6C1D5F]/15"
-              >
-                <span className="flex items-center gap-2">
-                  <GraduationCap size={14} className="shrink-0" />
-                  <span>Student Panel</span>
-                </span>
-                <ArrowRight size={12} className="opacity-70" />
-              </button>
-            </>
-          )}
-        </div>
 
-        {/* Trainer User Card */}
-        {!collapsed && (
-          <div className="border-t border-slate-200/80 p-3 bg-white">
-            <div className="flex items-center gap-2.5 rounded-md p-1">
-              <img
-                src={adminProfileIcon}
-                alt="Trainer"
-                className="w-[30px] h-[30px] rounded-full object-cover flex-shrink-0"
-              />
-              <div className="flex-1 min-w-0">
-                <div className="text-[12px] font-bold text-slate-900 whitespace-nowrap overflow-hidden text-ellipsis">
-                  Lead Instructor
-                </div>
-                <div className="text-[10px] text-[#6C1D5F] font-bold">Trainer</div>
-              </div>
-            </div>
-          </div>
-        )}
+
+
 
         {/* Toggle button */}
         <div className={`border-t border-slate-200/80 py-2.5 ${collapsed ? "flex justify-center" : "px-2 bg-white"}`}>
