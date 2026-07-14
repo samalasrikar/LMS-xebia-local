@@ -23,6 +23,17 @@ public class AssignmentController {
         return new ApiResponse<>(assignmentService.getAllAssignments());
     }
 
+    @GetMapping("/paginated")
+    public ApiResponse<org.springframework.data.domain.Page<Assignment>> getAssignmentsPaginated(
+            @RequestParam String studentId,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        return new ApiResponse<>(assignmentService.getAssignmentsForStudentPaginated(studentId, q, status, pageable));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Assignment>> getAssignmentById(@PathVariable String id) {
         return assignmentService.getAssignmentById(id)

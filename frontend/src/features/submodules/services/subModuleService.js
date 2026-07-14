@@ -6,6 +6,11 @@ const subModuleService = {
     return response.data.data;
   },
 
+  getSubModulesByModuleId: async (moduleId, config) => {
+    const response = await api.get(`/submodules?moduleId=${moduleId}`, config);
+    return response.data.data;
+  },
+
   createSubModule: async (subModuleData, config) => {
     const response = await api.post("/submodules", subModuleData, config);
     return response.data.data;

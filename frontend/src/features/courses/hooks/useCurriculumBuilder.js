@@ -56,6 +56,8 @@ export default function useCurriculumBuilder() {
   /* ── UI State ── */
   const [expandedModules, setExpandedModules] = useState({});
   const [activeSubModule, setActiveSubModule] = useState(null);
+  const [activeBlock, setActiveBlock] = useState(null);
+  const [editingBlock, setEditingBlock] = useState(null);
   const [treeSearch, setTreeSearch] = useState("");
   const [showNavBanner, setShowNavBanner] = useState(!!fromModuleManagement);
   const [saveStatus, setSaveStatus] = useState("saved"); // "saved" | "saving" | "unsaved"
@@ -174,13 +176,7 @@ export default function useCurriculumBuilder() {
 
     setLoadingCurriculum(true);
     try {
-      const [allModules, allSubModules, allContents] = await Promise.all([
-        moduleService.getAllModules(),
-        subModuleService.getAllSubModules(),
-        contentService.getAllContents(),
-      ]);
-
-      const courseModules = await loadCurriculumForCourse(selectedCourse.id, allModules, allSubModules, allContents);
+      const courseModules = await loadCurriculumForCourse(selectedCourse.id);
       const newCourseObj = {
         ...selectedCourse,
         modules: courseModules,
@@ -267,32 +263,38 @@ export default function useCurriculumBuilder() {
   const [assignmentMaxScore, setAssignmentMaxScore] = useState(100);
 
   /* ── Load Modules for Course Helper ── */
-  const loadCurriculumForCourse = async (courseId, allModules, allSubModules, allContents) => {
-    const courseModules = allModules
-      .filter(m => m.courseId === Number(courseId))
-      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
-    return courseModules.map(mod => ({
-      ...mod,
-      subModules: allSubModules
-        .filter(sm => sm.moduleId === mod.id)
-        .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-        .map(sm => ({ ...sm, content: allContents.find(c => c.subModuleId === sm.id) })),
+  const loadCurriculumForCourse = async (courseId) => {
+    const courseModules = await moduleService.getModulesByCourseId(courseId);
+    const sortedModules = [...(courseModules || [])].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    
+    return Promise.all(sortedModules.map(async (mod) => {
+      const subModules = await subModuleService.getSubModulesByModuleId(mod.id);
+      const sortedSubModules = [...(subModules || [])].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+      
+      const mappedSubModules = await Promise.all(sortedSubModules.map(async (sm) => {
+        const blocks = await contentService.getContentsBySubModuleId(sm.id);
+        const sortedBlocks = [...(blocks || [])].sort((a, b) => a.id - b.id);
+        return {
+          ...sm,
+          blocks: sortedBlocks,
+          content: sortedBlocks[0] || null
+        };
+      }));
+      
+      return {
+        ...mod,
+        subModules: mappedSubModules
+      };
     }));
   };
 
   const reloadAllLoadedCourses = async (coursesListToReload = loadedCourses) => {
     setLoadingCurriculum(true);
     try {
-      const [allModules, allSubModules, allContents] = await Promise.all([
-        moduleService.getAllModules(),
-        subModuleService.getAllSubModules(),
-        contentService.getAllContents(),
-      ]);
-
       const updatedCourses = await Promise.all(
         coursesListToReload.map(async (c) => {
           const courseData = await courseService.getCourseById(c.id);
-          const modulesData = await loadCurriculumForCourse(c.id, allModules, allSubModules, allContents);
+          const modulesData = await loadCurriculumForCourse(c.id);
           return {
             ...courseData,
             modules: modulesData,
@@ -301,6 +303,23 @@ export default function useCurriculumBuilder() {
       );
 
       changeLoadedCourses(updatedCourses);
+
+      if (activeSubModule) {
+        const nextCourse = updatedCourses.find(c => c.id === activeCourseId);
+        const nextSubModule = nextCourse?.modules
+          ?.flatMap(m => m.subModules || [])
+          ?.find(sm => sm.id === activeSubModule.id);
+        if (nextSubModule) {
+          setActiveSubModule(nextSubModule);
+          if (activeBlock) {
+            const nextBlock = nextSubModule.blocks?.find(b => b.id === activeBlock.id);
+            setActiveBlock(nextBlock || null);
+          }
+        } else {
+          setActiveSubModule(null);
+          setActiveBlock(null);
+        }
+      }
 
       const expandMap = {};
       updatedCourses.forEach(c => {
@@ -351,18 +370,11 @@ export default function useCurriculumBuilder() {
           return;
         }
 
-        // Fetch all modules, submodules, and contents in parallel
-        const [allModules, allSubModules, allContents] = await Promise.all([
-          moduleService.getAllModules(),
-          subModuleService.getAllSubModules(),
-          contentService.getAllContents(),
-        ]);
-
         const coursesData = await Promise.all(
           savedIds.map(async (courseId) => {
             try {
               const courseData = await courseService.getCourseById(courseId);
-              const courseModules = await loadCurriculumForCourse(courseId, allModules, allSubModules, allContents);
+              const courseModules = await loadCurriculumForCourse(courseId);
               return {
                 ...courseData,
                 modules: courseModules,
@@ -614,13 +626,14 @@ export default function useCurriculumBuilder() {
     setAssignmentMaxScore(100);
   };
 
-  const openEditBlockDialog = (subMod) => {
+  const openEditBlockDialog = (subMod, block = null) => {
     setActiveSubModule(subMod);
+    setEditingBlock(block);
     resetAllBlockFields();
 
-    if (subMod.content) {
-      const bt = subMod.content.blockType || "";
-      const c = subMod.content;
+    if (block) {
+      const bt = block.blockType || "";
+      const c = block;
 
       if (bt === "heading") {
         setBlockConfigType("heading");
@@ -703,6 +716,7 @@ export default function useCurriculumBuilder() {
     setBlockPickerOpen(false);
     setBlockConfigType(type);
     resetAllBlockFields();
+    setEditingBlock(null);
     setBlockConfigOpen(true);
   };
 
@@ -792,8 +806,8 @@ export default function useCurriculumBuilder() {
     try {
       const payload = buildBlockPayload();
 
-      if (activeSubModule.content) {
-        await contentService.updateContent(activeSubModule.content.id, payload);
+      if (editingBlock) {
+        await contentService.updateContent(editingBlock.id, payload);
         showToast("Block updated!");
       } else {
         console.log("Creating content...");
@@ -801,6 +815,7 @@ export default function useCurriculumBuilder() {
         showToast("Block created!");
       }
       setBlockConfigOpen(false);
+      setEditingBlock(null);
       await reloadAllLoadedCourses();
       setSaveStatus("saved");
     } catch (err) {
@@ -811,14 +826,22 @@ export default function useCurriculumBuilder() {
   };
 
 
-  const requestDelete = (type, target) => setDeleteTarget({ type, id: target.id, title: target.title });
+  const requestDelete = (type, target) => setDeleteTarget({ type, id: target.id, title: target.title || target.content || target.blockType || "Block" });
   const confirmDelete = async () => {
     if (!deleteTarget) return;
     try {
-      if (deleteTarget.type === "module") await moduleService.deleteModule(deleteTarget.id);
-      else await subModuleService.deleteSubModule(deleteTarget.id);
-      showToast(`${deleteTarget.type === "module" ? "Module" : "Block"} deleted.`);
-      if (activeSubModule?.id === deleteTarget.id) setActiveSubModule(null);
+      if (deleteTarget.type === "module") {
+        await moduleService.deleteModule(deleteTarget.id);
+        showToast("Module deleted.");
+      } else if (deleteTarget.type === "submodule") {
+        await subModuleService.deleteSubModule(deleteTarget.id);
+        showToast("Sub-module deleted.");
+        if (activeSubModule?.id === deleteTarget.id) setActiveSubModule(null);
+      } else if (deleteTarget.type === "block") {
+        await contentService.deleteContent(deleteTarget.id);
+        showToast("Block deleted.");
+        if (activeBlock?.id === deleteTarget.id) setActiveBlock(null);
+      }
       await reloadAllLoadedCourses();
     } catch (err) { console.error(err); showToast("Deletion failed.", "error"); }
     finally { setDeleteTarget(null); }
@@ -849,37 +872,33 @@ export default function useCurriculumBuilder() {
         status: "Draft",
       });
 
-      const [allModules, allSubModules, allContents] = await Promise.all([
-        moduleService.getAllModules(),
-        subModuleService.getAllSubModules(),
-        contentService.getAllContents(),
-      ]);
+      const courseModules = await moduleService.getModulesByCourseId(c.id);
 
-      const courseModules = allModules.filter(m => m.courseId === c.id);
-
-      for (const mod of courseModules) {
+      for (const mod of (courseModules || [])) {
         const duplicatedMod = await moduleService.createModule({
           courseId: duplicatedCourse.id,
           title: mod.title,
           description: mod.description || "",
         });
 
-        const modSubModules = allSubModules.filter(sm => sm.moduleId === mod.id);
-        for (const sub of modSubModules) {
+        const modSubModules = await subModuleService.getSubModulesByModuleId(mod.id);
+        for (const sub of (modSubModules || [])) {
           const duplicatedSub = await subModuleService.createSubModule({
             moduleId: duplicatedMod.id,
             title: sub.title,
             description: sub.description || "",
           });
 
-          const subContent = allContents.find(cont => cont.subModuleId === sub.id);
-          if (subContent) {
+          const subContents = await contentService.getContentsBySubModuleId(sub.id);
+          for (const subContent of (subContents || [])) {
             await contentService.createContent({
               subModuleId: duplicatedSub.id,
-              type: subContent.type,
-              body: subContent.body || "",
+              blockType: subContent.blockType,
+              content: subContent.content || "",
               videoUrl: subContent.videoUrl || "",
               pdfUrl: subContent.pdfUrl || "",
+              imageUrl: subContent.imageUrl || "",
+              title: subContent.title || `${sub.title} Content`
             });
           }
         }
@@ -916,14 +935,16 @@ export default function useCurriculumBuilder() {
           description: sub.description || "",
         });
 
-        const subContent = allContents.find(cont => cont.subModuleId === sub.id);
-        if (subContent) {
+        const subContents = allContents.filter(cont => cont.subModuleId === sub.id);
+        for (const subContent of subContents) {
           await contentService.createContent({
             subModuleId: duplicatedSub.id,
-            type: subContent.type,
-            body: subContent.body || "",
+            blockType: subContent.blockType,
+            content: subContent.content || "",
             videoUrl: subContent.videoUrl || "",
             pdfUrl: subContent.pdfUrl || "",
+            imageUrl: subContent.imageUrl || "",
+            title: subContent.title || `${sub.title} Content`
           });
         }
       }
@@ -938,7 +959,7 @@ export default function useCurriculumBuilder() {
 
   const handleDuplicateSubModule = async (sub) => {
     try {
-      showToast("Duplicating block...");
+      showToast("Duplicating sub-module...");
       const duplicatedSub = await subModuleService.createSubModule({
         moduleId: sub.moduleId,
         title: `${sub.title} (Copy)`,
@@ -946,17 +967,39 @@ export default function useCurriculumBuilder() {
       });
 
       const allContents = await contentService.getAllContents();
-      const subContent = allContents.find(cont => cont.subModuleId === sub.id);
-      if (subContent) {
+      const subContents = allContents.filter(cont => cont.subModuleId === sub.id);
+      for (const subContent of subContents) {
         await contentService.createContent({
           subModuleId: duplicatedSub.id,
-          type: subContent.type,
-          body: subContent.body || "",
+          blockType: subContent.blockType,
+          content: subContent.content || "",
           videoUrl: subContent.videoUrl || "",
           pdfUrl: subContent.pdfUrl || "",
+          imageUrl: subContent.imageUrl || "",
+          title: subContent.title || `${sub.title} Content`
         });
       }
 
+      showToast("Sub-module duplicated successfully!");
+      await reloadAllLoadedCourses();
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to duplicate sub-module.", "error");
+    }
+  };
+
+  const handleDuplicateBlock = async (block) => {
+    try {
+      showToast("Duplicating block...");
+      await contentService.createContent({
+        subModuleId: block.subModuleId,
+        blockType: block.blockType,
+        content: block.content || "",
+        videoUrl: block.videoUrl || "",
+        pdfUrl: block.pdfUrl || "",
+        imageUrl: block.imageUrl || "",
+        title: block.title || "Block Content"
+      });
       showToast("Block duplicated successfully!");
       await reloadAllLoadedCourses();
     } catch (err) {
@@ -987,7 +1030,7 @@ export default function useCurriculumBuilder() {
   const validateUrlFormat = (url) => {
     if (!url.trim()) { setVideoUrlError(""); return false; }
     try { new URL(url); setVideoUrlError(""); return true; }
-    catch { setVideoUrlError("Please enter a valid URL (e.g. https://...)"'); return false; }
+    catch { setVideoUrlError("Please enter a valid URL (e.g. https://...)"); return false; }
   };
   const handleVideoUrlChange = (val) => {
     setVideoUrl(val); setShowVideoPreview(false); validateUrlFormat(val);
@@ -1137,6 +1180,11 @@ export default function useCurriculumBuilder() {
     setAssignmentSubmissionType,
     assignmentMaxScore,
     setAssignmentMaxScore,
+    activeBlock,
+    setActiveBlock,
+    editingBlock,
+    setEditingBlock,
+    handleDuplicateBlock,
     // Multi course props
     loadedCourses,
     setLoadedCourses: changeLoadedCourses,

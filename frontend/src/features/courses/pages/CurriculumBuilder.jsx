@@ -206,6 +206,11 @@ export default function CurriculumBuilder() {
     assignmentMaxScore,
     setAssignmentMaxScore,
     loadCurriculumData,
+    activeBlock,
+    setActiveBlock,
+    editingBlock,
+    setEditingBlock,
+    handleDuplicateBlock,
     // Multi course props
     loadedCourses,
     activeCourseId,
@@ -370,6 +375,7 @@ export default function CurriculumBuilder() {
           handleDuplicateCourse={handleDuplicateCourse}
           handleDuplicateModule={handleDuplicateModule}
           handleDuplicateSubModule={handleDuplicateSubModule}
+          handleDuplicateBlock={handleDuplicateBlock}
           handleMoveModule={handleMoveModule}
           handleMoveSubModule={handleMoveSubModule}
           loadCurriculumData={loadCurriculumData}
@@ -400,6 +406,7 @@ export default function CurriculumBuilder() {
             openEditBlockDialog={openEditBlockDialog}
             requestDelete={requestDelete}
             openAddModuleModal={openAddModuleModal}
+            activeBlock={activeBlock}
           />
         )}
       </div>

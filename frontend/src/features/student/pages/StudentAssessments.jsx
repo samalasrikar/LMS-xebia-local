@@ -40,6 +40,8 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 
+import api from "@/shared/services/api";
+
 export default function StudentAssessments() {
   const navigate = useNavigate();
   const studentId = "s4"; // Active student: Jane Doe
@@ -52,24 +54,73 @@ export default function StudentAssessments() {
   const [filterStatus, setFilterStatus] = useState("All");
   const [sortOrder, setSortOrder] = useState("Newest");
 
-  // Fetch quizzes and assignments in parallel
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+
   useEffect(() => {
     setLoading(true);
-    Promise.all([
-      assignmentService.getAssignments(studentId),
-      quizService.getQuizzes(studentId)
-    ])
-      .then(([assignmentsData, quizzesData]) => {
-        setAssignments(assignmentsData || []);
-        setQuizzes(quizzesData || []);
-      })
-      .catch((err) => {
-        console.error("Failed to load assessments:", err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+    if (filterType === "Assignment") {
+      api.get("/assignments/paginated", {
+        params: {
+          studentId,
+          q: searchQuery,
+          status: filterStatus,
+          page: currentPage - 1,
+          size: itemsPerPage
+        }
+      }).then(res => {
+        if (res.data && res.data.data) {
+          const pageData = res.data.data;
+          setAssignments(pageData.content || []);
+          setQuizzes([]);
+          setTotalPages(pageData.totalPages || 1);
+          setTotalElements(pageData.totalElements || 0);
+        }
+      }).catch(() => {})
+        .finally(() => setLoading(false));
+    } else if (filterType === "Quiz") {
+      api.get("/quizzes/paginated", {
+        params: {
+          studentId,
+          q: searchQuery,
+          status: filterStatus,
+          page: currentPage - 1,
+          size: itemsPerPage
+        }
+      }).then(res => {
+        if (res.data && res.data.data) {
+          const pageData = res.data.data;
+          setQuizzes(pageData.content || []);
+          setAssignments([]);
+          setTotalPages(pageData.totalPages || 1);
+          setTotalElements(pageData.totalElements || 0);
+        }
+      }).catch(() => {})
+        .finally(() => setLoading(false));
+    } else {
+      // All - fetch both, merge and simulate pagination
+      Promise.all([
+        api.get("/assignments/paginated", {
+          params: { studentId, q: searchQuery, status: filterStatus, page: 0, size: 100 }
+        }),
+        api.get("/quizzes/paginated", {
+          params: { studentId, q: searchQuery, status: filterStatus, page: 0, size: 100 }
+        })
+      ]).then(([assRes, quizRes]) => {
+        const assList = assRes.data?.data?.content || [];
+        const quizList = quizRes.data?.data?.content || [];
+        setAssignments(assList);
+        setQuizzes(quizList);
+        const mergedLen = assList.length + quizList.length;
+        setTotalPages(Math.ceil(mergedLen / itemsPerPage) || 1);
+        setTotalElements(mergedLen);
+      }).catch(() => {})
+        .finally(() => setLoading(false));
+    }
+  }, [searchQuery, filterType, filterStatus, currentPage]);
 
   // Compute consolidated list of assessments
   const consolidatedList = useMemo(() => {
@@ -146,38 +197,7 @@ export default function StudentAssessments() {
   const filteredList = useMemo(() => {
     let result = [...consolidatedList];
 
-    // 1. Search Query
-    if (searchQuery.trim() !== "") {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (item) =>
-          item.title.toLowerCase().includes(query) ||
-          item.course.toLowerCase().includes(query)
-      );
-    }
-
-    // 2. Type Filter
-    if (filterType !== "All") {
-      result = result.filter((item) => item.type === filterType);
-    }
-
-    // 3. Status Filter
-    if (filterStatus !== "All") {
-      result = result.filter((item) => {
-        if (filterStatus === "Pending") {
-          return item.status === "Pending" || item.status === "Needs Revision";
-        } else if (filterStatus === "Completed") {
-          return ["Completed", "Submitted", "Late Submitted", "Reviewed"].includes(item.status);
-        } else if (filterStatus === "Reviewed") {
-          return item.status === "Reviewed" || (item.type === "Quiz" && item.status === "Completed");
-        } else if (filterStatus === "Overdue") {
-          return item.status === "Overdue";
-        }
-        return true;
-      });
-    }
-
-    // 4. Sort Order
+    // Sort Order
     result.sort((a, b) => {
       if (sortOrder === "Title") {
         return a.title.localeCompare(b.title);
@@ -193,8 +213,13 @@ export default function StudentAssessments() {
       return dateA - dateB;
     });
 
+    if (filterType === "All") {
+      const start = (currentPage - 1) * itemsPerPage;
+      return result.slice(start, start + itemsPerPage);
+    }
+
     return result;
-  }, [consolidatedList, searchQuery, filterType, filterStatus, sortOrder]);
+  }, [consolidatedList, filterType, currentPage, sortOrder]);
 
   const handleAction = (item) => {
     if (item.type === "Quiz") {
@@ -501,6 +526,27 @@ export default function StudentAssessments() {
           </TableBody>
         </Table>
       </div>
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center text-[12.5px] text-slate-450 font-bold px-2 pt-4 border-t border-slate-100 mt-2">
+          <span>Showing {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, totalElements)} of {totalElements} assessments</span>
+          <div className="flex gap-2">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              className="px-3 py-1 rounded border border-slate-200 hover:border-slate-350 disabled:opacity-40 disabled:cursor-not-allowed bg-white cursor-pointer"
+            >
+              Prev
+            </button>
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              className="px-3 py-1 rounded border border-slate-200 hover:border-slate-350 disabled:opacity-40 disabled:cursor-not-allowed bg-white cursor-pointer"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

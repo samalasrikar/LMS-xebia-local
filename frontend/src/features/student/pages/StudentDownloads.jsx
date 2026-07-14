@@ -22,97 +22,10 @@ import {
   ArrowUpDown,
   CheckCircle,
 } from "lucide-react";
-import contentService from "@/features/content/services/contentService";
-
-const INITIAL_RESOURCES = [
-  {
-    id: 1,
-    title: "Advanced System Architecture Compendium V2.0",
-    courseName: "Advanced Data Structures",
-    moduleName: "Module 4: Distributed Systems",
-    instructor: "Dr. Grace Hopper",
-    fileSize: "45.2 MB",
-    fileType: "PDF",
-    uploadDate: "2023-10-24",
-    lastUpdated: "2023-11-01",
-    downloads: 1420,
-    description: "Detailed compilation of advanced architectural patterns, microservices configurations, and high-availability setups.",
-    previewSupported: true,
-  },
-  {
-    id: 2,
-    title: "React Design Patterns Starter Templates",
-    courseName: "UX Design Principles",
-    moduleName: "Module 2: Advanced Prototyping",
-    instructor: "Dr. Alan Turing",
-    fileSize: "12.8 MB",
-    fileType: "ZIP",
-    uploadDate: "2023-10-18",
-    lastUpdated: "2023-10-18",
-    downloads: 854,
-    description: "Starter template files including routing, context state templates, and modular UI structure setups.",
-    previewSupported: false,
-  },
-  {
-    id: 3,
-    title: "Introduction to Artificial Intelligence Lecture Slides",
-    courseName: "Strategic Management",
-    moduleName: "Module 1: AI Foundations",
-    instructor: "LMS Admin",
-    fileSize: "8.4 MB",
-    fileType: "PPT",
-    uploadDate: "2023-10-12",
-    lastUpdated: "2023-10-15",
-    downloads: 620,
-    description: "Lecture decks covering the historical overview of AI, search algorithms, and intelligent agents.",
-    previewSupported: true,
-  },
-  {
-    id: 4,
-    title: "Machine Learning Model Training Pipeline",
-    courseName: "Intro to Machine Learning",
-    moduleName: "Module 3: Neural Networks",
-    instructor: "Dr. Yann LeCun",
-    fileSize: "4.2 MB",
-    fileType: "Code",
-    uploadDate: "2023-09-30",
-    lastUpdated: "2023-10-02",
-    downloads: 412,
-    description: "Python script containing training loops, loss plotting, and testing scripts for perceptron logic.",
-    previewSupported: false,
-  },
-  {
-    id: 5,
-    title: "Algorithm Complexities Cheat Sheet",
-    courseName: "Advanced Data Structures",
-    moduleName: "Module 1: Complexity Analysis",
-    instructor: "Dr. Grace Hopper",
-    fileSize: "2.1 MB",
-    fileType: "PDF",
-    uploadDate: "2023-09-28",
-    lastUpdated: "2023-09-28",
-    downloads: 2110,
-    description: "Cheat sheet covering Big O runtimes for all common sorting, searching, and tree structures.",
-    previewSupported: true,
-  },
-  {
-    id: 6,
-    title: "Neural Networks Overview Lecture Recording",
-    courseName: "Intro to Machine Learning",
-    moduleName: "Module 3: Neural Networks",
-    instructor: "Dr. Yann LeCun",
-    fileSize: "185.0 MB",
-    fileType: "Video",
-    uploadDate: "2023-09-20",
-    lastUpdated: "2023-09-20",
-    downloads: 98,
-    description: "Recording of the live lecture detailing feedforward propagation and gradient descent algorithms.",
-    previewSupported: true,
-  },
-];
+import studentService from "@/features/student/services/studentService";
 
 export default function StudentDownloads() {
-  const [resources, setResources] = useState(INITIAL_RESOURCES);
+  const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState([1, 5]); // Store favorited resource IDs
   const [openDropdown, setOpenDropdown] = useState(null); // ID of resource dropdown currently open
@@ -128,38 +41,41 @@ export default function StudentDownloads() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+
+  const [coursesList, setCoursesList] = useState([]);
+  const [instructorsList, setInstructorsList] = useState([]);
+
+  useEffect(() => {
+    studentService.getResourceStats().then(res => {
+      if (res && res.data) {
+        setCoursesList(res.data.uniqueCourses || []);
+        setInstructorsList(res.data.uniqueInstructors || []);
+      }
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     setLoading(true);
-    // Attempt backend content API fetch but fall back gracefully
-    contentService.getAllContents()
-      .then((data) => {
-        if (data && Array.isArray(data)) {
-          // Map backend contents to resource library format
-          const mapped = data.map((c) => ({
-            id: c.id,
-            title: c.title || "Untitled Resource",
-            courseName: c.courseName || "General Reference",
-            moduleName: c.moduleName || "General Modules",
-            instructor: c.instructor || "System Admin",
-            fileSize: c.fileSize || "1.2 MB",
-            fileType: c.type || "PDF",
-            uploadDate: c.createdAt ? c.createdAt.split("T")[0] : "2023-10-01",
-            lastUpdated: c.updatedAt ? c.updatedAt.split("T")[0] : "2023-10-01",
-            downloads: c.downloadCount || 10,
-            description: c.description || "No description provided.",
-            previewSupported: c.type === "PDF" || c.type === "Video",
-          }));
-          if (mapped.length > 0) {
-            setResources(mapped);
-          }
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, []);
+    studentService.getResourcesPaginated({
+      fileType: selectedType,
+      courseName: selectedCourse,
+      instructor: selectedInstructor,
+      q: searchQuery,
+      page: currentPage - 1,
+      size: itemsPerPage,
+      sortBy: sortField,
+      sortDir: sortOrder
+    }).then(res => {
+      if (res && res.data) {
+        setResources(res.data.content || []);
+        setTotalPages(res.data.totalPages || 1);
+        setTotalElements(res.data.totalElements || 0);
+      }
+    }).catch(() => {})
+      .finally(() => setLoading(false));
+  }, [searchQuery, selectedType, selectedCourse, selectedInstructor, sortField, sortOrder, currentPage]);
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
@@ -184,42 +100,15 @@ export default function StudentDownloads() {
     }
   };
 
-  // Filtered resources list
-  const filtered = resources
-    .filter((res) => {
-      const matchesSearch =
-        res.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        res.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesType = selectedType === "all" || res.fileType.toUpperCase() === selectedType.toUpperCase();
-      const matchesCourse = selectedCourse === "all" || res.courseName === selectedCourse;
-      const matchesInstructor = selectedInstructor === "all" || res.instructor === selectedInstructor;
-
-      return matchesSearch && matchesType && matchesCourse && matchesInstructor;
-    })
-    .sort((a, b) => {
-      let valA = a[sortField];
-      let valB = b[sortField];
-
-      if (sortField === "fileSize") {
-        valA = parseFloat(a.fileSize);
-        valB = parseFloat(b.fileSize);
-      }
-
-      if (typeof valA === "string") {
-        return sortOrder === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
-      }
-      return sortOrder === "asc" ? valA - valB : valB - valA;
-    });
-
   // Unique Courses & Instructors for filters
-  const uniqueCourses = Array.from(new Set(resources.map((r) => r.courseName)));
-  const uniqueInstructors = Array.from(new Set(resources.map((r) => r.instructor)));
+  const uniqueCourses = coursesList;
+  const uniqueInstructors = instructorsList;
 
   // Pagination helper
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const indexOfFirstItem = (currentPage - 1) * itemsPerPage;
+  const currentItems = resources;
+  const indexOfLastItem = indexOfFirstItem + currentItems.length;
+  const filtered = { length: totalElements };
 
   const handleSort = (field) => {
     if (sortField === field) {

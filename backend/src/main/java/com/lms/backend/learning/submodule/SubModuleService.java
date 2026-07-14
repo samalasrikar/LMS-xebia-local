@@ -39,8 +39,16 @@ public class SubModuleService {
         this.mapper = mapper;
     }
 
+    // TODO: Add role-based visibility filtering once Spring Security auth is implemented.
     public List<SubModuleResponse> getAllSubModules() {
         return repository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<SubModuleResponse> getSubModulesByModuleId(Long moduleId) {
+        return repository.findByModule_IdOrderBySortOrderAsc(moduleId)
                 .stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());

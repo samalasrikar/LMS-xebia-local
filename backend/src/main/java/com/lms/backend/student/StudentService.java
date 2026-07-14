@@ -5,8 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+// TODO: Add role-based visibility filtering once Spring Security auth is implemented.
+// Students should only see their own record; trainers only their batch students.
 @Service("subStudentService")
 @SuppressWarnings("null")
 public class StudentService {
@@ -25,6 +31,31 @@ public class StudentService {
             studentRepository.save(new Student("s6", "Sarah Jenkins", "Cohort A (Q3)", "Active", "sarah.jenkins@xebia.com", "Leadership", "Managing Remote Teams", 90, "8h"));
             studentRepository.save(new Student("s7", "Jane Smith", "Cohort A (Q3)", "Active", "jane.smith@xebia.com", "Marketing", "Inbound Marketing Strategy", 10, "2h"));
         }
+    }
+
+    public Page<Student> getStudentsPaginated(String query, String dept, String batch, Pageable pageable) {
+        return studentRepository.findAll((root, criteriaQuery, cb) -> {
+            java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
+            
+            if (query != null && !query.trim().isEmpty()) {
+                String searchPattern = "%" + query.trim().toLowerCase() + "%";
+                predicates.add(cb.or(
+                    cb.like(cb.lower(root.get("name")), searchPattern),
+                    cb.like(cb.lower(root.get("email")), searchPattern),
+                    cb.like(cb.lower(root.get("course")), searchPattern)
+                ));
+            }
+            
+            if (dept != null && !dept.trim().isEmpty() && !"All Departments".equalsIgnoreCase(dept)) {
+                predicates.add(cb.equal(cb.lower(root.get("dept")), dept.trim().toLowerCase()));
+            }
+            
+            if (batch != null && !batch.trim().isEmpty()) {
+                predicates.add(cb.equal(root.get("batch"), batch));
+            }
+            
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        }, pageable);
     }
 
     public List<Student> getAllStudents() {
@@ -47,5 +78,13 @@ public class StudentService {
             student.setStatus("Active");
         }
         return studentRepository.save(student);
+    }
+
+    public Map<String, Object> getStudentStats() {
+        Map<String, Object> stats = new LinkedHashMap<>();
+        stats.put("totalStudents", studentRepository.count());
+        stats.put("activeStudents", studentRepository.countByStatus("Active"));
+        stats.put("completedStudents", studentRepository.countByStatus("Completed"));
+        return stats;
     }
 }

@@ -20,25 +20,29 @@ const BLOCK_TYPE_MAP = {
   assignment: { label: "Assignment", icon: CheckSquare },
 };
 
-export const getContentType = (sub) => {
-  if (!sub?.content) return null;
-  const bt = sub.content.blockType;
+export const getContentType = (blockOrSub) => {
+  if (!blockOrSub) return null;
+  const content = (blockOrSub.blockType !== undefined || blockOrSub.subModuleId !== undefined)
+    ? blockOrSub
+    : (blockOrSub.content || blockOrSub.blocks?.[0]);
+  if (!content) return null;
+  const bt = content.blockType;
   if (bt && BLOCK_TYPE_MAP[bt]) return bt;
   // Legacy fallback
-  if (sub.content.pdfUrl) return "pdf";
-  if (sub.content.videoUrl) return "video";
-  if (sub.content.content) return "text";
+  if (content.pdfUrl) return "pdf";
+  if (content.videoUrl) return "video";
+  if (content.content) return "text";
   return null;
 };
 
-export const getContentLabel = (sub) => {
-  const t = getContentType(sub);
+export const getContentLabel = (blockOrSub) => {
+  const t = getContentType(blockOrSub);
   if (t && BLOCK_TYPE_MAP[t]) return BLOCK_TYPE_MAP[t].label;
   return "No content";
 };
 
-export const getContentIcon = (sub, size = 13) => {
-  const t = getContentType(sub);
+export const getContentIcon = (blockOrSub, size = 13) => {
+  const t = getContentType(blockOrSub);
   if (t && BLOCK_TYPE_MAP[t]) return React.createElement(BLOCK_TYPE_MAP[t].icon, { size });
   return React.createElement(BookOpen, { size });
 };

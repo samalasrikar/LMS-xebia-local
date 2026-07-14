@@ -5,8 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+// TODO: Add role-based visibility filtering once Spring Security auth is implemented.
+// Trainers should only see their own batches/students.
 @Service
 @SuppressWarnings("null")
 public class TrainerService {
@@ -23,6 +29,26 @@ public class TrainerService {
             trainerRepository.save(new Trainer("t4", "John Smith", "john.s@xebia.com", "Agile Coach", "Leadership", 3, 62, 4.6, "Active", "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150"));
             trainerRepository.save(new Trainer("t5", "David Wilson", "david.w@xebia.com", "Security Principal", "Cybersecurity", 2, 45, 4.5, "Inactive", "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150"));
         }
+    }
+
+    public Page<Trainer> getTrainersPaginated(String query, String status, Pageable pageable) {
+        return trainerRepository.findAll((root, criteriaQuery, cb) -> {
+            java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
+            
+            if (query != null && !query.trim().isEmpty()) {
+                String searchPattern = "%" + query.trim().toLowerCase() + "%";
+                predicates.add(cb.or(
+                    cb.like(cb.lower(root.get("name")), searchPattern),
+                    cb.like(cb.lower(root.get("dept")), searchPattern)
+                ));
+            }
+            
+            if (status != null && !status.trim().isEmpty() && !"All".equalsIgnoreCase(status)) {
+                predicates.add(cb.equal(cb.lower(root.get("status")), status.trim().toLowerCase()));
+            }
+            
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        }, pageable);
     }
 
     public List<Trainer> getAllTrainers() {
@@ -76,5 +102,14 @@ public class TrainerService {
             return true;
         }
         return false;
+    }
+
+    public Map<String, Object> getTrainerStats() {
+        Map<String, Object> stats = new LinkedHashMap<>();
+        stats.put("totalTrainers", trainerRepository.count());
+        stats.put("activeTrainers", trainerRepository.countByStatus("Active"));
+        stats.put("totalCoursesAssigned", trainerRepository.sumCourses());
+        stats.put("averageRating", Math.round(trainerRepository.avgRating() * 10.0) / 10.0);
+        return stats;
     }
 }

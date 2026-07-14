@@ -7,8 +7,14 @@ import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+// TODO: Add role-based visibility filtering once Spring Security auth is implemented.
+// Trainers should only see batches they instruct.
 @Service
 @SuppressWarnings("null")
 public class BatchService {
@@ -73,6 +79,27 @@ public class BatchService {
         }
     }
 
+    public Page<Batch> getBatchesPaginated(String query, String status, Pageable pageable) {
+        return batchRepository.findAll((root, criteriaQuery, cb) -> {
+            java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
+            
+            if (query != null && !query.trim().isEmpty()) {
+                String searchPattern = "%" + query.trim().toLowerCase() + "%";
+                predicates.add(cb.or(
+                    cb.like(cb.lower(root.get("name")), searchPattern),
+                    cb.like(cb.lower(root.get("course")), searchPattern),
+                    cb.like(cb.lower(root.get("instructor")), searchPattern)
+                ));
+            }
+            
+            if (status != null && !status.trim().isEmpty() && !"All".equalsIgnoreCase(status)) {
+                predicates.add(cb.equal(cb.lower(root.get("status")), status.trim().toLowerCase()));
+            }
+            
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        }, pageable);
+    }
+
     public List<Batch> getAllBatches() {
         return batchRepository.findAll();
     }
@@ -114,5 +141,14 @@ public class BatchService {
             return true;
         }
         return false;
+    }
+
+    public Map<String, Object> getBatchStats() {
+        Map<String, Object> stats = new LinkedHashMap<>();
+        stats.put("totalBatches", batchRepository.count());
+        stats.put("activeBatches", batchRepository.countByStatus("Active"));
+        stats.put("upcomingBatches", batchRepository.countByStatus("Upcoming"));
+        stats.put("completedBatches", batchRepository.countByStatus("Completed"));
+        return stats;
     }
 }

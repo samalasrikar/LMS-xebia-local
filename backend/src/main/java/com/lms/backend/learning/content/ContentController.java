@@ -38,12 +38,15 @@ public class ContentController {
 
     @Operation(summary = "Get all contents")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ContentResponse>>> getAllContents() {
-
+    public ResponseEntity<ApiResponse<List<ContentResponse>>> getAllContents(
+            @org.springframework.web.bind.annotation.RequestParam(required = false) Long subModuleId) {
+        List<ContentResponse> data = (subModuleId != null)
+                ? service.getContentsBySubModuleId(subModuleId)
+                : service.getAllContents();
         return ResponseEntity.ok(
                 ResponseBuilder.success(
                         "Contents fetched successfully",
-                        service.getAllContents(),
+                        data,
                         HttpStatus.OK.value()));
     }
 

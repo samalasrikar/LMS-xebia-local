@@ -359,4 +359,30 @@ public class QuizService {
 
         return filtered;
     }
+
+    public org.springframework.data.domain.Page<Quiz> getQuizzesForStudentPaginated(String studentId, String query, String status, org.springframework.data.domain.Pageable pageable) {
+        List<Quiz> list = getQuizzesForStudent(studentId);
+        if (query != null && !query.trim().isEmpty()) {
+            String qLower = query.trim().toLowerCase();
+            list = list.stream().filter(q -> 
+                (q.getName() != null && q.getName().toLowerCase().contains(qLower)) ||
+                (q.getCourse() != null && q.getCourse().toLowerCase().contains(qLower))
+            ).collect(Collectors.toList());
+        }
+        if (status != null && !"All".equalsIgnoreCase(status)) {
+            list = list.stream().filter(q -> {
+                String attStatus = q.getAttemptStatus(); // Completed or Pending
+                if ("Pending".equalsIgnoreCase(status)) {
+                    return "Pending".equalsIgnoreCase(attStatus);
+                } else if ("Completed".equalsIgnoreCase(status) || "Reviewed".equalsIgnoreCase(status)) {
+                    return "Completed".equalsIgnoreCase(attStatus);
+                }
+                return true;
+            }).collect(Collectors.toList());
+        }
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), list.size());
+        List<Quiz> subList = (start <= end && start < list.size()) ? list.subList(start, end) : Collections.emptyList();
+        return new org.springframework.data.domain.PageImpl<>(subList, pageable, list.size());
+    }
 }

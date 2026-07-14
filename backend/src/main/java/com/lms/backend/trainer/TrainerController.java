@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/trainers")
@@ -16,8 +16,25 @@ public class TrainerController {
     private TrainerService trainerService;
 
     @GetMapping
-    public ApiResponse<List<Trainer>> getAllTrainers() {
-        return new ApiResponse<>(trainerService.getAllTrainers());
+    public ApiResponse<?> getAllTrainers(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        
+        org.springframework.data.domain.Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? org.springframework.data.domain.Sort.by(sortBy).descending()
+                : org.springframework.data.domain.Sort.by(sortBy).ascending();
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+        
+        return new ApiResponse<>(trainerService.getTrainersPaginated(q, status, pageable));
+    }
+
+    @GetMapping("/stats")
+    public ApiResponse<Map<String, Object>> getTrainerStats() {
+        return new ApiResponse<>(trainerService.getTrainerStats());
     }
 
     @GetMapping("/{id}")

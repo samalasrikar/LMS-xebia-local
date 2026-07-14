@@ -39,8 +39,16 @@ public class ModuleService {
         this.mapper = mapper;
     }
 
+    // TODO: Add role-based visibility filtering once Spring Security auth is implemented.
     public List<ModuleResponse> getAllModules() {
         return repository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<ModuleResponse> getModulesByCourseId(Long courseId) {
+        return repository.findByCourse_IdOrderBySortOrderAsc(courseId)
                 .stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());

@@ -59,6 +59,7 @@ export default function CurriculumSidebar({
   handleDuplicateCourse,
   handleDuplicateModule,
   handleDuplicateSubModule,
+  handleDuplicateBlock,
   handleMoveModule,
   handleMoveSubModule,
   loadCurriculumData,
@@ -471,68 +472,69 @@ export default function CurriculumSidebar({
                                             {/* ════════════════════════════════
                                                 BLOCK (CONTENT LEAF)
                                             ════════════════════════════════ */}
-                                            {contentT && (
-                                              <div className="relative">
-                                                <div className="absolute left-0 top-[13px] w-3 h-px bg-slate-200/40" />
-                                                <div
-                                                  onClick={() => {
-                                                    setActiveCourseId(c.id);
-                                                    setActiveSubModule(sub);
-                                                  }}
-                                                  className="group/leaf ml-3 mr-1 flex items-center gap-1.5 pl-1 pr-2 py-1.5 rounded-lg cursor-pointer transition-all hover:bg-white hover:shadow-sm"
-                                                >
-                                                  {/* Content type icon */}
-                                                  <div className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
-                                                    contentT === "video" ? "bg-violet-100 text-violet-600"
-                                                    : contentT === "pdf" ? "bg-rose-100 text-rose-600"
-                                                    : "bg-sky-100 text-sky-600"
-                                                  }`}>
-                                                    {contentT === "video" ? <Video size={10} />
-                                                      : contentT === "pdf" ? <FileText size={10} />
-                                                      : <AlignLeft size={10} />}
-                                                  </div>
-                                                  <span className="text-[11px] text-slate-500 truncate flex-1">
-                                                    {contentT === "video" ? "Video"
-                                                      : contentT === "pdf" ? "PDF Document"
-                                                      : "Article"}
-                                                  </span>
-                                                  {/* Block context menu */}
-                                                  <div className="opacity-0 group-hover/leaf:opacity-100 flex items-center gap-0.5 transition-opacity shrink-0">
-                                                    <ShadcnDropdownMenu>
-                                                      <ShadcnDropdownMenuTrigger asChild>
-                                                        <button
-                                                          onClick={e => e.stopPropagation()}
-                                                          className="w-5 h-5 flex items-center justify-center rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
-                                                        >
-                                                          <MoreHorizontal size={10} />
-                                                        </button>
-                                                      </ShadcnDropdownMenuTrigger>
-                                                      <ShadcnDropdownMenuContent className="text-[12px] min-w-[165px] z-50">
-                                                        <ShadcnDropdownMenuItem onClick={() => openEditBlockDialog(sub)}>
-                                                          <Edit size={11} className="mr-2" /> Edit Block
-                                                        </ShadcnDropdownMenuItem>
-                                                        <ShadcnDropdownMenuItem onClick={() => handleDuplicateSubModule(sub)}>
-                                                          <Copy size={11} className="mr-2" /> Duplicate Block
-                                                        </ShadcnDropdownMenuItem>
-                                                        <ShadcnDropdownMenuSeparator />
-                                                        <ShadcnDropdownMenuItem
-                                                          onClick={() => requestDelete("submodule", sub)}
-                                                          className="text-red-600 focus:text-red-600"
-                                                        >
-                                                          <Trash2 size={11} className="mr-2" /> Delete Block
-                                                        </ShadcnDropdownMenuItem>
-                                                      </ShadcnDropdownMenuContent>
-                                                    </ShadcnDropdownMenu>
+                                            {sub.blocks && sub.blocks.length > 0 && sub.blocks.map((block) => {
+                                              const blockT = getContentType(block);
+                                              return (
+                                                <div key={block.id} className="relative">
+                                                  <div className="absolute left-0 top-[13px] w-3 h-px bg-slate-200/40" />
+                                                  <div
+                                                    onClick={() => {
+                                                      setActiveCourseId(c.id);
+                                                      setActiveSubModule(sub);
+                                                    }}
+                                                    className="group/leaf ml-3 mr-1 flex items-center gap-1.5 pl-1 pr-2 py-1.5 rounded-lg cursor-pointer transition-all hover:bg-white hover:shadow-sm"
+                                                  >
+                                                    {/* Content type icon */}
+                                                    <div className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
+                                                      blockT === "video" ? "bg-violet-100 text-violet-600"
+                                                      : blockT === "pdf" ? "bg-rose-100 text-rose-600"
+                                                      : "bg-sky-100 text-sky-600"
+                                                    }`}>
+                                                      {blockT === "video" ? <Video size={10} />
+                                                        : blockT === "pdf" ? <FileText size={10} />
+                                                        : <AlignLeft size={10} />}
+                                                    </div>
+                                                    <span className="text-[11px] text-slate-500 truncate flex-1">
+                                                      {block.title || (blockT === "video" ? "Video" : blockT === "pdf" ? "PDF Document" : "Article")}
+                                                    </span>
+                                                    {/* Block context menu */}
+                                                    <div className="opacity-0 group-hover/leaf:opacity-100 flex items-center gap-0.5 transition-opacity shrink-0">
+                                                      <ShadcnDropdownMenu>
+                                                        <ShadcnDropdownMenuTrigger asChild>
+                                                          <button
+                                                            onClick={e => e.stopPropagation()}
+                                                            className="w-5 h-5 flex items-center justify-center rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                                                          >
+                                                            <MoreHorizontal size={10} />
+                                                          </button>
+                                                        </ShadcnDropdownMenuTrigger>
+                                                        <ShadcnDropdownMenuContent className="text-[12px] min-w-[165px] z-50">
+                                                          <ShadcnDropdownMenuItem onClick={() => openEditBlockDialog(sub, block)}>
+                                                            <Edit size={11} className="mr-2" /> Edit Block
+                                                          </ShadcnDropdownMenuItem>
+                                                          <ShadcnDropdownMenuItem onClick={() => handleDuplicateBlock(block)}>
+                                                            <Copy size={11} className="mr-2" /> Duplicate Block
+                                                          </ShadcnDropdownMenuItem>
+                                                          <ShadcnDropdownMenuSeparator />
+                                                          <ShadcnDropdownMenuItem
+                                                            onClick={() => requestDelete("block", block)}
+                                                            className="text-red-600 focus:text-red-600"
+                                                          >
+                                                            <Trash2 size={11} className="mr-2" /> Delete Block
+                                                          </ShadcnDropdownMenuItem>
+                                                        </ShadcnDropdownMenuContent>
+                                                      </ShadcnDropdownMenu>
+                                                    </div>
                                                   </div>
                                                 </div>
-                                              </div>
-                                            )}
+                                              );
+                                            })}
 
                                             {/* ── Add Block — inside Sub-module ── */}
                                             <div className="relative ml-3 mr-1 my-1">
                                               <div className="absolute left-[-12px] top-[12px] w-3 h-px bg-slate-200/40" />
                                               <button
-                                                onClick={() => openEditBlockDialog(sub)}
+                                                onClick={() => openEditBlockDialog(sub, null)}
                                                 className="w-full flex items-center gap-1.5 px-2 py-1.5 text-slate-400 hover:text-violet-600 hover:bg-violet-50 border border-dashed border-slate-200 hover:border-violet-300 rounded-lg transition-all text-[11px] font-semibold cursor-pointer"
                                               >
                                                 <Plus size={10} /> Add Block

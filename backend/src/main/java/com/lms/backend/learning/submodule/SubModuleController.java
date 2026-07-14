@@ -39,12 +39,15 @@ public class SubModuleController {
 
     @Operation(summary = "Get all submodules")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<SubModuleResponse>>> getAllSubModules() {
-
+    public ResponseEntity<ApiResponse<List<SubModuleResponse>>> getAllSubModules(
+            @org.springframework.web.bind.annotation.RequestParam(required = false) Long moduleId) {
+        List<SubModuleResponse> data = (moduleId != null)
+                ? service.getSubModulesByModuleId(moduleId)
+                : service.getAllSubModules();
         return ResponseEntity.ok(
                 ResponseBuilder.success(
                         "SubModules fetched successfully",
-                        service.getAllSubModules(),
+                        data,
                         HttpStatus.OK.value()));
     }
 

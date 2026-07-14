@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/batches")
@@ -16,8 +16,25 @@ public class BatchController {
     private BatchService batchService;
 
     @GetMapping
-    public ApiResponse<List<Batch>> getBatches() {
-        return new ApiResponse<>(batchService.getAllBatches());
+    public ApiResponse<?> getBatches(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        
+        org.springframework.data.domain.Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? org.springframework.data.domain.Sort.by(sortBy).descending()
+                : org.springframework.data.domain.Sort.by(sortBy).ascending();
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+        
+        return new ApiResponse<>(batchService.getBatchesPaginated(q, status, pageable));
+    }
+
+    @GetMapping("/stats")
+    public ApiResponse<Map<String, Object>> getBatchStats() {
+        return new ApiResponse<>(batchService.getBatchStats());
     }
 
     @GetMapping("/{id}")

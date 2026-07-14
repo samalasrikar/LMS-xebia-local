@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController("subStudentController")
 @RequestMapping("/api/students")
@@ -16,11 +16,26 @@ public class StudentController {
     private StudentService studentService;
 
     @GetMapping
-    public ApiResponse<List<Student>> getStudents(@RequestParam(required = false) String batch) {
-        if (batch != null && !batch.trim().isEmpty()) {
-            return new ApiResponse<>(studentService.getStudentsByBatch(batch));
-        }
-        return new ApiResponse<>(studentService.getAllStudents());
+    public ApiResponse<?> getStudents(
+            @RequestParam(required = false) String batch,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String dept,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        
+        org.springframework.data.domain.Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? org.springframework.data.domain.Sort.by(sortBy).descending()
+                : org.springframework.data.domain.Sort.by(sortBy).ascending();
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+        
+        return new ApiResponse<>(studentService.getStudentsPaginated(q, dept, batch, pageable));
+    }
+
+    @GetMapping("/stats")
+    public ApiResponse<Map<String, Object>> getStudentStats() {
+        return new ApiResponse<>(studentService.getStudentStats());
     }
 
     @GetMapping("/{id}")

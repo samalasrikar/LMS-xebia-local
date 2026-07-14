@@ -1,26 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FolderOpen, Users, Edit, Search, Filter, Grid, List, ChevronLeft, ChevronRight, X, Play } from "lucide-react";
+import categoryService from "@/features/categories/services/categoryService";
 
 export default function CategoriesManagement() {
   const [viewType, setViewType] = useState("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [editingCategory, setEditingCategory] = useState(null);
+  const [categories, setCategories] = useState([]);
 
-  const initialCategories = [
-    { id: 1, name: "Information Technology", desc: "Comprehensive tracks covering Cloud Computing, Cybersecurity, and Enterprise Software Development.", courses: 42, learners: "1.2k", status: "Active", image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&fit=crop" },
-    { id: 2, name: "Leadership & Management", desc: "Strategic communication, team dynamics, and operational excellence for emerging leaders.", courses: 28, learners: "850", status: "Active", image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&fit=crop" },
-    { id: 3, name: "Marketing & Sales", desc: "Digital growth tactics, branding alignment, pipeline metrics, and lead conversions.", courses: 15, learners: "420", status: "Active", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&fit=crop" },
-    { id: 4, name: "Human Resources", desc: "Compliance training, workforce management strategies, and diversity enrichment tracks.", courses: 12, learners: "310", status: "Active", image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400&fit=crop" },
-    { id: 5, name: "Creative Arts & Design", desc: "Mastering Figma layout designs, design systems, visual prototyping, and UI foundations.", courses: 22, learners: "640", status: "Active", image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=400&fit=crop" },
-    { id: 6, name: "Finance & Accounting", desc: "Platform accounting procedures, auditing controls, cost analysis, and tax guidelines.", courses: 18, learners: "500", status: "Active", image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&fit=crop" }
-  ];
+  const loadCategories = () => {
+    categoryService.getAllCategories().then(data => {
+      if (data && Array.isArray(data)) {
+        setCategories(data.map(c => ({
+          id: c.id,
+          name: c.name,
+          desc: c.description || "Comprehensive educational track.",
+          courses: c.coursesCount || 10,
+          learners: c.learnersCount || "400",
+          status: c.status || "Active",
+          image: c.imageUrl || "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&fit=crop"
+        })));
+      }
+    }).catch(() => {});
+  };
 
-  const [categories, setCategories] = useState(initialCategories);
+  useEffect(() => {
+    loadCategories();
+  }, []);
 
   const handleSaveCategory = (e) => {
     e.preventDefault();
-    setCategories(categories.map(c => c.id === editingCategory.id ? editingCategory : c));
-    setEditingCategory(null);
+    const formData = new FormData();
+    formData.append("name", editingCategory.name);
+    formData.append("description", editingCategory.desc);
+    formData.append("status", editingCategory.status || "Active");
+
+    categoryService.updateCategory(editingCategory.id, formData).then(() => {
+      loadCategories();
+      setEditingCategory(null);
+    }).catch(() => {});
   };
 
   const filteredCategories = categories.filter(c =>

@@ -349,4 +349,34 @@ public class AssignmentService {
             assignment.setStatus("Active");
         }
     }
+
+    public org.springframework.data.domain.Page<Assignment> getAssignmentsForStudentPaginated(String studentId, String query, String status, org.springframework.data.domain.Pageable pageable) {
+        List<Assignment> list = getAssignmentsForStudent(studentId);
+        if (query != null && !query.trim().isEmpty()) {
+            String qLower = query.trim().toLowerCase();
+            list = list.stream().filter(a -> 
+                (a.getTitle() != null && a.getTitle().toLowerCase().contains(qLower)) ||
+                (a.getCourse() != null && a.getCourse().toLowerCase().contains(qLower))
+            ).collect(Collectors.toList());
+        }
+        if (status != null && !"All".equalsIgnoreCase(status)) {
+            list = list.stream().filter(a -> {
+                String disp = a.getDisplayStatus();
+                if ("Pending".equalsIgnoreCase(status)) {
+                    return "Pending".equalsIgnoreCase(disp) || "Needs Revision".equalsIgnoreCase(disp) || "Overdue".equalsIgnoreCase(disp);
+                } else if ("Completed".equalsIgnoreCase(status)) {
+                    return "Submitted".equalsIgnoreCase(disp) || "Late Submitted".equalsIgnoreCase(disp) || "Reviewed".equalsIgnoreCase(disp);
+                } else if ("Reviewed".equalsIgnoreCase(status)) {
+                    return "Reviewed".equalsIgnoreCase(disp);
+                } else if ("Overdue".equalsIgnoreCase(status)) {
+                    return "Overdue".equalsIgnoreCase(disp);
+                }
+                return true;
+            }).collect(Collectors.toList());
+        }
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), list.size());
+        List<Assignment> subList = (start <= end && start < list.size()) ? list.subList(start, end) : Collections.emptyList();
+        return new org.springframework.data.domain.PageImpl<>(subList, pageable, list.size());
+    }
 }

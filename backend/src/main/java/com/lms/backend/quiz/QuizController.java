@@ -29,6 +29,17 @@ public class QuizController {
         return new ApiResponse<>(quizService.getAllQuizzes());
     }
 
+    @GetMapping("/paginated")
+    public ApiResponse<org.springframework.data.domain.Page<Quiz>> getQuizzesPaginated(
+            @RequestParam String studentId,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        return new ApiResponse<>(quizService.getQuizzesForStudentPaginated(studentId, q, status, pageable));
+    }
+
     @GetMapping("/stats")
     public ApiResponse<QuizStatsDto> getQuizStats() {
         return new ApiResponse<>(quizService.getQuizStats());

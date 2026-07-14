@@ -1,61 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PlayCircle, Award, Star, Search, Filter, Plus, Grid, List, ChevronRight, X, BookOpen, Layers } from "lucide-react";
+import courseService from "@/features/courses/services/courseService";
 
 export default function CoursesManagement() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [activeTab, setActiveTab] = useState("Overview");
   const [searchQuery, setSearchQuery] = useState("");
+  const [courses, setCourses] = useState([]);
 
-  const courses = [
-    {
-      title: "Digital Transformation Masterclass",
-      category: "Business",
-      status: "ACTIVE",
-      instructor: "Prof. Helen Carter",
-      instructorAvatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&fit=crop",
-      learners: 420,
-      rating: "4.9",
-      bgImage: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&fit=crop",
-      desc: "Our flagship masterclass on business agility and digital transformation processes. Learn structural leadership.",
-      curriculum: [
-        { title: "Introduction to Digital Agility", duration: "2h 15m" },
-        { title: "Modern Technology Stacks & Architectures", duration: "4h 30m" },
-        { title: "Managing Cultural Shifts & Teams", duration: "3h 10m" }
-      ]
-    },
-    {
-      title: "Kubernetes & DevOps Fundamentals",
-      category: "Engineering",
-      status: "ACTIVE",
-      instructor: "Michael Torres",
-      instructorAvatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&fit=crop",
-      learners: 820,
-      rating: "4.8",
-      bgImage: "https://images.unsplash.com/photo-1618401471353-b98aedd07871?w=400&fit=crop",
-      desc: "Comprehensive course teaching deployment automation, containerization, orchestration, and continuous pipelines.",
-      curriculum: [
-        { title: "Containerization with Docker", duration: "3h 05m" },
-        { title: "Kubernetes Pods, Services & Deployments", duration: "5h 45m" },
-        { title: "CI/CD Integration and GitOps", duration: "4h 20m" }
-      ]
-    },
-    {
-      title: "Advanced Data Science & Analytics",
-      category: "Data Science",
-      status: "DRAFT",
-      instructor: "David Chen",
-      instructorAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&fit=crop",
-      learners: 120,
-      rating: "4.7",
-      bgImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&fit=crop",
-      desc: "Master predictive modeling, linear systems, neural structures, and advanced python data pipelines.",
-      curriculum: [
-        { title: "Statistical Foundations for ML", duration: "4h 10m" },
-        { title: "Deep Learning & Neural Architectures", duration: "6h 25m" },
-        { title: "Pipeline Optimization & Production", duration: "3h 50m" }
-      ]
-    }
-  ];
+  useEffect(() => {
+    courseService.getAllCourses().then(data => {
+      if (data && Array.isArray(data)) {
+        setCourses(data.map(c => ({
+          id: c.id,
+          title: c.title,
+          category: c.category || "Business",
+          status: c.status || "ACTIVE",
+          instructor: c.instructor || "Prof. Helen Carter",
+          instructorAvatar: c.instructorAvatar || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&fit=crop",
+          learners: c.learners || 420,
+          rating: c.rating || "4.9",
+          bgImage: c.bgImage || "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&fit=crop",
+          desc: c.description || "Our flagship masterclass on business agility and digital transformation processes.",
+          curriculum: c.curriculum || [
+            { title: "Introduction to Course Concepts", duration: "2h 15m" },
+            { title: "Advanced Methods & Paradigms", duration: "4h 30m" },
+            { title: "Industry Case Study and Projects", duration: "3h 10m" }
+          ]
+        })));
+      }
+    }).catch(() => {});
+  }, []);
 
   return (
     <div className="space-y-6 relative min-h-[80vh]">
