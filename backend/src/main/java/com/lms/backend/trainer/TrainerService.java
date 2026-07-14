@@ -31,8 +31,8 @@ public class TrainerService {
         }
     }
 
-    public Page<Trainer> getTrainersPaginated(String query, String status, Pageable pageable) {
-        return trainerRepository.findAll((root, criteriaQuery, cb) -> {
+    private org.springframework.data.jpa.domain.Specification<Trainer> getSpec(String query, String status) {
+        return (root, criteriaQuery, cb) -> {
             java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
             
             if (query != null && !query.trim().isEmpty()) {
@@ -48,7 +48,15 @@ public class TrainerService {
             }
             
             return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
-        }, pageable);
+        };
+    }
+
+    public Page<Trainer> getTrainersPaginated(String query, String status, Pageable pageable) {
+        return trainerRepository.findAll(getSpec(query, status), pageable);
+    }
+
+    public List<Trainer> getTrainers(String query, String status, org.springframework.data.domain.Sort sort) {
+        return trainerRepository.findAll(getSpec(query, status), sort);
     }
 
     public List<Trainer> getAllTrainers() {

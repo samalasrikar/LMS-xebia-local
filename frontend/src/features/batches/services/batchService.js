@@ -2,7 +2,7 @@ import api from "@/shared/services/api";
 
 const batchService = {
   getBatches: async (config) => {
-    const response = await api.get("/batches", config);
+    const response = await api.get("/batches?all=true", config);
     return response.data.data;
   },
 
