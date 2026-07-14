@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
+import AppLayout from "@/app/layouts/AppLayout";
+import adminProfileIcon from "@/assets/admin_profile_icon.svg";
 import {
   User,
   GraduationCap,
@@ -18,27 +21,96 @@ import {
   Percent,
   Sparkles,
   Lock,
+  // Added for other roles:
+  Users,
+  ClipboardList,
+  Star,
+  AlertCircle,
+  UserCheck,
+  Layers,
+  Plug,
+  Trophy,
+  Search
 } from "lucide-react";
 
 export default function StudentProfile() {
-  const [activeTab, setActiveTab] = useState("general"); // 'general', 'academic', 'learning', 'account'
-  const [profile, setProfile] = useState({
-    name: "Alex Johnson",
-    id: "STU-2021-8902",
-    rollNumber: "21CSB045",
-    email: "alex.j@university.edu",
-    phone: "+1 (555) 123-4567",
-    dob: "2002-05-15",
-    gender: "Female",
-    address: "123 Tech Lane, Silicon Valley, CA 94000",
-    avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuDsyA0vivV0CljyXSlO3SYa2Gmz4zhiGm-b2jr6sz5y0X9zQ-2QYxVIQhFznZswh2oWy6CWbcilrt8DuhXIY0hoZEOwfoLXSXKJq52lwOp6TKpxMxvu5i3PCQBHmpCcMEo0bLB2uhWCNxh2gzo_NV6W4SMp5KSErR1EIEyk4e4ofvihdR7bax6PuGE-LHAsxwQQukHG1AU3DzIR_ILy3eVATJfuedxBS0V9ieM5lajis6SdRBJVU5kxbTcn5VlGWjqCkr786KglsMs",
-  });
+  const { pathname } = useLocation();
+  let role = "student";
+  if (pathname.startsWith("/admin")) role = "admin";
+  else if (pathname.startsWith("/manager")) role = "manager";
+  else if (pathname.startsWith("/trainer")) role = "trainer";
 
+  const getInitialProfile = () => {
+    if (role === "admin") {
+      return {
+        name: "Super Admin",
+        id: "ADM-2026-0001",
+        rollNumber: "",
+        email: "admin@xebia.com",
+        phone: "+1 (555) 019-2831",
+        dob: "1988-11-23",
+        gender: "Male",
+        address: "Xebia HQ, Gurgaon, Haryana, India",
+        avatar: adminProfileIcon,
+        roleLabel: "Platform Administrator",
+        idLabel: "Admin ID"
+      };
+    } else if (role === "manager") {
+      return {
+        name: "Manager",
+        id: "MGR-2026-0012",
+        rollNumber: "",
+        email: "manager@xebia.com",
+        phone: "+1 (555) 014-9988",
+        dob: "1990-04-12",
+        gender: "Female",
+        address: "Xebia Office, Gurgaon, India",
+        avatar: adminProfileIcon,
+        roleLabel: "LMS Manager",
+        idLabel: "Manager ID"
+      };
+    } else if (role === "trainer") {
+      return {
+        name: "Lead Instructor",
+        id: "TRN-2026-0045",
+        rollNumber: "",
+        email: "instructor@xebia.com",
+        phone: "+1 (555) 016-7722",
+        dob: "1992-08-30",
+        gender: "Male",
+        address: "Xebia Training Hub, Gurgaon, India",
+        avatar: adminProfileIcon,
+        roleLabel: "Lead Trainer",
+        idLabel: "Trainer ID"
+      };
+    }
+    return {
+      name: "Alex Johnson",
+      id: "STU-2021-8902",
+      rollNumber: "21CSB045",
+      email: "alex.j@university.edu",
+      phone: "+1 (555) 123-4567",
+      dob: "2002-05-15",
+      gender: "Female",
+      address: "123 Tech Lane, Silicon Valley, CA 94000",
+      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuDsyA0vivV0CljyXSlO3SYa2Gmz4zhiGm-b2jr6sz5y0X9zQ-2QYxVIQhFznZswh2oWy6CWbcilrt8DuhXIY0hoZEOwfoLXSXKJq52lwOp6TKpxMxvu5i3PCQBHmpCcMEo0bLB2uhWCNxh2gzo_NV6W4SMp5KSErR1EIEyk4e4ofvihdR7bax6PuGE-LHAsxwQQukHG1AU3DzIR_ILy3eVATJfuedxBS0V9ieM5lajis6SdRBJVU5kxbTcn5VlGWjqCkr786KglsMs",
+      roleLabel: "Active Student",
+      idLabel: "Student ID"
+    };
+  };
+
+  const [activeTab, setActiveTab] = useState("general");
+  const [profile, setProfile] = useState(getInitialProfile);
   const [settings, setSettings] = useState({
     tfa: true,
     emailNotifications: true,
     publicProfile: false,
   });
+
+  React.useEffect(() => {
+    setProfile(getInitialProfile());
+    setActiveTab("general");
+  }, [role, pathname]);
 
   const handleProfileChange = (key, val) => {
     setProfile((prev) => ({ ...prev, [key]: val }));
@@ -59,7 +131,47 @@ export default function StudentProfile() {
     setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  return (
+  // Build statistics list
+  let statsList = [];
+  if (role === "student") {
+    statsList = [
+      { label: "Enrolled", value: "6 Courses", icon: BookOpen, bg: "bg-[#6C1D5F]/5", text: "text-[#6C1D5F]", border: "border-[#6C1D5F]/10" },
+      { label: "Completed", value: "24 Courses", icon: CheckCircle, bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-100" },
+      { label: "Current CGPA", value: "3.85 / 4.0", icon: TrendingUp, bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-100" },
+      { label: "Attendance", value: "94%", icon: Percent, bg: "bg-[#6C1D5F]/5", text: "text-[#6C1D5F]", border: "border-[#6C1D5F]/10" },
+      { label: "Credits", value: "72 CR", icon: Award, bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-100" },
+      { label: "Pending Tasks", value: "3 Items", icon: Clock, bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-100" },
+    ];
+  } else if (role === "trainer") {
+    statsList = [
+      { label: "Active Batches", value: "4 Batches", icon: Users, bg: "bg-[#6C1D5F]/5", text: "text-[#6C1D5F]", border: "border-[#6C1D5F]/10" },
+      { label: "Assigned Courses", value: "8 Courses", icon: BookOpen, bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-100" },
+      { label: "Assessments", value: "18 Active", icon: ClipboardList, bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-100" },
+      { label: "Average Rating", value: "4.8 / 5.0", icon: Star, bg: "bg-[#6C1D5F]/5", text: "text-[#6C1D5F]", border: "border-[#6C1D5F]/10" },
+      { label: "Teaching Hours", value: "320 Hrs", icon: Clock, bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-100" },
+      { label: "Pending Reviews", value: "12 Items", icon: AlertCircle, bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-100" },
+    ];
+  } else if (role === "manager") {
+    statsList = [
+      { label: "Total Courses", value: "36 Courses", icon: BookOpen, bg: "bg-[#6C1D5F]/5", text: "text-[#6C1D5F]", border: "border-[#6C1D5F]/10" },
+      { label: "Total Trainers", value: "15 Trainers", icon: UserCheck, bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-100" },
+      { label: "Total Learners", value: "840 Active", icon: Users, bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-100" },
+      { label: "Active Batches", value: "12 Batches", icon: Layers, bg: "bg-[#6C1D5F]/5", text: "text-[#6C1D5F]", border: "border-[#6C1D5F]/10" },
+      { label: "Completion Rate", value: "88%", icon: TrendingUp, bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-100" },
+      { label: "Approvals", value: "5 Pending", icon: CheckCircle, bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-100" },
+    ];
+  } else if (role === "admin") {
+    statsList = [
+      { label: "Users Registry", value: "1,200 Users", icon: Users, bg: "bg-[#6C1D5F]/5", text: "text-[#6C1D5F]", border: "border-[#6C1D5F]/10" },
+      { label: "Integrations", value: "8 Connected", icon: Plug, bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-100" },
+      { label: "System Health", value: "99.9% Uptime", icon: ShieldCheck, bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-100" },
+      { label: "SEO Configs", value: "Good (85/100)", icon: Search, bg: "bg-[#6C1D5F]/5", text: "text-[#6C1D5F]", border: "border-[#6C1D5F]/10" },
+      { label: "Total Programs", value: "4 Flagship", icon: Trophy, bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-100" },
+      { label: "Audit Log Status", value: "Healthy", icon: FileText, bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-100" },
+    ];
+  }
+
+  const profileContent = (
     <div className="max-w-[1000px] w-full mx-auto px-6 md:px-8 py-8 space-y-8 animate-fadeIn">
       {/* ── Header: Avatar & Brief Info ── */}
       <section className="flex flex-col md:flex-row items-center md:items-start gap-8 bg-white p-6 md:p-8 rounded-3xl border border-slate-200/70 shadow-sm relative overflow-hidden">
@@ -82,100 +194,51 @@ export default function StudentProfile() {
             <div className="flex flex-col md:flex-row md:items-center justify-center md:justify-start gap-2.5">
               <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight leading-tight">{profile.name}</h1>
               <span className="px-3 py-0.5 bg-[#84117C]/10 border border-[#84117C]/20 text-[#84117C] rounded-full text-[10px] font-black uppercase tracking-wider w-fit mx-auto md:mx-0">
-                Active Student
+                {profile.roleLabel}
               </span>
             </div>
-            <p className="text-[12.5px] text-slate-400 font-bold tracking-wide uppercase">Student ID: {profile.id}</p>
+            <p className="text-[12.5px] text-slate-400 font-bold tracking-wide uppercase">{profile.idLabel}: {profile.id}</p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100 text-left">
-            <div>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Roll Number</p>
-              <p className="text-[12.5px] font-extrabold text-slate-850 mt-0.5">{profile.rollNumber}</p>
+          {role === "student" && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100 text-left">
+              <div>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Roll Number</p>
+                <p className="text-[12.5px] font-extrabold text-slate-850 mt-0.5">{profile.rollNumber}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Program</p>
+                <p className="text-[12.5px] font-extrabold text-slate-850 mt-0.5">B.Tech CS</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Department</p>
+                <p className="text-[12.5px] font-extrabold text-slate-850 mt-0.5">CSE</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Semester</p>
+                <p className="text-[12.5px] font-extrabold text-slate-850 mt-0.5">5th Sem</p>
+              </div>
             </div>
-            <div>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Program</p>
-              <p className="text-[12.5px] font-extrabold text-slate-850 mt-0.5">B.Tech CS</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Department</p>
-              <p className="text-[12.5px] font-extrabold text-slate-850 mt-0.5">CSE</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Semester</p>
-              <p className="text-[12.5px] font-extrabold text-slate-850 mt-0.5">5th Sem</p>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 
       {/* ── Statistics Grid ── */}
       <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {/* Enrolled */}
-        <div className="bg-white p-4.5 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between h-[110px]">
-          <div className="w-8 h-8 rounded-lg bg-[#6C1D5F]/5 text-[#6C1D5F] flex items-center justify-center border border-[#6C1D5F]/10">
-            <BookOpen size={15} />
-          </div>
-          <div>
-            <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">Enrolled</p>
-            <p className="text-xl font-black text-slate-800">6 Courses</p>
-          </div>
-        </div>
-
-        {/* Completed */}
-        <div className="bg-white p-4.5 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between h-[110px]">
-          <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100">
-            <CheckCircle size={15} />
-          </div>
-          <div>
-            <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">Completed</p>
-            <p className="text-xl font-black text-slate-800">24 Courses</p>
-          </div>
-        </div>
-
-        {/* CGPA */}
-        <div className="bg-white p-4.5 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between h-[110px]">
-          <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-100">
-            <TrendingUp size={15} />
-          </div>
-          <div>
-            <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">Current CGPA</p>
-            <p className="text-xl font-black text-slate-800">3.85 <span className="text-[10px] text-slate-400 font-medium">/ 4.0</span></p>
-          </div>
-        </div>
-
-        {/* Attendance */}
-        <div className="bg-white p-4.5 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between h-[110px]">
-          <div className="w-8 h-8 rounded-lg bg-[#6C1D5F]/5 text-[#6C1D5F] flex items-center justify-center border border-[#6C1D5F]/10">
-            <Percent size={15} />
-          </div>
-          <div>
-            <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">Attendance</p>
-            <p className="text-xl font-black text-slate-800">94%</p>
-          </div>
-        </div>
-
-        {/* Credits */}
-        <div className="bg-white p-4.5 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between h-[110px]">
-          <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100">
-            <Award size={15} />
-          </div>
-          <div>
-            <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">Credits</p>
-            <p className="text-xl font-black text-slate-800">72 <span className="text-[10px] text-slate-400 font-medium">CR</span></p>
-          </div>
-        </div>
-
-        {/* Pending */}
-        <div className="bg-white p-4.5 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between h-[110px]">
-          <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-100">
-            <Clock size={15} />
-          </div>
-          <div>
-            <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">Pending Tasks</p>
-            <p className="text-xl font-black text-slate-800">3 Items</p>
-          </div>
-        </div>
+        {statsList.map((stat, index) => {
+          const IconComponent = stat.icon;
+          return (
+            <div key={index} className="bg-white p-4.5 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between h-[110px]">
+              <div className={`w-8 h-8 rounded-lg ${stat.bg} ${stat.text} flex items-center justify-center border ${stat.border}`}>
+                <IconComponent size={15} />
+              </div>
+              <div>
+                <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">{stat.label}</p>
+                <p className="text-xl font-black text-slate-800">{stat.value}</p>
+              </div>
+            </div>
+          );
+        })}
       </section>
 
       {/* ── Tabs & Configurations ── */}
@@ -191,24 +254,28 @@ export default function StudentProfile() {
             <User size={15} /> General Information
             {activeTab === "general" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#6C1D5F] rounded-full" />}
           </button>
-          <button
-            onClick={() => setActiveTab("academic")}
-            className={`py-5 px-4 font-bold text-[13px] transition-all flex items-center gap-2 cursor-pointer border-none outline-none relative bg-transparent ${
-              activeTab === "academic" ? "text-[#6C1D5F]" : "text-slate-400 hover:text-slate-650"
-            }`}
-          >
-            <GraduationCap size={15} /> Academic Record
-            {activeTab === "academic" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#6C1D5F] rounded-full" />}
-          </button>
-          <button
-            onClick={() => setActiveTab("learning")}
-            className={`py-5 px-4 font-bold text-[13px] transition-all flex items-center gap-2 cursor-pointer border-none outline-none relative bg-transparent ${
-              activeTab === "learning" ? "text-[#6C1D5F]" : "text-slate-400 hover:text-slate-650"
-            }`}
-          >
-            <BookOpen size={15} /> Learning Stats
-            {activeTab === "learning" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#6C1D5F] rounded-full" />}
-          </button>
+          {role === "student" && (
+            <>
+              <button
+                onClick={() => setActiveTab("academic")}
+                className={`py-5 px-4 font-bold text-[13px] transition-all flex items-center gap-2 cursor-pointer border-none outline-none relative bg-transparent ${
+                  activeTab === "academic" ? "text-[#6C1D5F]" : "text-slate-400 hover:text-slate-650"
+                }`}
+              >
+                <GraduationCap size={15} /> Academic Record
+                {activeTab === "academic" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#6C1D5F] rounded-full" />}
+              </button>
+              <button
+                onClick={() => setActiveTab("learning")}
+                className={`py-5 px-4 font-bold text-[13px] transition-all flex items-center gap-2 cursor-pointer border-none outline-none relative bg-transparent ${
+                  activeTab === "learning" ? "text-[#6C1D5F]" : "text-slate-400 hover:text-slate-650"
+                }`}
+              >
+                <BookOpen size={15} /> Learning Stats
+                {activeTab === "learning" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#6C1D5F] rounded-full" />}
+              </button>
+            </>
+          )}
           <button
             onClick={() => setActiveTab("account")}
             className={`py-5 px-4 font-bold text-[13px] transition-all flex items-center gap-2 cursor-pointer border-none outline-none relative bg-transparent ${
@@ -235,7 +302,7 @@ export default function StudentProfile() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11.5px] font-black uppercase text-slate-400 tracking-wider">Student ID</label>
+                  <label className="text-[11.5px] font-black uppercase text-slate-400 tracking-wider">{profile.idLabel}</label>
                   <input
                     type="text"
                     value={profile.id}
@@ -243,15 +310,17 @@ export default function StudentProfile() {
                     className="w-full bg-slate-100/70 border border-slate-200 text-slate-450 rounded-xl px-4 py-2.5 text-[13px] cursor-not-allowed outline-none"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11.5px] font-black uppercase text-slate-400 tracking-wider">Roll Number</label>
-                  <input
-                    type="text"
-                    value={profile.rollNumber}
-                    readOnly
-                    className="w-full bg-slate-100/70 border border-slate-200 text-slate-450 rounded-xl px-4 py-2.5 text-[13px] cursor-not-allowed outline-none"
-                  />
-                </div>
+                {role === "student" && (
+                  <div className="space-y-1.5">
+                    <label className="text-[11.5px] font-black uppercase text-slate-400 tracking-wider">Roll Number</label>
+                    <input
+                      type="text"
+                      value={profile.rollNumber}
+                      readOnly
+                      className="w-full bg-slate-100/70 border border-slate-200 text-slate-450 rounded-xl px-4 py-2.5 text-[13px] cursor-not-allowed outline-none"
+                    />
+                  </div>
+                )}
                 <div className="space-y-1.5">
                   <label className="text-[11.5px] font-black uppercase text-slate-400 tracking-wider">Email Address</label>
                   <input
@@ -310,7 +379,7 @@ export default function StudentProfile() {
             </div>
           )}
 
-          {activeTab === "academic" && (
+          {role === "student" && activeTab === "academic" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
               <div className="space-y-1.5">
                 <label className="text-[11.5px] font-black uppercase text-slate-455 tracking-wider">Program</label>
@@ -347,7 +416,7 @@ export default function StudentProfile() {
             </div>
           )}
 
-          {activeTab === "learning" && (
+          {role === "student" && activeTab === "learning" && (
             <div className="space-y-6 animate-fadeIn">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1.5">
@@ -468,4 +537,10 @@ export default function StudentProfile() {
       </section>
     </div>
   );
+
+  if (role === "admin" || role === "trainer") {
+    return <AppLayout>{profileContent}</AppLayout>;
+  }
+
+  return profileContent;
 }

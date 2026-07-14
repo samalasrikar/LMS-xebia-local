@@ -22,13 +22,7 @@ public class TrainerService {
 
     @PostConstruct
     public void seedTrainers() {
-        if (trainerRepository.count() == 0) {
-            trainerRepository.save(new Trainer("t1", "Sarah Jenkins", "sarah.j@xebia.com", "Principal Cloud Architect", "Cloud Solutions", 5, 142, 4.9, "Active", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150"));
-            trainerRepository.save(new Trainer("t2", "Arjun Mehta", "arjun.m@xebia.com", "Lead UI Developer", "Frontend", 4, 98, 4.8, "Active", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"));
-            trainerRepository.save(new Trainer("t3", "Maria Davis", "maria.d@xebia.com", "DevOps Engineer", "Infrastructure", 3, 110, 4.7, "Active", "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150"));
-            trainerRepository.save(new Trainer("t4", "John Smith", "john.s@xebia.com", "Agile Coach", "Leadership", 3, 62, 4.6, "Active", "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150"));
-            trainerRepository.save(new Trainer("t5", "David Wilson", "david.w@xebia.com", "Security Principal", "Cybersecurity", 2, 45, 4.5, "Inactive", "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150"));
-        }
+        // Seeding disabled to clean up dummy data
     }
 
     private org.springframework.data.jpa.domain.Specification<Trainer> getSpec(String query, String status) {

@@ -210,18 +210,10 @@ export default function StudentTopbar() {
           : "border-slate-200/80"
       }`}
     >
-      {/* ── Left: Breadcrumb + Title ──────────────────────────── */}
+      {/* ── Left: Title ──────────────────────────── */}
       <div className="flex flex-col min-w-0 shrink-0 mr-4">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-1 text-[11px] font-medium text-slate-400 leading-none">
-          <span>Student Portal</span>
-          <span className="text-slate-300">/</span>
-          <span className="text-[#6C1D5F] font-semibold truncate">
-            {meta.breadcrumb}
-          </span>
-        </div>
         {/* Title + description */}
-        <div className="flex items-baseline gap-2 mt-0.5">
+        <div className="flex items-baseline gap-2">
           <h1 className="text-[15px] font-bold text-slate-800 leading-tight truncate">
             {meta.title}
           </h1>

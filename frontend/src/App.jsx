@@ -127,9 +127,11 @@ function App() {
         <Route path="settings" element={<ManagerSettings />} />
         <Route path="batches" element={<BatchManagement />} />
         <Route path="approvals" element={<ApprovalCenter />} />
+        <Route path="profile" element={<StudentProfile />} />
       </Route>
 
       <Route path="/admin" element={<Dashboard />} />
+      <Route path="/admin/profile" element={<StudentProfile />} />
 
       {/* Stitch-integrated Admin pages */}
       <Route path="/seo" element={<SEOMeta />} />
@@ -168,6 +170,7 @@ function App() {
       <Route path="/trainer/batches" element={<BatchDashboard />} />
       <Route path="/trainer/batches/create" element={<CreateBatch />} />
       <Route path="/trainer/batches/edit/:id" element={<CreateBatch />} />
+      <Route path="/trainer/profile" element={<StudentProfile />} />
 
       {/* ── Student Portal (sidebar layout) ── */}
       <Route path="/student" element={<StudentLayout />}>

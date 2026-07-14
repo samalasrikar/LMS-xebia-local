@@ -1,5 +1,11 @@
-import { Bell, Search, HelpCircle } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Bell, Search, HelpCircle, User, LogOut, Settings } from "lucide-react";
+import { useLocation, Link } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from "@/shared/components/ui/dropdown-menu";
 import adminProfileIcon from "../../assets/admin_profile_icon.svg";
 
 const PATH_LABELS = {
@@ -44,16 +50,16 @@ function getBreadcrumb(pathname) {
 
 export default function Topbar() {
   const location = useLocation();
+  const isManager = location.pathname.startsWith("/manager");
+  const profileLink = isManager ? "/manager/profile" : "/admin/profile";
   const pageLabel = getBreadcrumb(location.pathname);
 
   return (
     <header className="sticky top-0 z-30 flex h-[52px] items-center justify-between border-b border-slate-200 bg-white px-8 flex-shrink-0">
 
-      {/* ── Left: Breadcrumb ─────────────────────── */}
-      <div className="flex items-center gap-1.5 text-[13px]">
-        <span className="text-slate-400 font-medium">Xebia LMS</span>
-        <span className="text-slate-300">/</span>
-        <span className="text-slate-900 font-semibold">{pageLabel}</span>
+      {/* ── Left: Header ─────────────────────── */}
+      <div className="flex items-center gap-1.5">
+        <span className="text-slate-900 font-bold text-[14px]">Xebia LMS</span>
       </div>
 
       {/* ── Right: Actions ───────────────────────── */}
@@ -83,12 +89,36 @@ export default function Topbar() {
           <HelpCircle size={14} />
         </button>
 
-        {/* Avatar */}
-        <img
-          src={adminProfileIcon}
-          alt="Admin"
-          className="w-[30px] h-[30px] rounded-full object-cover border-2 border-slate-200 ml-1 cursor-pointer"
-        />
+        {/* Avatar Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <img
+              src={adminProfileIcon}
+              alt="Profile"
+              className="w-[30px] h-[30px] rounded-full object-cover border-2 border-slate-200 ml-1 cursor-pointer outline-none"
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-white border border-slate-200 shadow-md rounded-lg p-1 min-w-[150px] z-50">
+            <DropdownMenuItem asChild className="focus:bg-[#6C1D5F]/5 focus:text-[#6C1D5F] rounded-lg cursor-pointer">
+              <Link to={profileLink} className="flex items-center gap-2.5 px-3 py-2 text-[12.5px] font-medium w-full text-slate-700">
+                <User size={14} />
+                My Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="focus:bg-[#6C1D5F]/5 focus:text-[#6C1D5F] rounded-lg cursor-pointer">
+              <Link to="/settings" className="flex items-center gap-2.5 px-3 py-2 text-[12.5px] font-medium w-full text-slate-700">
+                <Settings size={14} />
+                Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="focus:bg-rose-50 focus:text-rose-600 rounded-lg cursor-pointer">
+              <Link to="/login" className="flex items-center gap-2.5 px-3 py-2 text-[12.5px] font-medium w-full text-rose-600 hover:text-rose-650">
+                <LogOut size={14} />
+                Logout
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );

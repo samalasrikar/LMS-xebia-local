@@ -202,47 +202,6 @@ export default function StudentSidebar() {
           {BOTTOM_MENU.map(renderLink)}
         </div>
 
-        {/* Back switch options */}
-        <div className={`border-t border-slate-200/80 px-2 py-3 space-y-1.5 ${collapsed ? "flex flex-col items-center" : ""}`}>
-          {collapsed ? (
-            <>
-              <NavTooltip label="Back to Admin">
-                <button
-                  onClick={() => navigate("/admin")}
-                  className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-750 flex items-center justify-center transition-all cursor-pointer border-none outline-none"
-                >
-                  <ShieldAlert size={15} />
-                </button>
-              </NavTooltip>
-              <NavTooltip label="Back to Trainer">
-                <button
-                  onClick={() => navigate("/trainer")}
-                  className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-750 flex items-center justify-center transition-all cursor-pointer border-none outline-none"
-                >
-                  <ArrowLeft size={15} />
-                </button>
-              </NavTooltip>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => navigate("/admin")}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12px] font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all cursor-pointer border-none outline-none text-left"
-              >
-                <ShieldAlert size={14} className="shrink-0 text-slate-400" />
-                <span>Back to Admin</span>
-              </button>
-              <button
-                onClick={() => navigate("/trainer")}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12px] font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all cursor-pointer border-none outline-none text-left"
-              >
-                <ArrowLeft size={14} className="shrink-0 text-slate-400" />
-                <span>Back to Trainer</span>
-              </button>
-            </>
-          )}
-        </div>
-
         {/* Toggle button */}
         <div className={`border-t border-slate-200/80 py-2.5 ${collapsed ? "flex justify-center" : "px-2"}`}>
           <button

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, Link } from "react-router-dom";
 import {
   LayoutDashboard,
   BarChart3,
@@ -171,33 +171,22 @@ export default function ManagerSidebar() {
         )}
       </nav>
 
-      {/* ── Student Panel Switch ── */}
-      <div className="flex-shrink-0 border-t border-slate-200 p-3 bg-slate-50/50">
-        <NavLink
-          to="/student"
-          className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[#84117C] hover:bg-[#6c0f66] text-white text-[12px] font-semibold transition-all shadow-sm shadow-[#84117C]/15 hover:shadow-md cursor-pointer text-center w-full"
-        >
-          <GraduationCap size={13} className="shrink-0" />
-          <span>Student Panel</span>
-        </NavLink>
-      </div>
-
       {/* ── User Footer ──────────────────────────── */}
       <div className="flex-shrink-0 border-t border-slate-200 p-3">
-        <div className="flex items-center gap-2.5 cursor-pointer rounded-md p-1 hover:bg-slate-50 transition-colors">
+        <Link to="/manager/profile" className="flex items-center gap-2.5 cursor-pointer rounded-md p-1 hover:bg-slate-50 transition-colors text-slate-800 hover:text-slate-900 no-underline">
           <img
             src={adminProfileIcon}
             alt="Manager"
             className="w-[30px] h-[30px] rounded-full object-cover flex-shrink-0"
           />
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 text-left">
             <div className="text-[12px] font-bold text-slate-900 whitespace-nowrap overflow-hidden text-ellipsis">
               Manager
             </div>
             <div className="text-[10px] text-slate-400 font-medium">Manager Console</div>
           </div>
           <ChevronsUpDown size={13} className="text-slate-400 flex-shrink-0" />
-        </div>
+        </Link>
       </div>
     </aside>
   );

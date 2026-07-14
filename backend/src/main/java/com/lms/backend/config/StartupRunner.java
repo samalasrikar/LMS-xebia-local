@@ -38,20 +38,7 @@ public class StartupRunner implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        // Seed default student if empty
-        if (studentRepository.count() == 0) {
-            Student student = Student.builder()
-                .name("Alex")
-                .email("alex@xebia.com")
-                .avatar("https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150")
-                .department("Engineering")
-                .academicYear("2023-2024")
-                .gpa(3.8)
-                .studyStreak(14)
-                .build();
-            studentRepository.save(Objects.requireNonNull(student));
-            log.info("Default student seeded successfully: {}", student.getEmail());
-        }
+        // Default student seeding disabled to clean up dummy data
 
         try (Connection connection = dataSource.getConnection()) {
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, Link } from "react-router-dom";
 import {
   LayoutDashboard,
   BarChart3,
@@ -206,43 +206,22 @@ export default function Sidebar() {
         )}
       </nav>
 
-      {/* ── Student Panel Switch ── */}
-      <div className="flex-shrink-0 border-t border-slate-200 p-3 bg-slate-50/50 flex flex-col gap-1.5">
-        <NavLink
-          to="/trainer"
-          className="flex items-center justify-between px-3 py-2 rounded-xl text-[12px] font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all cursor-pointer border-none outline-none text-left"
-        >
-          <span className="flex items-center gap-2">
-            <BookOpen size={14} className="shrink-0 text-slate-400" />
-            <span>Trainer Workspace</span>
-          </span>
-          <ArrowRight size={12} className="opacity-40" />
-        </NavLink>
-        <NavLink
-          to="/student"
-          className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[#6C1D5F] hover:bg-[#521347] text-white text-[12px] font-semibold transition-all shadow-sm shadow-[#6C1D5F]/15 hover:shadow-md cursor-pointer text-center w-full"
-        >
-          <GraduationCap size={13} className="shrink-0" />
-          <span>Student Panel</span>
-        </NavLink>
-      </div>
-
       {/* ── User Footer ──────────────────────────── */}
       <div className="flex-shrink-0 border-t border-slate-200 p-3">
-        <div className="flex items-center gap-2.5 cursor-pointer rounded-md p-1 hover:bg-slate-50 transition-colors">
+        <Link to="/admin/profile" className="flex items-center gap-2.5 cursor-pointer rounded-md p-1 hover:bg-slate-50 transition-colors text-slate-800 hover:text-slate-900 no-underline">
           <img
             src={adminProfileIcon}
             alt="Admin"
             className="w-[30px] h-[30px] rounded-full object-cover flex-shrink-0"
           />
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 text-left">
             <div className="text-[12px] font-bold text-slate-900 whitespace-nowrap overflow-hidden text-ellipsis">
               Admin
             </div>
             <div className="text-[10px] text-slate-400 font-medium">Super Admin</div>
           </div>
           <ChevronsUpDown size={13} className="text-slate-400 flex-shrink-0" />
-        </div>
+        </Link>
       </div>
     </aside>
   );
