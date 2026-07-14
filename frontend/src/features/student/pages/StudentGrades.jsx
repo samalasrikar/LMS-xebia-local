@@ -39,8 +39,9 @@ const INITIAL_CERTIFICATES = [
 
 export default function StudentGrades() {
   const [activeTab, setActiveTab] = useState("grades"); // 'grades' or 'certificates'
-  const [grades, setGrades] = useState(INITIAL_GRADES);
-  const [certificates, setCertificates] = useState(INITIAL_CERTIFICATES);
+  const [grades, setGrades] = useState([]);
+  const [certificates, setCertificates] = useState([]);
+  const [stats, setStats] = useState({ completedCourses: 0, creditsEarned: 0, averagePercentage: 0.0, cgpa: 0.0, certificatesCount: 0 });
   const [loading, setLoading] = useState(false);
 
   // Search & Filter state
@@ -54,65 +55,66 @@ export default function StudentGrades() {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+
+  useEffect(() => {
+    studentService.getGradeStats({ studentId: "s4" }).then(res => {
+      if (res && res.data) {
+        setStats(res.data);
+      }
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     setLoading(true);
-    // Attempt real API call but fallback gracefully if backend does not serve student academic endpoints
-    Promise.all([
-      studentService.getGrades().catch(() => null),
-      studentService.getCertificates().catch(() => null),
-    ])
-      .then(([gradesRes, certsRes]) => {
-        if (gradesRes && Array.isArray(gradesRes)) {
-          setGrades(gradesRes);
+    if (activeTab === "grades") {
+      studentService.getGradesPaginated({
+        studentId: "s4",
+        semester: selectedSemester,
+        academicYear: selectedYear,
+        q: searchQuery,
+        page: currentPage - 1,
+        size: itemsPerPage,
+        sortBy: sortField,
+        sortDir: sortOrder
+      }).then(res => {
+        if (res && res.data) {
+          setGrades(res.data.content || []);
+          setTotalPages(res.data.totalPages || 1);
+          setTotalElements(res.data.totalElements || 0);
         }
-        if (certsRes && Array.isArray(certsRes)) {
-          setCertificates(certsRes);
+      }).catch(() => {})
+        .finally(() => setLoading(false));
+    } else {
+      studentService.getCertificatesPaginated({
+        studentId: "s4",
+        type: selectedCertType,
+        q: searchQuery,
+        page: currentPage - 1,
+        size: itemsPerPage,
+        sortBy: "title",
+        sortDir: "asc"
+      }).then(res => {
+        if (res && res.data) {
+          setCertificates(res.data.content || []);
+          setTotalPages(res.data.totalPages || 1);
+          setTotalElements(res.data.totalElements || 0);
         }
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, []);
+      }).catch(() => {})
+        .finally(() => setLoading(false));
+    }
+  }, [activeTab, searchQuery, selectedSemester, selectedYear, selectedCertType, sortField, sortOrder, currentPage]);
 
-  // Filtered Grades
-  const filteredGrades = grades
-    .filter((g) => {
-      const matchesSearch =
-        g.course.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        g.instructor.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesSemester = selectedSemester === "all" || g.semester === selectedSemester;
-      const matchesYear = selectedYear === "all" || g.academicYear === selectedYear;
-      return matchesSearch && matchesSemester && matchesYear;
-    })
-    .sort((a, b) => {
-      let valA = a[sortField];
-      let valB = b[sortField];
+  const currentGrades = grades;
+  const currentCerts = certificates;
 
-      if (typeof valA === "string") {
-        return sortOrder === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
-      }
-      return sortOrder === "asc" ? valA - valB : valB - valA;
-    });
-
-  // Filtered Certificates
-  const filteredCertificates = certificates.filter((c) => {
-    const matchesSearch =
-      c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.id.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = selectedCertType === "all" || c.type === selectedCertType;
-    return matchesSearch && matchesType;
-  });
-
-  // Pagination helper
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentGrades = filteredGrades.slice(indexOfFirstItem, indexOfLastItem);
-  const currentCerts = filteredCertificates.slice(indexOfFirstItem, indexOfLastItem);
-
-  const totalPagesGrades = Math.ceil(filteredGrades.length / itemsPerPage);
-  const totalPagesCerts = Math.ceil(filteredCertificates.length / itemsPerPage);
+  const totalPagesGrades = totalPages;
+  const totalPagesCerts = totalPages;
+  const indexOfFirstItem = (currentPage - 1) * itemsPerPage;
+  const indexOfLastItem = indexOfFirstItem + (activeTab === "grades" ? currentGrades.length : currentCerts.length);
+  const filteredGrades = { length: totalElements };
+  const filteredCertificates = { length: totalElements };
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -143,18 +145,18 @@ export default function StudentGrades() {
           </div>
           <div>
             <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">Current CGPA</p>
-            <p className="text-xl font-black text-slate-850">3.85 <span className="text-[10px] text-slate-400 font-medium">/ 4.0</span></p>
+            <p className="text-xl font-black text-slate-850">{stats.cgpa || "0.0"} <span className="text-[10px] text-slate-400 font-medium">/ 4.0</span></p>
           </div>
         </div>
 
         {/* Metric 2: Average Grade */}
         <div className="bg-white p-4.5 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between h-[110px]">
-          <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-650 flex items-center justify-center border border-teal-100">
+          <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-655 flex items-center justify-center border border-teal-100">
             <Percent size={15} />
           </div>
           <div>
             <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">Average Score</p>
-            <p className="text-xl font-black text-slate-855">91.0%</p>
+            <p className="text-xl font-black text-slate-855">{stats.averagePercentage || "0.0"}%</p>
           </div>
         </div>
 
@@ -165,7 +167,7 @@ export default function StudentGrades() {
           </div>
           <div>
             <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">Credits Earned</p>
-            <p className="text-xl font-black text-slate-850">25 <span className="text-[10px] text-slate-400 font-medium">CR</span></p>
+            <p className="text-xl font-black text-slate-850">{stats.creditsEarned} <span className="text-[10px] text-slate-400 font-medium">CR</span></p>
           </div>
         </div>
 
@@ -176,18 +178,18 @@ export default function StudentGrades() {
           </div>
           <div>
             <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">Completed</p>
-            <p className="text-xl font-black text-slate-850">6 Courses</p>
+            <p className="text-xl font-black text-slate-850">{stats.completedCourses} Courses</p>
           </div>
         </div>
 
         {/* Metric 5: Certificates Earned */}
         <div className="bg-white p-4.5 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between h-[110px] col-span-2 sm:col-span-1">
-          <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100">
+          <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-650 flex items-center justify-center border border-teal-100">
             <Award size={15} />
           </div>
           <div>
             <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">Certificates</p>
-            <p className="text-xl font-black text-slate-850">4 Earned</p>
+            <p className="text-xl font-black text-slate-850">{stats.certificatesCount} Earned</p>
           </div>
         </div>
       </section>

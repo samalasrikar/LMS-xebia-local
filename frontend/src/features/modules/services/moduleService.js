@@ -6,6 +6,11 @@ const moduleService = {
     return response.data.data;
   },
 
+  getModulesByCourseId: async (courseId, config) => {
+    const response = await api.get(`/modules?courseId=${courseId}`, config);
+    return response.data.data;
+  },
+
   createModule: async (moduleData, config) => {
     const response = await api.post("/modules", moduleData, config);
     return response.data.data;

@@ -19,6 +19,7 @@ export default function CurriculumRightPanel({
   openEditSubModuleDrawer,
   requestDelete,
   openAddModuleModal,
+  activeBlock,
 }) {
   return (
     <aside className="w-[264px] bg-white border-l border-slate-200 flex flex-col shrink-0">
@@ -145,89 +146,94 @@ export default function CurriculumRightPanel({
             </div>
           ) : (
             /* ── Block properties ── */
-            <div className="p-4 space-y-5">
-              {activeSubModule.content?.videoUrl ? (
-                <>
-                  <section className="space-y-3">
-                    <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Video Settings</h3>
-                    <div className="space-y-3">
-                      {[
-                        { label: "Autoplay", on: false },
-                        { label: "Allow seeking", on: true },
-                        { label: "Loop video", on: false },
-                      ].map(({ label, on }) => (
-                        <div key={label} className="flex items-center justify-between">
-                          <span className="text-[12px] font-semibold text-slate-700">{label}</span>
-                          <button className={`w-9 h-5 rounded-full relative transition-colors ${on ? "bg-[#6C1D5F]" : "bg-slate-200"}`}>
-                            <div className={`w-4 h-4 bg-white rounded-full absolute top-0.5 transition-transform shadow-sm ${on ? "right-0.5" : "left-0.5"}`} />
-                          </button>
+            (() => {
+              const displayBlock = activeBlock || activeSubModule.blocks?.[0] || activeSubModule.content;
+              return (
+                <div className="p-4 space-y-5">
+                  {displayBlock?.videoUrl ? (
+                    <>
+                      <section className="space-y-3">
+                        <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Video Settings</h3>
+                        <div className="space-y-3">
+                          {[
+                            { label: "Autoplay", on: false },
+                            { label: "Allow seeking", on: true },
+                            { label: "Loop video", on: false },
+                          ].map(({ label, on }) => (
+                            <div key={label} className="flex items-center justify-between">
+                              <span className="text-[12px] font-semibold text-slate-700">{label}</span>
+                              <button className={`w-9 h-5 rounded-full relative transition-colors ${on ? "bg-[#6C1D5F]" : "bg-slate-200"}`}>
+                                <div className={`w-4 h-4 bg-white rounded-full absolute top-0.5 transition-transform shadow-sm ${on ? "right-0.5" : "left-0.5"}`} />
+                              </button>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10.5px] font-semibold text-slate-500">Aspect Ratio</label>
-                      <div className="grid grid-cols-3 gap-1.5">
-                        {["16:9", "4:3", "1:1"].map((r, i) => (
-                          <button
-                            key={r}
-                            className={`py-1.5 border text-[11px] font-bold rounded-lg transition-colors ${
-                              i === 0
-                                ? "border-[#6C1D5F] bg-[#6C1D5F]/5 text-[#6C1D5F]"
-                                : "border-slate-200 text-slate-500 hover:bg-slate-50"
-                            }`}
-                          >
-                            {r}
-                          </button>
+                        <div className="space-y-1.5">
+                          <label className="text-[10.5px] font-semibold text-slate-500">Aspect Ratio</label>
+                          <div className="grid grid-cols-3 gap-1.5">
+                            {["16:9", "4:3", "1:1"].map((r, i) => (
+                              <button
+                                key={r}
+                                className={`py-1.5 border text-[11px] font-bold rounded-lg transition-colors ${
+                                  i === 0
+                                    ? "border-[#6C1D5F] bg-[#6C1D5F]/5 text-[#6C1D5F]"
+                                    : "border-slate-200 text-slate-500 hover:bg-slate-50"
+                                }`}
+                              >
+                                {r}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </section>
+                      <Separator className="bg-slate-100" />
+                    </>
+                  ) : displayBlock?.pdfUrl ? (
+                    <section className="space-y-3">
+                      <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">PDF Settings</h3>
+                      <div className="space-y-3">
+                        {[
+                          { label: "Allow download", on: true },
+                          { label: "Show annotations", on: false },
+                        ].map(({ label, on }) => (
+                          <div key={label} className="flex items-center justify-between">
+                            <span className="text-[12px] font-semibold text-slate-700">{label}</span>
+                            <button className={`w-9 h-5 rounded-full relative transition-colors ${on ? "bg-[#6C1D5F]" : "bg-slate-200"}`}>
+                              <div className={`w-4 h-4 bg-white rounded-full absolute top-0.5 transition-transform shadow-sm ${on ? "right-0.5" : "left-0.5"}`} />
+                            </button>
+                          </div>
                         ))}
                       </div>
+                    </section>
+                  ) : (
+                    <div className="py-8 text-center text-slate-400">
+                      <HelpCircle size={24} className="mx-auto mb-2 text-slate-300" />
+                      <p className="text-[12px] font-medium">No block selected</p>
+                      <p className="text-[11px] text-slate-300 mt-1">Click a block in the editor to see its settings.</p>
                     </div>
-                  </section>
-                  <Separator className="bg-slate-100" />
-                </>
-              ) : activeSubModule.content?.pdfUrl ? (
-                <section className="space-y-3">
-                  <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">PDF Settings</h3>
-                  <div className="space-y-3">
-                    {[
-                      { label: "Allow download", on: true },
-                      { label: "Show annotations", on: false },
-                    ].map(({ label, on }) => (
-                      <div key={label} className="flex items-center justify-between">
-                        <span className="text-[12px] font-semibold text-slate-700">{label}</span>
-                        <button className={`w-9 h-5 rounded-full relative transition-colors ${on ? "bg-[#6C1D5F]" : "bg-slate-200"}`}>
-                          <div className={`w-4 h-4 bg-white rounded-full absolute top-0.5 transition-transform shadow-sm ${on ? "right-0.5" : "left-0.5"}`} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ) : (
-                <div className="py-8 text-center text-slate-400">
-                  <HelpCircle size={24} className="mx-auto mb-2 text-slate-300" />
-                  <p className="text-[12px] font-medium">No block selected</p>
-                  <p className="text-[11px] text-slate-300 mt-1">Click a block in the editor to see its settings.</p>
-                </div>
-              )}
+                  )}
 
-              {/* Metadata (always shown in block tab) */}
-              {activeSubModule.content && (
-                <section className="space-y-2">
-                  <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Block Metadata</h3>
-                  <div className="flex justify-between text-[11px]">
-                    <span className="text-slate-400">Type</span>
-                    <span className="text-slate-700 font-semibold capitalize">{getContentLabel(activeSubModule)}</span>
-                  </div>
-                  <div className="flex justify-between text-[11px]">
-                    <span className="text-slate-400">Last modified</span>
-                    <span className="text-slate-700 font-semibold">Just now</span>
-                  </div>
-                  <div className="flex justify-between text-[11px]">
-                    <span className="text-slate-400">Version</span>
-                    <span className="text-slate-700 font-semibold">v1.0</span>
-                  </div>
-                </section>
-              )}
-            </div>
+                  {/* Metadata (always shown in block tab) */}
+                  {displayBlock && (
+                    <section className="space-y-2">
+                      <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Block Metadata</h3>
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-slate-400">Type</span>
+                        <span className="text-slate-700 font-semibold capitalize">{getContentLabel(displayBlock)}</span>
+                      </div>
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-slate-400">Last modified</span>
+                        <span className="text-slate-700 font-semibold">Just now</span>
+                      </div>
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-slate-400">Version</span>
+                        <span className="text-slate-700 font-semibold">v1.0</span>
+                      </div>
+                    </section>
+                  )}
+                </div>
+              );
+            })()
           )
         ) : (
           <div className="p-6 text-center text-slate-400 pt-12">

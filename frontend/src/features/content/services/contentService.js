@@ -6,6 +6,11 @@ const contentService = {
     return response.data.data;
   },
 
+  getContentsBySubModuleId: async (subModuleId, config) => {
+    const response = await api.get(`/contents?subModuleId=${subModuleId}`, config);
+    return response.data.data;
+  },
+
   createContent: async (contentData, config) => {
     const response = await api.post("/contents", contentData, config);
     return response.data.data;

@@ -12,6 +12,11 @@ const assignmentService = {
     return response.data.data;
   },
 
+  getBatchesPaginated: async (params, config) => {
+    const response = await api.get("/batches", { ...config, params });
+    return response.data;
+  },
+
   createBatch: async (batchData, config) => {
     const response = await api.post("/batches", batchData, config);
     return response.data.data;
@@ -79,6 +84,11 @@ const assignmentService = {
     return response.data.data;
   },
 
+  getStudentsPaginated: async (params, config) => {
+    const response = await api.get("/students", { ...config, params });
+    return response.data;
+  },
+
   createStudent: async (studentData, config) => {
     const response = await api.post("/students", studentData, config);
     return response.data.data;
@@ -92,6 +102,16 @@ const assignmentService = {
   getGradebookStats: async (config) => {
     const response = await api.get("/submissions/stats", config);
     return response.data.data;
+  },
+
+  getStudentsStats: async (config) => {
+    const response = await api.get("/students/stats", config);
+    return response.data;
+  },
+
+  getBatchesStats: async (config) => {
+    const response = await api.get("/batches/stats", config);
+    return response.data;
   }
 };
 

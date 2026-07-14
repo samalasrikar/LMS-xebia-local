@@ -1,27 +1,64 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShieldCheck, FileCheck, X, Search, Filter, Download, User, Info, ArrowUpRight, Check, AlertTriangle, Clock, Paperclip, ChevronRight } from "lucide-react";
+import api from "@/shared/services/api";
 
 export default function ApprovalCenter() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRequest, setSelectedRequest] = useState(null); // request details for drawer
 
-  const [requests, setRequests] = useState([
-    { id: 1, type: "Certification Claim", name: "Arjun Mehta", course: "Cloud Architect Certification", date: "Oct 24, 2026", cost: "$299.00 USD", priority: "High", status: "Pending", provider: "Amazon Web Services", justification: "Required for the upcoming Modernization Project. This certification will allow the team to self-manage architectural reviews without external consulting." },
-    { id: 2, type: "Course Enrollment", name: "Priya Sharma", course: "Full-Stack Web Bootcamp", date: "Oct 23, 2026", cost: "Free", priority: "Medium", status: "Approved", provider: "Internal Academy", justification: "Gaining Javascript proficiency to support front-end tasks on project SAMAS." },
-    { id: 3, type: "Course Enrollment", name: "Rohan Gupta", course: "AWS Cloud Practitioner", date: "Oct 24, 2026", cost: "Free", priority: "Low", status: "Pending", provider: "Internal Academy", justification: "Expanding base knowledge in cloud services as part of yearly professional goals." },
-    { id: 4, type: "Certification Claim", name: "Neha Patil", course: "Certified Scrum Master", date: "Oct 22, 2026", cost: "$450.00 USD", priority: "Medium", status: "Rejected", provider: "Scrum Alliance", justification: "L&D allocation limit exceeded for the current quarter." }
-  ]);
+  const [requests, setRequests] = useState([]);
+  const [stats, setStats] = useState({ pendingRequests: 0, approvedCount: 0, rejectedCount: 0, escalatedCount: 0 });
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const itemsPerPage = 5;
 
-  const handleAction = (id, action) => {
-    setRequests(requests.map(r => r.id === id ? { ...r, status: action } : r));
-    setSelectedRequest(null);
+  const fetchStats = () => {
+    api.get("/approval-requests/stats").then(res => {
+      if (res.data && res.data.data) {
+        setStats(res.data.data);
+      }
+    }).catch(() => {});
   };
 
-  const filteredRequests = requests.filter((r) =>
-    r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.course.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.type.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const fetchRequests = () => {
+    api.get("/approval-requests", {
+      params: {
+        q: searchQuery,
+        page: currentPage,
+        size: itemsPerPage
+      }
+    }).then(res => {
+      if (res.data && res.data.data) {
+        setRequests(res.data.data.content || []);
+        setTotalPages(res.data.data.totalPages || 1);
+        setTotalElements(res.data.data.totalElements || 0);
+      }
+    }).catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  useEffect(() => {
+    fetchRequests();
+    setCurrentPage(0);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    fetchRequests();
+  }, [currentPage]);
+
+  const handleAction = (id, action) => {
+    api.put(`/approval-requests/${id}/status?status=${action}`).then(() => {
+      fetchStats();
+      fetchRequests();
+      setSelectedRequest(null);
+    }).catch(() => {});
+  };
+
+  const filteredRequests = requests;
 
   return (
     <div className="space-y-6">
@@ -47,7 +84,7 @@ export default function ApprovalCenter() {
           <div>
             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Pending Requests</span>
             <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">
-              {requests.filter(r => r.status === "Pending").length}
+              {stats.pendingRequests}
             </h3>
           </div>
           <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -57,9 +94,9 @@ export default function ApprovalCenter() {
 
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Approved Today</span>
+            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Approved</span>
             <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">
-              {requests.filter(r => r.status === "Approved").length}
+              {stats.approvedCount}
             </h3>
           </div>
           <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -71,7 +108,7 @@ export default function ApprovalCenter() {
           <div>
             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Rejected</span>
             <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">
-              {requests.filter(r => r.status === "Rejected").length}
+              {stats.rejectedCount}
             </h3>
           </div>
           <div className="w-10 h-10 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center">
@@ -82,7 +119,9 @@ export default function ApprovalCenter() {
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Escalated</span>
-            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">03</h3>
+            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">
+              {stats.escalatedCount}
+            </h3>
           </div>
           <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
             <AlertTriangle size={18} />
@@ -170,6 +209,27 @@ export default function ApprovalCenter() {
             </tbody>
           </table>
         </div>
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center text-[12.5px] text-slate-450 font-bold px-2 pt-4 border-t border-slate-100 mt-2">
+            <span>Showing {currentPage * itemsPerPage + 1}-{Math.min((currentPage + 1) * itemsPerPage, totalElements)} of {totalElements} requests</span>
+            <div className="flex gap-2">
+              <button
+                disabled={currentPage === 0}
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 0))}
+                className="px-3 py-1 rounded border border-slate-200 hover:border-slate-350 disabled:opacity-40 disabled:cursor-not-allowed bg-white cursor-pointer"
+              >
+                Prev
+              </button>
+              <button
+                disabled={currentPage === totalPages - 1}
+                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages - 1))}
+                className="px-3 py-1 rounded border border-slate-200 hover:border-slate-350 disabled:opacity-40 disabled:cursor-not-allowed bg-white cursor-pointer"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Side Drawer: Approval Details */}

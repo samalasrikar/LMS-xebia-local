@@ -6,12 +6,31 @@ export default function BatchManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [batches, setBatches] = useState([]);
+  const [stats, setStats] = useState({ totalBatches: 0, activeBatches: 0, upcomingBatches: 0, completedBatches: 0 });
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const itemsPerPage = 5;
 
   useEffect(() => {
-    assignmentService.getBatches().then(data => {
-      if (data) {
-        // Map the backend fields to what the frontend expects
-        const mapped = data.map(b => ({
+    assignmentService.getBatchesStats().then(res => {
+      if (res && res.data) {
+        setStats(res.data);
+      }
+    }).catch(() => {});
+  }, [showCreateModal]);
+
+  useEffect(() => {
+    assignmentService.getBatchesPaginated({
+      q: searchQuery,
+      page: currentPage,
+      size: itemsPerPage
+    }).then(res => {
+      if (res && res.data) {
+        const pageData = res.data;
+        setTotalPages(pageData.totalPages || 1);
+        setTotalElements(pageData.totalElements || 0);
+        const mapped = (pageData.content || []).map(b => ({
           id: b.id,
           name: b.name || b.title,
           course: b.course,
@@ -23,9 +42,14 @@ export default function BatchManagement() {
         setBatches(mapped);
       }
     });
-  }, [showCreateModal]);
+  }, [searchQuery, currentPage, showCreateModal]);
 
   const [newBatch, setNewBatch] = useState({ name: "", course: "", trainer: "", learners: 0, timeline: "", status: "Active" });
+
+  const handleSearchChange = (val) => {
+    setSearchQuery(val);
+    setCurrentPage(0);
+  };
 
   const handleCreateBatch = (e) => {
     e.preventDefault();
@@ -55,11 +79,7 @@ export default function BatchManagement() {
     });
   };
 
-  const filteredBatches = batches.filter((b) =>
-    (b.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (b.course || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (b.trainer || "").toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredBatches = batches;
 
   return (
     <div className="space-y-6">
@@ -88,7 +108,7 @@ export default function BatchManagement() {
           </div>
           <div>
             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Active Batches</span>
-            <h3 className="text-[20px] font-extrabold text-slate-800 mt-0.5">24</h3>
+            <h3 className="text-[20px] font-extrabold text-slate-800 mt-0.5">{stats.activeBatches}</h3>
           </div>
         </div>
 
@@ -98,7 +118,7 @@ export default function BatchManagement() {
           </div>
           <div>
             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Upcoming Batches</span>
-            <h3 className="text-[20px] font-extrabold text-slate-800 mt-0.5">12</h3>
+            <h3 className="text-[20px] font-extrabold text-slate-800 mt-0.5">{stats.upcomingBatches}</h3>
           </div>
         </div>
 
@@ -108,7 +128,7 @@ export default function BatchManagement() {
           </div>
           <div>
             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Completed</span>
-            <h3 className="text-[20px] font-extrabold text-slate-800 mt-0.5">158</h3>
+            <h3 className="text-[20px] font-extrabold text-slate-800 mt-0.5">{stats.completedBatches}</h3>
           </div>
         </div>
 
@@ -117,8 +137,8 @@ export default function BatchManagement() {
             <AlertCircle size={18} />
           </div>
           <div>
-            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Pending Approvals</span>
-            <h3 className="text-[20px] font-extrabold text-slate-800 mt-0.5">08</h3>
+            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Total Batches</span>
+            <h3 className="text-[20px] font-extrabold text-slate-800 mt-0.5">{stats.totalBatches}</h3>
           </div>
         </div>
       </div>
@@ -130,7 +150,7 @@ export default function BatchManagement() {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search batches, courses, or trainers..."
             className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-4 py-1.5 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
           />
@@ -176,6 +196,28 @@ export default function BatchManagement() {
             </tbody>
           </table>
         </div>
+        {/* Pagination controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center text-[12.5px] text-slate-450 font-bold px-4 py-3 border-t border-slate-200 bg-slate-50/50">
+            <span>Showing {currentPage * itemsPerPage + 1}-{Math.min((currentPage + 1) * itemsPerPage, totalElements)} of {totalElements} entries</span>
+            <div className="flex gap-2">
+              <button
+                disabled={currentPage === 0}
+                onClick={() => setCurrentPage(p => Math.max(p - 1, 0))}
+                className="px-3 py-1 rounded-lg border border-slate-200 hover:border-slate-350 disabled:opacity-40 disabled:cursor-not-allowed bg-white cursor-pointer text-[12px] font-semibold transition-all"
+              >
+                Prev
+              </button>
+              <button
+                disabled={currentPage >= totalPages - 1}
+                onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages - 1))}
+                className="px-3 py-1 rounded-lg border border-slate-200 hover:border-slate-350 disabled:opacity-40 disabled:cursor-not-allowed bg-white cursor-pointer text-[12px] font-semibold transition-all"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Create Batch Modal */}

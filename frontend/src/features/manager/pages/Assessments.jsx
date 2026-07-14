@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Award, FileText, CheckCircle2, TrendingUp, Search, Plus, Download, X, Calendar, BookOpen, Clock, BarChart } from "lucide-react";
+import api from "@/shared/services/api";
 
 export default function Assessments() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -11,25 +12,63 @@ export default function Assessments() {
     { id: 3, name: "Leadership Case Analysis", course: "Leadership & Empathy", due: "Nov 02, 2026", comp: 0, total: 35, type: "Case Study" }
   ]);
 
-  const [allAssessments, setAllAssessments] = useState([
-    { id: 1, name: "React State Management Quiz", course: "Full-Stack Web Architecture", questions: 25, duration: "45 mins", passScore: "75%", status: "Active" },
-    { id: 2, name: "Docker & Kubernetes Basics", course: "AWS Cloud Deployments", questions: 30, duration: "60 mins", passScore: "80%", status: "Active" },
-    { id: 3, name: "Conflict Resolution Assessment", course: "Leadership & Empathy", questions: 15, duration: "30 mins", passScore: "70%", status: "Draft" },
-    { id: 4, name: "SQL & Database Schema Design", course: "Database Administration", questions: 20, duration: "40 mins", passScore: "75%", status: "Active" }
-  ]);
+  const [allAssessments, setAllAssessments] = useState([]);
+  const [stats, setStats] = useState({ totalAssessments: 0, activeCount: 0, draftCount: 0, avgPassScore: 75.0 });
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const itemsPerPage = 5;
+
+  const fetchStats = () => {
+    api.get("/assessments/stats").then(res => {
+      if (res.data && res.data.data) {
+        setStats(res.data.data);
+      }
+    }).catch(() => {});
+  };
+
+  const fetchAssessments = () => {
+    api.get("/assessments", {
+      params: {
+        q: searchQuery,
+        page: currentPage,
+        size: itemsPerPage
+      }
+    }).then(res => {
+      if (res.data && res.data.data) {
+        setAllAssessments(res.data.data.content || []);
+        setTotalPages(res.data.data.totalPages || 1);
+        setTotalElements(res.data.data.totalElements || 0);
+      }
+    }).catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  useEffect(() => {
+    fetchAssessments();
+    setCurrentPage(0);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    fetchAssessments();
+  }, [currentPage]);
 
   const [newAssessment, setNewAssessment] = useState({ name: "", course: "", questions: 20, duration: "45 mins", passScore: "75%", status: "Active" });
 
   const handleCreateAssessment = (e) => {
     e.preventDefault();
-    setAllAssessments([...allAssessments, { ...newAssessment, id: Date.now() }]);
-    setShowCreateModal(false);
-    setNewAssessment({ name: "", course: "", questions: 20, duration: "45 mins", passScore: "75%", status: "Active" });
+    api.post("/assessments", newAssessment).then(() => {
+      fetchStats();
+      fetchAssessments();
+      setShowCreateModal(false);
+      setNewAssessment({ name: "", course: "", questions: 20, duration: "45 mins", passScore: "75%", status: "Active" });
+    }).catch(() => {});
   };
 
-  const filteredAssessments = allAssessments.filter((a) =>
-    a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.course.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAssessments = allAssessments;
 
   return (
     <div className="space-y-6">
@@ -61,7 +100,7 @@ export default function Assessments() {
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Total Assessments</span>
-            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">158</h3>
+            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">{stats.totalAssessments}</h3>
           </div>
           <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
             <FileText size={18} />
@@ -70,8 +109,8 @@ export default function Assessments() {
 
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Upcoming</span>
-            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">24</h3>
+            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Active</span>
+            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">{stats.activeCount}</h3>
           </div>
           <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
             <Calendar size={18} />
@@ -80,8 +119,8 @@ export default function Assessments() {
 
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Completed Tests</span>
-            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">1,240</h3>
+            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Draft Templates</span>
+            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">{stats.draftCount}</h3>
           </div>
           <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
             <CheckCircle2 size={18} />
@@ -91,7 +130,7 @@ export default function Assessments() {
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Avg. Passing Score</span>
-            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">82.4%</h3>
+            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">{stats.avgPassScore}%</h3>
           </div>
           <div className="w-10 h-10 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center">
             <TrendingUp size={18} />
@@ -178,6 +217,27 @@ export default function Assessments() {
             </tbody>
           </table>
         </div>
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center text-[12.5px] text-slate-450 font-bold px-2 pt-4 border-t border-slate-100 mt-2">
+            <span>Showing {currentPage * itemsPerPage + 1}-{Math.min((currentPage + 1) * itemsPerPage, totalElements)} of {totalElements} assessments</span>
+            <div className="flex gap-2">
+              <button
+                disabled={currentPage === 0}
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 0))}
+                className="px-3 py-1 rounded border border-slate-200 hover:border-slate-350 disabled:opacity-40 disabled:cursor-not-allowed bg-white cursor-pointer"
+              >
+                Prev
+              </button>
+              <button
+                disabled={currentPage === totalPages - 1}
+                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages - 1))}
+                className="px-3 py-1 rounded border border-slate-200 hover:border-slate-350 disabled:opacity-40 disabled:cursor-not-allowed bg-white cursor-pointer"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Create Assessment Modal */}

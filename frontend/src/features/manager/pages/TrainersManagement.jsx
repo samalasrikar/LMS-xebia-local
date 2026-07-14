@@ -8,22 +8,51 @@ export default function TrainersManagement() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [statusFilter, setStatusFilter] = useState("All");
   const [trainers, setTrainers] = useState([]);
+  const [stats, setStats] = useState({ totalTrainers: 0, activeTrainers: 0, totalCoursesAssigned: 0, averageRating: 0.0 });
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const itemsPerPage = 6;
 
   useEffect(() => {
-    api.get("/trainers").then(response => {
+    api.get("/trainers/stats").then(response => {
       if (response.data && response.data.data) {
-        setTrainers(response.data.data);
+        setStats(response.data.data);
       }
     }).catch(() => {});
   }, [showAddModal]);
 
+  useEffect(() => {
+    api.get("/trainers", {
+      params: {
+        q: searchQuery,
+        status: statusFilter,
+        page: currentPage,
+        size: itemsPerPage
+      }
+    }).then(response => {
+      if (response.data && response.data.data) {
+        const pageData = response.data.data;
+        setTotalPages(pageData.totalPages || 1);
+        setTotalElements(pageData.totalElements || 0);
+        setTrainers(pageData.content || []);
+      }
+    }).catch(() => {});
+  }, [searchQuery, statusFilter, currentPage, showAddModal]);
+
   const [newTrainer, setNewTrainer] = useState({ name: "", email: "", role: "", dept: "", courses: 1, learners: 0, rating: 5.0, status: "Active" });
 
-  const filteredTrainers = trainers.filter((t) => {
-    const matchesSearch = (t.name || "").toLowerCase().includes(searchQuery.toLowerCase()) || (t.dept || "").toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "All" || t.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const handleSearchChange = (val) => {
+    setSearchQuery(val);
+    setCurrentPage(0);
+  };
+
+  const handleStatusFilterChange = (val) => {
+    setStatusFilter(val);
+    setCurrentPage(0);
+  };
+
+  const filteredTrainers = trainers;
 
   const handleAddTrainer = (e) => {
     e.preventDefault();
@@ -64,7 +93,7 @@ export default function TrainersManagement() {
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Total Trainers</span>
-            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">{trainers.length}</h3>
+            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">{stats.totalTrainers}</h3>
           </div>
           <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
             <Users size={18} />
@@ -76,7 +105,7 @@ export default function TrainersManagement() {
           <div>
             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Active Trainers</span>
             <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">
-              {trainers.filter(t => t.status === "Active").length}
+              {stats.activeTrainers}
             </h3>
           </div>
           <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -89,7 +118,7 @@ export default function TrainersManagement() {
           <div>
             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Courses Assigned</span>
             <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">
-              {trainers.reduce((acc, curr) => acc + curr.courses, 0)}
+              {stats.totalCoursesAssigned}
             </h3>
           </div>
           <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -101,7 +130,7 @@ export default function TrainersManagement() {
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Average Rating</span>
-            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">4.8</h3>
+            <h3 className="text-[24px] font-extrabold text-slate-800 mt-1">{stats.averageRating}</h3>
           </div>
           <div className="w-10 h-10 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center">
             <Star size={18} />
@@ -118,7 +147,7 @@ export default function TrainersManagement() {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               placeholder="Search trainers..."
               className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-4 py-1.5 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
             />
@@ -128,7 +157,7 @@ export default function TrainersManagement() {
             <Filter size={11} className="text-slate-400" />
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => handleStatusFilterChange(e.target.value)}
               className="bg-transparent border-none outline-none pr-3 py-0.5 cursor-pointer text-[12px] font-medium"
             >
               <option value="All">All Statuses</option>
@@ -243,6 +272,29 @@ export default function TrainersManagement() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center text-[12.5px] text-slate-450 font-bold px-4 py-3 border border-slate-200 rounded-xl bg-slate-50/50">
+          <span>Showing {currentPage * itemsPerPage + 1}-{Math.min((currentPage + 1) * itemsPerPage, totalElements)} of {totalElements} entries</span>
+          <div className="flex gap-2">
+            <button
+              disabled={currentPage === 0}
+              onClick={() => setCurrentPage(p => Math.max(p - 1, 0))}
+              className="px-3 py-1 rounded-lg border border-slate-200 hover:border-slate-350 disabled:opacity-40 disabled:cursor-not-allowed bg-white cursor-pointer text-[12px] font-semibold transition-all"
+            >
+              Prev
+            </button>
+            <button
+              disabled={currentPage >= totalPages - 1}
+              onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages - 1))}
+              className="px-3 py-1 rounded-lg border border-slate-200 hover:border-slate-350 disabled:opacity-40 disabled:cursor-not-allowed bg-white cursor-pointer text-[12px] font-semibold transition-all"
+            >
+              Next
+            </button>
           </div>
         </div>
       )}

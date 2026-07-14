@@ -39,11 +39,15 @@ public class ModuleController {
 
     @Operation(summary = "Get all modules")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ModuleResponse>>> getAllModules() {
+    public ResponseEntity<ApiResponse<List<ModuleResponse>>> getAllModules(
+            @org.springframework.web.bind.annotation.RequestParam(required = false) Long courseId) {
+        List<ModuleResponse> data = (courseId != null) 
+                ? service.getModulesByCourseId(courseId) 
+                : service.getAllModules();
         return ResponseEntity.ok(
                 ResponseBuilder.success(
                         "Modules fetched successfully",
-                        service.getAllModules(),
+                        data,
                         HttpStatus.OK.value()));
     }
 

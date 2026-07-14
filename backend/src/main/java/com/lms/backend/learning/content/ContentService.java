@@ -37,8 +37,16 @@ public class ContentService {
         this.mapper = mapper;
     }
 
+    // TODO: Add role-based visibility filtering once Spring Security auth is implemented.
     public List<ContentResponse> getAllContents() {
         return repository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<ContentResponse> getContentsBySubModuleId(Long subModuleId) {
+        return repository.findBySubModule_IdOrderByIdAsc(subModuleId)
                 .stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
