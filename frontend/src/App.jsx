@@ -6,7 +6,7 @@ import Login from "@/features/auth/pages/Login";
 import ManagerLayout from "@/app/layouts/ManagerLayout";
 import ManagerDashboard from "@/features/manager/pages/ManagerDashboard";
 import LearningDashboard from "@/features/manager/pages/LearningDashboard";
-import AdminDashboard from "@/features/manager/pages/AdminDashboard";
+
 import CoursesManagement from "@/features/manager/pages/CoursesManagement";
 import ReportsAnalytics from "@/features/manager/pages/ReportsAnalytics";
 import CategoriesManagement from "@/features/manager/pages/CategoriesManagement";
@@ -126,7 +126,7 @@ function App() {
       <Route path="/manager" element={<ManagerLayout />}>
         <Route index element={<ManagerDashboard />} />
         <Route path="learning" element={<LearningDashboard />} />
-        <Route path="admin-dashboard" element={<AdminDashboard />} />
+
         <Route path="courses" element={<CoursesManagement />} />
         <Route path="analytics" element={<ReportsAnalytics />} />
         <Route path="categories" element={<CategoriesManagement />} />

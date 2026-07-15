@@ -92,7 +92,6 @@ const PATH_LABELS = {
   "/settings": "Settings",
   "/manager": "Dashboard",
   "/manager/learning": "Learning Dashboard",
-  "/manager/admin-dashboard": "Admin Dashboard",
   "/manager/categories": "Categories",
   "/manager/courses": "Courses",
   "/manager/assessments": "Assessments",

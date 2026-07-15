@@ -5,7 +5,6 @@ import {
   BarChart3,
   FolderOpen,
   BookOpen,
-  Layers,
   FileText,
   Users,
   UserCheck,
@@ -61,7 +60,6 @@ const NAV_GROUPS = [
     items: [
       { title: "Manager Dashboard", path: "/manager", icon: LayoutDashboard },
       { title: "Learning Dashboard", path: "/manager/learning", icon: BookOpen },
-      { title: "Admin Dashboard", path: "/manager/admin-dashboard", icon: Layers },
     ],
   },
   {
