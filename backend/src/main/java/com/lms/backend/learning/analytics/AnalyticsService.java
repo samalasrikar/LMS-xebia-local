@@ -7,9 +7,6 @@ import com.lms.backend.learning.analytics.dto.DashboardResponse;
 import lombok.RequiredArgsConstructor;
 import com.lms.backend.learning.category.CategoryRepository;
 import com.lms.backend.learning.course.CourseRepository;
-import com.lms.backend.learning.module.ModuleRepository;
-import com.lms.backend.learning.submodule.SubModuleRepository;
-import com.lms.backend.learning.content.ContentRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -17,9 +14,6 @@ public class AnalyticsService {
 
     private final CategoryRepository categoryRepository;
     private final CourseRepository courseRepository;
-    private final ModuleRepository moduleRepository;
-    private final SubModuleRepository submoduleRepository;
-    private final ContentRepository contentRepository;
 
     // --- BASE DATA STRUCTURES ---
     public record EmployeeRecord(
@@ -578,8 +572,6 @@ public class AnalyticsService {
     }
 
     public DashboardResponse getSkillGapDashboard(Map<String, String> filters) {
-        long courseCount = courseRepository.count();
-
         Map<String, Object> kpis = Map.of(
             "requiredScore", 85.0,
             "currentIndex", 81.2,

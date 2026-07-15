@@ -1,6 +1,7 @@
 package com.lms.backend.learning.submodule;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -38,8 +39,16 @@ public class SubModuleService {
         this.mapper = mapper;
     }
 
+    // TODO: Add role-based visibility filtering once Spring Security auth is implemented.
     public List<SubModuleResponse> getAllSubModules() {
         return repository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<SubModuleResponse> getSubModulesByModuleId(Long moduleId) {
+        return repository.findByModule_IdOrderBySortOrderAsc(moduleId)
                 .stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
@@ -86,5 +95,20 @@ public class SubModuleService {
     @Transactional
     public void deleteSubModule(@NonNull Long id) {
         repository.deleteById(id);
+    }
+
+    @Transactional
+    public void reorderSubModules(List<Map<String, Long>> reorderList) {
+        for (Map<String, Long> item : reorderList) {
+            Long subModuleId = item.get("id");
+            Long sortOrderLong = item.get("sortOrder");
+            if (subModuleId == null || sortOrderLong == null) continue;
+
+            SubModule subModule = repository.findById(subModuleId).orElse(null);
+            if (subModule != null) {
+                subModule.setSortOrder(sortOrderLong.intValue());
+                repository.save(subModule);
+            }
+        }
     }
 }

@@ -163,6 +163,28 @@ export default function CurriculumBuilder() {
     setBlockConfigOpen,
     blockConfigType,
     setBlockConfigType,
+    headingText,
+    setHeadingText,
+    quoteText,
+    setQuoteText,
+    dividerStyle,
+    setDividerStyle,
+    imageAlt,
+    setImageAlt,
+    imageCaption,
+    setImageCaption,
+    codeContent,
+    setCodeContent,
+    codeLanguage,
+    setCodeLanguage,
+    downloadUrl,
+    setDownloadUrl,
+    downloadDisplayName,
+    setDownloadDisplayName,
+    linkUrl,
+    setLinkUrl,
+    linkText,
+    setLinkText,
     openEditBlockDialog,
     handleSelectBlockType,
     handleSaveBlock,
@@ -170,7 +192,25 @@ export default function CurriculumBuilder() {
     handleDuplicateCourse,
     handleDuplicateModule,
     handleDuplicateSubModule,
+    handleMoveModule,
+    handleMoveSubModule,
+    // Quiz & Assignment state
+    quizQuestions,
+    setQuizQuestions,
+    assignmentInstructions,
+    setAssignmentInstructions,
+    assignmentDueDate,
+    setAssignmentDueDate,
+    assignmentSubmissionType,
+    setAssignmentSubmissionType,
+    assignmentMaxScore,
+    setAssignmentMaxScore,
     loadCurriculumData,
+    activeBlock,
+    setActiveBlock,
+    editingBlock,
+    setEditingBlock,
+    handleDuplicateBlock,
     // Multi course props
     loadedCourses,
     activeCourseId,
@@ -335,6 +375,9 @@ export default function CurriculumBuilder() {
           handleDuplicateCourse={handleDuplicateCourse}
           handleDuplicateModule={handleDuplicateModule}
           handleDuplicateSubModule={handleDuplicateSubModule}
+          handleDuplicateBlock={handleDuplicateBlock}
+          handleMoveModule={handleMoveModule}
+          handleMoveSubModule={handleMoveSubModule}
           loadCurriculumData={loadCurriculumData}
         />
 
@@ -363,6 +406,7 @@ export default function CurriculumBuilder() {
             openEditBlockDialog={openEditBlockDialog}
             requestDelete={requestDelete}
             openAddModuleModal={openAddModuleModal}
+            activeBlock={activeBlock}
           />
         )}
       </div>
@@ -386,6 +430,39 @@ export default function CurriculumBuilder() {
         modules={modules}
         activeSubModule={activeSubModule}
         showToast={showToast}
+        // Block extra fields
+        headingText={headingText}
+        setHeadingText={setHeadingText}
+        quoteText={quoteText}
+        setQuoteText={setQuoteText}
+        dividerStyle={dividerStyle}
+        setDividerStyle={setDividerStyle}
+        imageAlt={imageAlt}
+        setImageAlt={setImageAlt}
+        imageCaption={imageCaption}
+        setImageCaption={setImageCaption}
+        codeContent={codeContent}
+        setCodeContent={setCodeContent}
+        codeLanguage={codeLanguage}
+        setCodeLanguage={setCodeLanguage}
+        downloadUrl={downloadUrl}
+        setDownloadUrl={setDownloadUrl}
+        downloadDisplayName={downloadDisplayName}
+        setDownloadDisplayName={setDownloadDisplayName}
+        linkUrl={linkUrl}
+        setLinkUrl={setLinkUrl}
+        linkText={linkText}
+        setLinkText={setLinkText}
+        quizQuestions={quizQuestions}
+        setQuizQuestions={setQuizQuestions}
+        assignmentInstructions={assignmentInstructions}
+        setAssignmentInstructions={setAssignmentInstructions}
+        assignmentDueDate={assignmentDueDate}
+        setAssignmentDueDate={setAssignmentDueDate}
+        assignmentSubmissionType={assignmentSubmissionType}
+        setAssignmentSubmissionType={setAssignmentSubmissionType}
+        assignmentMaxScore={assignmentMaxScore}
+        setAssignmentMaxScore={setAssignmentMaxScore}
         isModuleModalOpen={isModuleModalOpen}
         setIsModuleModalOpen={setIsModuleModalOpen}
         editingModule={editingModule}

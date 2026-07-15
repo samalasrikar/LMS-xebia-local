@@ -5,6 +5,7 @@ public class ModuleResponse {
     private Long id;
     private String title;
     private String description;
+    private Integer sortOrder;
 
     private Long courseId;
     private String courseTitle;
@@ -16,12 +17,14 @@ public class ModuleResponse {
             Long id,
             String title,
             String description,
+            Integer sortOrder,
             Long courseId,
             String courseTitle) {
 
         this.id = id;
         this.title = title;
         this.description = description;
+        this.sortOrder = sortOrder;
         this.courseId = courseId;
         this.courseTitle = courseTitle;
     }
@@ -48,6 +51,14 @@ public class ModuleResponse {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(Integer sortOrder) {
+        this.sortOrder = sortOrder;
     }
 
     public Long getCourseId() {

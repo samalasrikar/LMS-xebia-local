@@ -2,12 +2,24 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Landing from "@/features/landing/pages/Landing";
 import Login from "@/features/auth/pages/Login";
 
+// Manager features
+import ManagerLayout from "@/app/layouts/ManagerLayout";
+import ManagerDashboard from "@/features/manager/pages/ManagerDashboard";
+import LearningDashboard from "@/features/manager/pages/LearningDashboard";
+
+import CoursesManagement from "@/features/manager/pages/CoursesManagement";
+import ReportsAnalytics from "@/features/manager/pages/ReportsAnalytics";
+import CategoriesManagement from "@/features/manager/pages/CategoriesManagement";
+import TrainersManagement from "@/features/manager/pages/TrainersManagement";
+import LearnersManagement from "@/features/manager/pages/LearnersManagement";
+import Assessments from "@/features/manager/pages/Assessments";
+import ManagerSettings from "@/features/manager/pages/Settings";
+import BatchManagement from "@/features/manager/pages/BatchManagement";
+import ApprovalCenter from "@/features/manager/pages/ApprovalCenter";
+
 // Admin features
 import Dashboard from "@/features/admin/pages/Dashboard";
-import DesignSystem from "@/features/admin/pages/DesignSystem";
-import Integrations from "@/features/admin/pages/Integrations";
 import Learners from "@/features/admin/pages/Learners";
-import SEOMeta from "@/features/admin/pages/SEOMeta";
 import Settings from "@/features/admin/pages/Settings";
 
 // Categories Feature
@@ -25,6 +37,37 @@ import ModuleManagement from "@/features/modules/pages/Modules";
 
 // Content Feature
 import ContentLibrary from "@/features/content/pages/ContentLibrary";
+
+// Assignments Feature
+import ManagerAssignmentDashboard from "@/features/assignments/pages/ManagerAssignmentDashboard";
+import CreateAssignment from "@/features/assignments/pages/CreateAssignment";
+import SubmissionReview from "@/features/assignments/pages/SubmissionReview";
+import Gradebook from "@/features/assignments/pages/Gradebook";
+import StudentAssignmentDashboard from "@/features/assignments/pages/StudentAssignmentDashboard";
+import StudentAssignmentDetails from "@/features/assignments/pages/StudentAssignmentDetails";
+import StudentMySubmissions from "@/features/assignments/pages/StudentMySubmissions";
+import StudentAssignmentResult from "@/features/assignments/pages/StudentAssignmentResult";
+
+// Quizzes Feature
+import QuizDashboard from "@/features/quizzes/pages/QuizDashboard";
+import ImportQuiz from "@/features/quizzes/pages/ImportQuiz";
+import StudentQuizDashboard from "@/features/quizzes/pages/StudentQuizDashboard";
+import StudentQuizPlayer from "@/features/quizzes/pages/StudentQuizPlayer";
+import StudentQuizResult from "@/features/quizzes/pages/StudentQuizResult";
+
+// Batches Feature
+import BatchDashboard from "@/features/batches/pages/BatchDashboard";
+import CreateBatch from "@/features/batches/pages/CreateBatch";
+
+// Trainer Feature
+import TrainerDashboard from "@/features/trainer/pages/TrainerDashboard";
+
+// Events Feature
+import EventsManagement from "@/features/events/pages/EventsManagement";
+import CreateEvent from "@/features/events/pages/CreateEvent";
+import EventRegistrations from "@/features/events/pages/EventRegistrations";
+import EventsCatalog from "@/features/events/pages/EventsCatalog";
+import EventDetail from "@/features/events/pages/EventDetail";
 
 // Analytics Feature
 import {
@@ -52,7 +95,7 @@ import {
   StudentDashboard,
   StudentCourses,
   StudentCalendar,
-  StudentAssignments,
+  StudentAssessments,
   StudentGrades,
   StudentAnalytics,
   StudentProfile,
@@ -67,20 +110,47 @@ import StudentCourseOverview from "@/features/student/pages/StudentCourseOvervie
 import StudentModuleDetail from "@/features/student/pages/StudentModuleDetail";
 import StudentLessonDetail from "@/features/student/pages/StudentLessonDetail";
 import StudentCourseCompletion from "@/features/student/pages/StudentCourseCompletion";
+
+// Additional Portal Notifications Pages
+import AdminNotifications from "@/features/admin/pages/AdminNotifications";
+import ManagerNotifications from "@/features/manager/pages/ManagerNotifications";
+import TrainerNotifications from "@/features/trainer/pages/TrainerNotifications";
  
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/admin" element={<Dashboard />} />
+      
+      {/* Manager Console routes */}
+      <Route path="/manager" element={<ManagerLayout />}>
+        <Route index element={<ManagerDashboard />} />
+        <Route path="learning" element={<LearningDashboard />} />
 
-      {/* Stitch-integrated Admin pages */}
-      <Route path="/seo" element={<SEOMeta />} />
+        <Route path="courses" element={<CoursesManagement />} />
+        <Route path="analytics" element={<ReportsAnalytics />} />
+        <Route path="categories" element={<CategoriesManagement />} />
+        <Route path="trainers" element={<TrainersManagement />} />
+        <Route path="learners" element={<LearnersManagement />} />
+        <Route path="assessments" element={<Assessments />} />
+        <Route path="settings" element={<ManagerSettings />} />
+        <Route path="batches" element={<BatchManagement />} />
+        <Route path="approvals" element={<ApprovalCenter />} />
+        <Route path="profile" element={<StudentProfile />} />
+        <Route path="notifications" element={<ManagerNotifications />} />
+      </Route>
+
+      <Route path="/admin" element={<Dashboard />} />
+      <Route path="/admin/profile" element={<StudentProfile />} />
+      <Route path="/admin/notifications" element={<AdminNotifications />} />
+
+      {/* Admin pages */}
       <Route path="/learners" element={<Learners />} />
-      <Route path="/integrations" element={<Integrations />} />
       <Route path="/settings" element={<Settings />} />
-      <Route path="/design-system" element={<DesignSystem />} />
+      <Route path="/admin/events" element={<EventsManagement />} />
+      <Route path="/admin/events/create" element={<CreateEvent />} />
+      <Route path="/admin/events/edit/:id" element={<CreateEvent />} />
+      <Route path="/admin/events/:id/registrations" element={<EventRegistrations />} />
 
       {/* Categories */}
       <Route path="/categories" element={<Categories />} />
@@ -100,8 +170,22 @@ function App() {
       <Route path="/module-management" element={<ModuleManagement />} />
       <Route path="/content-library" element={<ContentLibrary />} />
 
-
-
+      {/* Trainer/Manager Routes */}
+      <Route path="/trainer" element={<TrainerDashboard />} />
+      <Route path="/trainer/assignments" element={<ManagerAssignmentDashboard />} />
+      <Route path="/trainer/assignments/create" element={<CreateAssignment />} />
+      <Route path="/trainer/assignments/edit/:id" element={<CreateAssignment />} />
+      <Route path="/trainer/assignments/review/:submissionId" element={<SubmissionReview />} />
+      <Route path="/trainer/gradebook" element={<Gradebook />} />
+      <Route path="/trainer/quizzes" element={<QuizDashboard />} />
+      <Route path="/trainer/quizzes/import" element={<ImportQuiz />} />
+      <Route path="/trainer/batches" element={<BatchDashboard />} />
+      <Route path="/trainer/batches/create" element={<CreateBatch />} />
+      <Route path="/trainer/batches/edit/:id" element={<CreateBatch />} />
+      <Route path="/trainer/profile" element={<StudentProfile />} />
+      <Route path="/trainer/events" element={<EventsCatalog />} />
+      <Route path="/trainer/events/:id" element={<EventDetail />} />
+      <Route path="/trainer/notifications" element={<TrainerNotifications />} />
 
       {/* ── Student Portal (sidebar layout) ── */}
       <Route path="/student" element={<StudentLayout />}>
@@ -112,7 +196,13 @@ function App() {
         <Route path="courses/:courseId/modules/:moduleId" element={<StudentModuleDetail />} />
         <Route path="courses/:courseId/modules/:moduleId/lessons/:lessonId" element={<StudentLessonDetail />} />
         <Route path="calendar" element={<StudentCalendar />} />
-        <Route path="assignments" element={<StudentAssignments />} />
+        <Route path="assessments" element={<StudentAssessments />} />
+        <Route path="assignments" element={<StudentAssessments />} />
+        <Route path="assignments/:id" element={<StudentAssignmentDetails />} />
+        <Route path="assignments/:id/submissions" element={<StudentMySubmissions />} />
+        <Route path="assignments/:id/result" element={<StudentAssignmentResult />} />
+        <Route path="quizzes" element={<StudentAssessments />} />
+        <Route path="quizzes/:id/result" element={<StudentQuizResult />} />
         <Route path="grades" element={<StudentGrades />} />
         <Route path="analytics" element={<StudentAnalytics />} />
         <Route path="downloads" element={<StudentDownloads />} />
@@ -120,7 +210,12 @@ function App() {
         <Route path="notifications" element={<StudentNotifications />} />
         <Route path="profile" element={<StudentProfile />} />
         <Route path="settings" element={<StudentSettings />} />
+        <Route path="events" element={<EventsCatalog />} />
+        <Route path="events/:id" element={<EventDetail />} />
       </Route>
+
+      {/* Quiz Player */}
+      <Route path="/student/quizzes/:id/play" element={<StudentQuizPlayer />} />
 
       {/* Backward Compatibility */}
 

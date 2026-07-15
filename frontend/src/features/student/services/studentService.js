@@ -1,17 +1,25 @@
 import api from "@/shared/services/api";
 
 const studentService = {
-  getGrades: async (config) => {
-    const response = await api.get("/student/grades", config);
-    return response.data.data;
+  getGradesPaginated: async (params, config) => {
+    const response = await api.get("/grades", { ...config, params });
+    return response.data;
   },
-  getCertificates: async (config) => {
-    const response = await api.get("/student/certificates", config);
-    return response.data.data;
+  getGradeStats: async (params, config) => {
+    const response = await api.get("/grades/stats", { ...config, params });
+    return response.data;
   },
-  getResources: async (config) => {
-    const response = await api.get("/student/resources", config);
-    return response.data.data;
+  getCertificatesPaginated: async (params, config) => {
+    const response = await api.get("/certificates", { ...config, params });
+    return response.data;
+  },
+  getResourcesPaginated: async (params, config) => {
+    const response = await api.get("/resources", { ...config, params });
+    return response.data;
+  },
+  getResourceStats: async (config) => {
+    const response = await api.get("/resources/stats", config);
+    return response.data;
   },
   getAnalytics: async (config) => {
     try {

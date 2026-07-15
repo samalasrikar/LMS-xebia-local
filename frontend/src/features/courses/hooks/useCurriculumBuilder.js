@@ -4,6 +4,7 @@ import courseService from "@/features/courses/services/courseService";
 import moduleService from "@/features/modules/services/moduleService";
 import subModuleService from "@/features/submodules/services/subModuleService";
 import contentService from "@/features/content/services/contentService";
+import categoryService from "@/features/categories/services/categoryService";
 
 export default function useCurriculumBuilder() {
   const { id } = useParams();
@@ -22,6 +23,31 @@ export default function useCurriculumBuilder() {
   const [loadedCourses, setLoadedCourses] = useState([]);
   const [activeCourseId, setActiveCourseId] = useState(null);
 
+  const changeLoadedCourses = (val) => {
+    setLoadedCourses(prev => {
+      const nextCourses = typeof val === "function" ? val(prev) : val;
+      if (nextCourses && nextCourses.length > 0) {
+        const ids = nextCourses.map(c => c.id);
+        localStorage.setItem("curriculum_builder_loaded_course_ids", JSON.stringify(ids));
+      } else {
+        localStorage.removeItem("curriculum_builder_loaded_course_ids");
+      }
+      return nextCourses;
+    });
+  };
+
+  const changeActiveCourseId = (val) => {
+    setActiveCourseId(prev => {
+      const nextId = typeof val === "function" ? val(prev) : val;
+      if (nextId !== null && nextId !== undefined) {
+        localStorage.setItem("curriculum_builder_active_course_id", String(nextId));
+      } else {
+        localStorage.removeItem("curriculum_builder_active_course_id");
+      }
+      return nextId;
+    });
+  };
+
   const course = loadedCourses.find(c => c.id === activeCourseId) || null;
   const modules = course?.modules || [];
   const [expandedCourses, setExpandedCourses] = useState({});
@@ -30,6 +56,8 @@ export default function useCurriculumBuilder() {
   /* ── UI State ── */
   const [expandedModules, setExpandedModules] = useState({});
   const [activeSubModule, setActiveSubModule] = useState(null);
+  const [activeBlock, setActiveBlock] = useState(null);
+  const [editingBlock, setEditingBlock] = useState(null);
   const [treeSearch, setTreeSearch] = useState("");
   const [showNavBanner, setShowNavBanner] = useState(!!fromModuleManagement);
   const [saveStatus, setSaveStatus] = useState("saved"); // "saved" | "saving" | "unsaved"
@@ -40,6 +68,18 @@ export default function useCurriculumBuilder() {
   const [blockConfigOpen, setBlockConfigOpen] = useState(false);
   const [blockConfigType, setBlockConfigType] = useState("video");
 
+  /* ── Block Extra Fields ── */
+  const [headingText, setHeadingText] = useState("");
+  const [quoteText, setQuoteText] = useState("");
+  const [dividerStyle, setDividerStyle] = useState("");
+  const [imageAlt, setImageAlt] = useState("");
+  const [imageCaption, setImageCaption] = useState("");
+  const [codeContent, setCodeContent] = useState("");
+  const [codeLanguage, setCodeLanguage] = useState("");
+  const [downloadUrl, setDownloadUrl] = useState("");
+  const [downloadDisplayName, setDownloadDisplayName] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkText, setLinkText] = useState("");
 
   /* ── Notification ── */
   const [toast, setToast] = useState(null);
@@ -102,6 +142,11 @@ export default function useCurriculumBuilder() {
   };
 
   const openCourseDialog = (tab = "select") => {
+    if (tab === "create") {
+      setCourseDialogOpen(false);
+      navigate("/courses/create");
+      return;
+    }
     setCourseSearch("");
     setCourseDialogTab(tab);
     setNewCourseTitle("");
@@ -118,9 +163,9 @@ export default function useCurriculumBuilder() {
     const alreadyExists = loadedCourses.some(c => c.id === selectedCourse.id);
     if (alreadyExists) {
       // Focus and expand that course instead of adding it again
-      setActiveCourseId(selectedCourse.id);
+      changeActiveCourseId(selectedCourse.id);
       setExpandedCourses(prev => ({ ...prev, [selectedCourse.id]: true }));
-      
+
       const existingCourse = loadedCourses.find(c => c.id === selectedCourse.id);
       if (existingCourse && existingCourse.modules?.[0]?.subModules?.[0]) {
         setActiveSubModule(existingCourse.modules[0].subModules[0]);
@@ -131,20 +176,14 @@ export default function useCurriculumBuilder() {
 
     setLoadingCurriculum(true);
     try {
-      const [allModules, allSubModules, allContents] = await Promise.all([
-        moduleService.getAllModules(),
-        subModuleService.getAllSubModules(),
-        contentService.getAllContents(),
-      ]);
-
-      const courseModules = await loadCurriculumForCourse(selectedCourse.id, allModules, allSubModules, allContents);
+      const courseModules = await loadCurriculumForCourse(selectedCourse.id);
       const newCourseObj = {
         ...selectedCourse,
         modules: courseModules,
       };
 
-      setLoadedCourses(prev => [...prev, newCourseObj]);
-      setActiveCourseId(selectedCourse.id);
+      changeLoadedCourses(prev => [...prev, newCourseObj]);
+      changeActiveCourseId(selectedCourse.id);
       setExpandedCourses(prev => ({ ...prev, [selectedCourse.id]: true }));
 
       const expandMap = {};
@@ -166,12 +205,40 @@ export default function useCurriculumBuilder() {
   const handleCreateAndSelectCourse = async (e) => {
     e.preventDefault();
     if (!newCourseTitle.trim()) { showToast("Course title is required.", "error"); return; }
+    if (!newCourseCategory.trim()) { showToast("Category is required.", "error"); return; }
     setCreatingCourse(true);
     try {
+      // 1. Fetch categories to check if the entered category exists
+      const categories = await categoryService.getAllCategories();
+      let matchedCategory = categories?.find(
+        c => c.name.toLowerCase() === newCourseCategory.trim().toLowerCase()
+      );
+
+      let targetCategoryId;
+      if (matchedCategory) {
+        targetCategoryId = matchedCategory.id;
+      } else {
+        // 2. Create the category if it doesn't exist
+        const fd = new FormData();
+        fd.append("name", newCourseCategory.trim());
+        fd.append("description", `Automatically created category for course ${newCourseTitle.trim()}`);
+        fd.append("publishState", "Published");
+        fd.append("status", "Active");
+
+        const slug = newCourseCategory.trim().toLowerCase()
+          .replace(/[^a-z0-9 ]/g, '')
+          .replace(/\s+/g, '-');
+        fd.append("slug", slug);
+
+        const newCat = await categoryService.createCategory(fd);
+        targetCategoryId = newCat.id;
+      }
+
+      // 3. Create the course with the resolved categoryId
       const created = await courseService.createCourse({
         title: newCourseTitle.trim(),
         description: newCourseDescription.trim(),
-        category: newCourseCategory.trim(),
+        categoryId: targetCategoryId,
         status: "Draft",
       });
       showToast("Course created!");
@@ -188,30 +255,46 @@ export default function useCurriculumBuilder() {
   const toggleSubModuleExpand = (subId) =>
     setExpandedSubModules(p => ({ ...p, [subId]: !p[subId] }));
 
+  /* ── Quiz & Assignment State ── */
+  const [quizQuestions, setQuizQuestions] = useState([]);
+  const [assignmentInstructions, setAssignmentInstructions] = useState("");
+  const [assignmentDueDate, setAssignmentDueDate] = useState("");
+  const [assignmentSubmissionType, setAssignmentSubmissionType] = useState("file");
+  const [assignmentMaxScore, setAssignmentMaxScore] = useState(100);
+
   /* ── Load Modules for Course Helper ── */
-  const loadCurriculumForCourse = async (courseId, allModules, allSubModules, allContents) => {
-    const courseModules = allModules.filter(m => m.courseId === Number(courseId));
-    return courseModules.map(mod => ({
-      ...mod,
-      subModules: allSubModules
-        .filter(sm => sm.moduleId === mod.id)
-        .map(sm => ({ ...sm, content: allContents.find(c => c.subModuleId === sm.id) })),
+  const loadCurriculumForCourse = async (courseId) => {
+    const courseModules = await moduleService.getModulesByCourseId(courseId);
+    const sortedModules = [...(courseModules || [])].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    
+    return Promise.all(sortedModules.map(async (mod) => {
+      const subModules = await subModuleService.getSubModulesByModuleId(mod.id);
+      const sortedSubModules = [...(subModules || [])].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+      
+      const mappedSubModules = await Promise.all(sortedSubModules.map(async (sm) => {
+        const blocks = await contentService.getContentsBySubModuleId(sm.id);
+        const sortedBlocks = [...(blocks || [])].sort((a, b) => a.id - b.id);
+        return {
+          ...sm,
+          blocks: sortedBlocks,
+          content: sortedBlocks[0] || null
+        };
+      }));
+      
+      return {
+        ...mod,
+        subModules: mappedSubModules
+      };
     }));
   };
 
   const reloadAllLoadedCourses = async (coursesListToReload = loadedCourses) => {
     setLoadingCurriculum(true);
     try {
-      const [allModules, allSubModules, allContents] = await Promise.all([
-        moduleService.getAllModules(),
-        subModuleService.getAllSubModules(),
-        contentService.getAllContents(),
-      ]);
-
       const updatedCourses = await Promise.all(
         coursesListToReload.map(async (c) => {
           const courseData = await courseService.getCourseById(c.id);
-          const modulesData = await loadCurriculumForCourse(c.id, allModules, allSubModules, allContents);
+          const modulesData = await loadCurriculumForCourse(c.id);
           return {
             ...courseData,
             modules: modulesData,
@@ -219,7 +302,24 @@ export default function useCurriculumBuilder() {
         })
       );
 
-      setLoadedCourses(updatedCourses);
+      changeLoadedCourses(updatedCourses);
+
+      if (activeSubModule) {
+        const nextCourse = updatedCourses.find(c => c.id === activeCourseId);
+        const nextSubModule = nextCourse?.modules
+          ?.flatMap(m => m.subModules || [])
+          ?.find(sm => sm.id === activeSubModule.id);
+        if (nextSubModule) {
+          setActiveSubModule(nextSubModule);
+          if (activeBlock) {
+            const nextBlock = nextSubModule.blocks?.find(b => b.id === activeBlock.id);
+            setActiveBlock(nextBlock || null);
+          }
+        } else {
+          setActiveSubModule(null);
+          setActiveBlock(null);
+        }
+      }
 
       const expandMap = {};
       updatedCourses.forEach(c => {
@@ -238,69 +338,134 @@ export default function useCurriculumBuilder() {
     }
   };
 
-  /* ── Data Loading ── */
+  /* ── Data Loading & Persistence ── */
   useEffect(() => {
-    if (id) {
-      const initLoad = async () => {
-        setLoadingCourse(true);
-        setLoadingCurriculum(true);
+    const initLoad = async () => {
+      setLoadingCourse(true);
+      setLoadingCurriculum(true);
+      try {
+        let savedIds = [];
         try {
-          const courseData = await courseService.getCourseById(id);
-          setActiveCourseId(Number(id));
-          setExpandedCourses(prev => ({ ...prev, [Number(id)]: true }));
-
-          const [allModules, allSubModules, allContents] = await Promise.all([
-            moduleService.getAllModules(),
-            subModuleService.getAllSubModules(),
-            contentService.getAllContents(),
-          ]);
-
-          const courseModules = await loadCurriculumForCourse(id, allModules, allSubModules, allContents);
-
-          const initialCourse = {
-            ...courseData,
-            modules: courseModules,
-          };
-          setLoadedCourses([initialCourse]);
-
-          const expandMap = {};
-          courseModules.forEach(m => { expandMap[m.id] = true; });
-          setExpandedModules(prev => ({ ...expandMap, ...prev }));
-
-          // Pre-selection logic
-          if (preselectedSubModuleId) {
-            const flat = courseModules.flatMap(m => m.subModules);
-            const t = flat.find(s => s.id === preselectedSubModuleId);
-            if (t) { setActiveSubModule(t); return; }
-          }
-          if (preselectedModuleId) {
-            const tm = courseModules.find(m => m.id === preselectedModuleId);
-            if (tm?.subModules?.[0]) { setActiveSubModule(tm.subModules[0]); return; }
-          }
-          if (courseModules[0]?.subModules?.[0]) {
-            setActiveSubModule(courseModules[0].subModules[0]);
+          const savedIdsStr = localStorage.getItem("curriculum_builder_loaded_course_ids");
+          if (savedIdsStr) {
+            savedIds = JSON.parse(savedIdsStr);
           }
         } catch (err) {
-          console.error(err);
-          showToast("Could not load initial course and curriculum.", "error");
-        } finally {
+          console.error("Failed to parse saved loaded course IDs:", err);
+        }
+
+        // If id is in useParams(), ensure it is in the loaded list
+        if (id) {
+          const numericId = Number(id);
+          if (!savedIds.includes(numericId)) {
+            savedIds = [...savedIds, numericId];
+          }
+        }
+
+        if (savedIds.length === 0) {
+          changeLoadedCourses([]);
+          changeActiveCourseId(null);
           setLoadingCourse(false);
           setLoadingCurriculum(false);
+          return;
         }
-      };
-      initLoad();
-    } else {
-      setLoadingCourse(false);
-      setLoadingCurriculum(false);
-    }
+
+        const coursesData = await Promise.all(
+          savedIds.map(async (courseId) => {
+            try {
+              const courseData = await courseService.getCourseById(courseId);
+              const courseModules = await loadCurriculumForCourse(courseId);
+              return {
+                ...courseData,
+                modules: courseModules,
+              };
+            } catch (err) {
+              console.error(`Failed to load course ${courseId}:`, err);
+              return null;
+            }
+          })
+        );
+
+        const validCourses = coursesData.filter(Boolean);
+        changeLoadedCourses(validCourses);
+
+        const expandMap = {};
+        validCourses.forEach(c => {
+          c.modules.forEach(m => {
+            expandMap[m.id] = true;
+          });
+        });
+        setExpandedModules(prev => ({ ...expandMap, ...prev }));
+
+        // Resolve active course ID
+        let resolvedActiveId = null;
+        if (id) {
+          resolvedActiveId = Number(id);
+        } else {
+          const savedActiveIdStr = localStorage.getItem("curriculum_builder_active_course_id");
+          if (savedActiveIdStr) {
+            const savedActiveId = Number(savedActiveIdStr);
+            if (validCourses.some(c => c.id === savedActiveId)) {
+              resolvedActiveId = savedActiveId;
+            }
+          }
+          if (resolvedActiveId === null && validCourses.length > 0) {
+            resolvedActiveId = validCourses[0].id;
+          }
+        }
+
+        if (resolvedActiveId) {
+          changeActiveCourseId(resolvedActiveId);
+          setExpandedCourses(prev => ({ ...prev, [resolvedActiveId]: true }));
+
+          const activeCourseObj = validCourses.find(c => c.id === resolvedActiveId);
+          if (activeCourseObj) {
+            const activeCourseModules = activeCourseObj.modules || [];
+
+            // Only perform pre-selection if id was matched in useParams()
+            if (id) {
+              if (preselectedSubModuleId) {
+                const flat = activeCourseModules.flatMap(m => m.subModules || []);
+                const t = flat.find(s => s.id === preselectedSubModuleId);
+                if (t) { setActiveSubModule(t); setLoadingCourse(false); setLoadingCurriculum(false); return; }
+              }
+              if (preselectedModuleId) {
+                const tm = activeCourseModules.find(m => m.id === preselectedModuleId);
+                if (tm?.subModules?.[0]) { setActiveSubModule(tm.subModules[0]); setLoadingCourse(false); setLoadingCurriculum(false); return; }
+              }
+            }
+
+            if (activeCourseModules[0]?.subModules?.[0]) {
+              setActiveSubModule(activeCourseModules[0].subModules[0]);
+            }
+          }
+        } else {
+          changeActiveCourseId(null);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Could not load course and curriculum.", "error");
+      } finally {
+        setLoadingCourse(false);
+        setLoadingCurriculum(false);
+      }
+    };
+
+    initLoad();
   }, [id, preselectedModuleId, preselectedSubModuleId, showToast]);
 
 
 
   /* ── Module Actions ── */
   const openAddModuleModal = (courseId) => {
-    setTargetCourseId(courseId || activeCourseId);
-    setEditingModule(null); setModuleTitle(""); setModuleDescription(""); setIsModuleModalOpen(true);
+    const resolvedId = (courseId && !isNaN(Number(courseId)) && typeof courseId !== "object")
+      ? Number(courseId)
+      : (activeCourseId || Number(id));
+    setTargetCourseId(resolvedId);
+    setEditingModule(null);
+    setModuleTitle("");
+    setModuleDescription("");
+    setIsModuleModalOpen(true);
   };
   const openEditModuleModal = (mod) => {
     setEditingModule(mod); setModuleTitle(mod.title); setModuleDescription(mod.description || ""); setIsModuleModalOpen(true);
@@ -318,10 +483,16 @@ export default function useCurriculumBuilder() {
         });
         showToast("Module updated!");
       } else {
+        const finalCourseId = Number(targetCourseId || activeCourseId || id);
+        if (!finalCourseId || isNaN(finalCourseId)) {
+          showToast("Course is required.", "error");
+          setSubmittingModule(false);
+          return;
+        }
         await moduleService.createModule({
           title: moduleTitle.trim(),
           description: moduleDescription.trim(),
-          courseId: Number(targetCourseId || activeCourseId || id)
+          courseId: finalCourseId
         });
         showToast("Module created!");
       }
@@ -381,28 +552,159 @@ export default function useCurriculumBuilder() {
     } finally { setSubmittingSubModule(false); }
   };
 
+  /* ── Move Up / Move Down Handlers ── */
+  const handleMoveModule = async (mod, direction) => {
+    const activeCourse = loadedCourses.find(c => c.id === activeCourseId);
+    if (!activeCourse) return;
+    const mods = [...activeCourse.modules].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    const idx = mods.findIndex(m => m.id === mod.id);
+    const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= mods.length) return;
+    // Swap sort orders
+    const reorderList = mods.map((m, i) => {
+      if (i === idx) return { id: m.id, sortOrder: targetIdx };
+      if (i === targetIdx) return { id: m.id, sortOrder: idx };
+      return { id: m.id, sortOrder: i };
+    });
+    try {
+      await moduleService.reorderModules(reorderList);
+      showToast(`Module moved ${direction}!`);
+      await reloadAllLoadedCourses();
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to reorder modules.", "error");
+    }
+  };
+
+  const handleMoveSubModule = async (sub, direction) => {
+    const activeCourse = loadedCourses.find(c => c.id === activeCourseId);
+    if (!activeCourse) return;
+    const parentMod = activeCourse.modules.find(m => m.subModules?.some(s => s.id === sub.id));
+    if (!parentMod) return;
+    const subs = [...parentMod.subModules].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    const idx = subs.findIndex(s => s.id === sub.id);
+    const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= subs.length) return;
+    const reorderList = subs.map((s, i) => {
+      if (i === idx) return { id: s.id, sortOrder: targetIdx };
+      if (i === targetIdx) return { id: s.id, sortOrder: idx };
+      return { id: s.id, sortOrder: i };
+    });
+    try {
+      await subModuleService.reorderSubModules(reorderList);
+      showToast(`Block moved ${direction}!`);
+      await reloadAllLoadedCourses();
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to reorder blocks.", "error");
+    }
+  };
+
   /* ── Block Actions ── */
-  const openEditBlockDialog = (subMod) => {
-    setActiveSubModule(subMod);
-    // Reset forms
+  const resetAllBlockFields = () => {
     setVideoUrl("");
     setPdfUrl("");
     setTextContent("");
     setUploadedFileName("");
     setVideoUrlError("");
     setShowVideoPreview(false);
+    setHeadingText("");
+    setQuoteText("");
+    setDividerStyle("solid");
+    setImageAlt("");
+    setImageCaption("");
+    setCodeContent("");
+    setCodeLanguage("javascript");
+    setDownloadUrl("");
+    setDownloadDisplayName("");
+    setLinkUrl("");
+    setLinkText("");
+    setQuizQuestions([]);
+    setAssignmentInstructions("");
+    setAssignmentDueDate("");
+    setAssignmentSubmissionType("file");
+    setAssignmentMaxScore(100);
+  };
 
-    if (subMod.content) {
-      if (subMod.content.pdfUrl) {
+  const openEditBlockDialog = (subMod, block = null) => {
+    setActiveSubModule(subMod);
+    setEditingBlock(block);
+    resetAllBlockFields();
+
+    if (block) {
+      const bt = block.blockType || "";
+      const c = block;
+
+      if (bt === "heading") {
+        setBlockConfigType("heading");
+        setHeadingText(c.content || "");
+      } else if (bt === "quote") {
+        setBlockConfigType("quote");
+        setQuoteText(c.content || "");
+      } else if (bt === "divider") {
+        setBlockConfigType("divider");
+        setDividerStyle(c.content || "solid");
+      } else if (bt === "image") {
+        setBlockConfigType("image");
+        // imageUrl stored in c.imageUrl; alt & caption stored as JSON in content
+        if (c.imageUrl) setUploadedFileName(c.imageUrl.split("/").pop());
+        try {
+          const meta = JSON.parse(c.content || "{}");
+          setImageAlt(meta.alt || "");
+          setImageCaption(meta.caption || "");
+        } catch { setImageAlt(""); setImageCaption(""); }
+      } else if (bt === "code") {
+        setBlockConfigType("code");
+        try {
+          const meta = JSON.parse(c.content || "{}");
+          setCodeContent(meta.code || "");
+          setCodeLanguage(meta.language || "javascript");
+        } catch { setCodeContent(c.content || ""); setCodeLanguage("javascript"); }
+      } else if (bt === "download" || bt === "file") {
+        setBlockConfigType(bt);
+        setDownloadUrl(c.pdfUrl || c.imageUrl || "");
+        setDownloadDisplayName(c.content || "");
+      } else if (bt === "link" || bt === "embed") {
+        setBlockConfigType(bt);
+        setLinkUrl(c.videoUrl || c.imageUrl || "");
+        setLinkText(c.content || "");
+      } else if (bt === "callout") {
+        setBlockConfigType("callout");
+        setTextContent(c.content || "");
+      } else if (bt === "audio") {
+        setBlockConfigType("audio");
+        setDownloadUrl(c.videoUrl || "");
+        setDownloadDisplayName(c.content || "");
+      } else if (bt === "paragraph" || bt === "text") {
+        setBlockConfigType("paragraph");
+        setTextContent(c.content || "");
+      } else if (bt === "quiz") {
+        setBlockConfigType("quiz");
+        try {
+          const parsed = JSON.parse(c.content || "[]");
+          setQuizQuestions(Array.isArray(parsed) ? parsed : parsed.questions || []);
+        } catch { setQuizQuestions([]); }
+      } else if (bt === "assignment") {
+        setBlockConfigType("assignment");
+        try {
+          const parsed = JSON.parse(c.content || "{}");
+          setAssignmentInstructions(parsed.instructions || "");
+          setAssignmentDueDate(parsed.dueDate || "");
+          setAssignmentSubmissionType(parsed.submissionType || "file");
+          setAssignmentMaxScore(parsed.maxScore ?? 100);
+        } catch {
+          setAssignmentInstructions(c.content || "");
+        }
+      } else if (c.pdfUrl) {
         setBlockConfigType("pdf");
-        setPdfUrl(subMod.content.pdfUrl);
+        setPdfUrl(c.pdfUrl);
         setUploadedFileName("document.pdf");
-      } else if (subMod.content.videoUrl) {
+      } else if (c.videoUrl) {
         setBlockConfigType("video");
-        setVideoUrl(subMod.content.videoUrl);
+        setVideoUrl(c.videoUrl);
       } else {
         setBlockConfigType("text");
-        setTextContent(subMod.content.content || "");
+        setTextContent(c.content || "");
       }
       setBlockConfigOpen(true);
     } else {
@@ -413,46 +715,107 @@ export default function useCurriculumBuilder() {
   const handleSelectBlockType = (type) => {
     setBlockPickerOpen(false);
     setBlockConfigType(type);
-    // Reset forms
-    setVideoUrl("");
-    setPdfUrl("");
-    setTextContent("");
-    setUploadedFileName("");
-    setVideoUrlError("");
-    setShowVideoPreview(false);
+    resetAllBlockFields();
+    setEditingBlock(null);
     setBlockConfigOpen(true);
   };
 
+  const buildBlockPayload = () => {
+    const base = {
+      title: `${activeSubModule.title} Content`,
+      subModuleId: activeSubModule.id,
+      blockType: blockConfigType,
+      content: "",
+      videoUrl: "",
+      pdfUrl: "",
+      imageUrl: "",
+    };
+
+    switch (blockConfigType) {
+      case "video":
+        base.content = `Content for ${activeSubModule.title}`;
+        base.videoUrl = videoUrl.trim();
+        break;
+      case "pdf":
+        base.content = `Content for ${activeSubModule.title}`;
+        base.pdfUrl = pdfUrl.trim();
+        break;
+      case "paragraph":
+      case "text":
+        base.content = textContent.trim();
+        break;
+      case "heading":
+        base.content = headingText.trim();
+        break;
+      case "quote":
+        base.content = quoteText.trim();
+        break;
+      case "divider":
+        base.content = dividerStyle || "solid";
+        break;
+      case "image":
+        base.imageUrl = downloadUrl.trim(); // reuse downloadUrl for uploaded image URL
+        base.content = JSON.stringify({ alt: imageAlt.trim(), caption: imageCaption.trim() });
+        break;
+      case "code":
+        base.content = JSON.stringify({ code: codeContent.trim(), language: codeLanguage || "javascript" });
+        break;
+      case "download":
+      case "file":
+        base.pdfUrl = downloadUrl.trim();
+        base.content = downloadDisplayName.trim() || "Downloadable File";
+        break;
+      case "link":
+      case "embed":
+        base.videoUrl = linkUrl.trim();
+        base.content = linkText.trim() || linkUrl.trim();
+        break;
+      case "callout":
+        base.content = textContent.trim();
+        break;
+      case "audio":
+        base.videoUrl = downloadUrl.trim();
+        base.content = downloadDisplayName.trim() || "Audio";
+        break;
+      case "quiz":
+        base.content = JSON.stringify(quizQuestions);
+        break;
+      case "assignment":
+        base.content = JSON.stringify({
+          instructions: assignmentInstructions.trim(),
+          dueDate: assignmentDueDate || null,
+          submissionType: assignmentSubmissionType,
+          maxScore: assignmentMaxScore,
+        });
+        break;
+      default:
+        base.content = textContent.trim() || `Content for ${activeSubModule.title}`;
+        break;
+    }
+    return base;
+  };
+
   const handleSaveBlock = async (e) => {
+    console.log("handleSaveBlock called");
+    console.log(activeSubModule);
+    console.log(blockConfigType);
     if (e) e.preventDefault();
     if (!activeSubModule) return;
     setSubmittingSubModule(true);
     setSaveStatus("saving");
     try {
-      const tV = blockConfigType === "video" ? videoUrl.trim() : "";
-      const tP = blockConfigType === "pdf" ? pdfUrl.trim() : "";
-      const tT = blockConfigType === "text" ? textContent.trim() : `Content for ${activeSubModule.title}`;
+      const payload = buildBlockPayload();
 
-      if (activeSubModule.content) {
-        await contentService.updateContent(activeSubModule.content.id, {
-          title: `${activeSubModule.title} Content`,
-          content: tT,
-          videoUrl: tV,
-          pdfUrl: tP,
-          subModuleId: activeSubModule.id
-        });
+      if (editingBlock) {
+        await contentService.updateContent(editingBlock.id, payload);
         showToast("Block updated!");
       } else {
-        await contentService.createContent({
-          title: `${activeSubModule.title} Content`,
-          content: tT,
-          videoUrl: tV,
-          pdfUrl: tP,
-          subModuleId: activeSubModule.id
-        });
+        console.log("Creating content...");
+        await contentService.createContent(payload);
         showToast("Block created!");
       }
       setBlockConfigOpen(false);
+      setEditingBlock(null);
       await reloadAllLoadedCourses();
       setSaveStatus("saved");
     } catch (err) {
@@ -463,14 +826,22 @@ export default function useCurriculumBuilder() {
   };
 
 
-  const requestDelete = (type, target) => setDeleteTarget({ type, id: target.id, title: target.title });
+  const requestDelete = (type, target) => setDeleteTarget({ type, id: target.id, title: target.title || target.content || target.blockType || "Block" });
   const confirmDelete = async () => {
     if (!deleteTarget) return;
     try {
-      if (deleteTarget.type === "module") await moduleService.deleteModule(deleteTarget.id);
-      else await subModuleService.deleteSubModule(deleteTarget.id);
-      showToast(`${deleteTarget.type === "module" ? "Module" : "Block"} deleted.`);
-      if (activeSubModule?.id === deleteTarget.id) setActiveSubModule(null);
+      if (deleteTarget.type === "module") {
+        await moduleService.deleteModule(deleteTarget.id);
+        showToast("Module deleted.");
+      } else if (deleteTarget.type === "submodule") {
+        await subModuleService.deleteSubModule(deleteTarget.id);
+        showToast("Sub-module deleted.");
+        if (activeSubModule?.id === deleteTarget.id) setActiveSubModule(null);
+      } else if (deleteTarget.type === "block") {
+        await contentService.deleteContent(deleteTarget.id);
+        showToast("Block deleted.");
+        if (activeBlock?.id === deleteTarget.id) setActiveBlock(null);
+      }
       await reloadAllLoadedCourses();
     } catch (err) { console.error(err); showToast("Deletion failed.", "error"); }
     finally { setDeleteTarget(null); }
@@ -501,37 +872,33 @@ export default function useCurriculumBuilder() {
         status: "Draft",
       });
 
-      const [allModules, allSubModules, allContents] = await Promise.all([
-        moduleService.getAllModules(),
-        subModuleService.getAllSubModules(),
-        contentService.getAllContents(),
-      ]);
+      const courseModules = await moduleService.getModulesByCourseId(c.id);
 
-      const courseModules = allModules.filter(m => m.courseId === c.id);
-
-      for (const mod of courseModules) {
+      for (const mod of (courseModules || [])) {
         const duplicatedMod = await moduleService.createModule({
           courseId: duplicatedCourse.id,
           title: mod.title,
           description: mod.description || "",
         });
 
-        const modSubModules = allSubModules.filter(sm => sm.moduleId === mod.id);
-        for (const sub of modSubModules) {
+        const modSubModules = await subModuleService.getSubModulesByModuleId(mod.id);
+        for (const sub of (modSubModules || [])) {
           const duplicatedSub = await subModuleService.createSubModule({
             moduleId: duplicatedMod.id,
             title: sub.title,
             description: sub.description || "",
           });
 
-          const subContent = allContents.find(cont => cont.subModuleId === sub.id);
-          if (subContent) {
+          const subContents = await contentService.getContentsBySubModuleId(sub.id);
+          for (const subContent of (subContents || [])) {
             await contentService.createContent({
               subModuleId: duplicatedSub.id,
-              type: subContent.type,
-              body: subContent.body || "",
+              blockType: subContent.blockType,
+              content: subContent.content || "",
               videoUrl: subContent.videoUrl || "",
               pdfUrl: subContent.pdfUrl || "",
+              imageUrl: subContent.imageUrl || "",
+              title: subContent.title || `${sub.title} Content`
             });
           }
         }
@@ -568,14 +935,16 @@ export default function useCurriculumBuilder() {
           description: sub.description || "",
         });
 
-        const subContent = allContents.find(cont => cont.subModuleId === sub.id);
-        if (subContent) {
+        const subContents = allContents.filter(cont => cont.subModuleId === sub.id);
+        for (const subContent of subContents) {
           await contentService.createContent({
             subModuleId: duplicatedSub.id,
-            type: subContent.type,
-            body: subContent.body || "",
+            blockType: subContent.blockType,
+            content: subContent.content || "",
             videoUrl: subContent.videoUrl || "",
             pdfUrl: subContent.pdfUrl || "",
+            imageUrl: subContent.imageUrl || "",
+            title: subContent.title || `${sub.title} Content`
           });
         }
       }
@@ -590,7 +959,7 @@ export default function useCurriculumBuilder() {
 
   const handleDuplicateSubModule = async (sub) => {
     try {
-      showToast("Duplicating block...");
+      showToast("Duplicating sub-module...");
       const duplicatedSub = await subModuleService.createSubModule({
         moduleId: sub.moduleId,
         title: `${sub.title} (Copy)`,
@@ -598,17 +967,39 @@ export default function useCurriculumBuilder() {
       });
 
       const allContents = await contentService.getAllContents();
-      const subContent = allContents.find(cont => cont.subModuleId === sub.id);
-      if (subContent) {
+      const subContents = allContents.filter(cont => cont.subModuleId === sub.id);
+      for (const subContent of subContents) {
         await contentService.createContent({
           subModuleId: duplicatedSub.id,
-          type: subContent.type,
-          body: subContent.body || "",
+          blockType: subContent.blockType,
+          content: subContent.content || "",
           videoUrl: subContent.videoUrl || "",
           pdfUrl: subContent.pdfUrl || "",
+          imageUrl: subContent.imageUrl || "",
+          title: subContent.title || `${sub.title} Content`
         });
       }
 
+      showToast("Sub-module duplicated successfully!");
+      await reloadAllLoadedCourses();
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to duplicate sub-module.", "error");
+    }
+  };
+
+  const handleDuplicateBlock = async (block) => {
+    try {
+      showToast("Duplicating block...");
+      await contentService.createContent({
+        subModuleId: block.subModuleId,
+        blockType: block.blockType,
+        content: block.content || "",
+        videoUrl: block.videoUrl || "",
+        pdfUrl: block.pdfUrl || "",
+        imageUrl: block.imageUrl || "",
+        title: block.title || "Block Content"
+      });
       showToast("Block duplicated successfully!");
       await reloadAllLoadedCourses();
     } catch (err) {
@@ -742,6 +1133,28 @@ export default function useCurriculumBuilder() {
     setBlockConfigOpen,
     blockConfigType,
     setBlockConfigType,
+    headingText,
+    setHeadingText,
+    quoteText,
+    setQuoteText,
+    dividerStyle,
+    setDividerStyle,
+    imageAlt,
+    setImageAlt,
+    imageCaption,
+    setImageCaption,
+    codeContent,
+    setCodeContent,
+    codeLanguage,
+    setCodeLanguage,
+    downloadUrl,
+    setDownloadUrl,
+    downloadDisplayName,
+    setDownloadDisplayName,
+    linkUrl,
+    setLinkUrl,
+    linkText,
+    setLinkText,
     openEditBlockDialog,
     handleSelectBlockType,
     handleSaveBlock,
@@ -754,13 +1167,30 @@ export default function useCurriculumBuilder() {
     handleDuplicateCourse,
     handleDuplicateModule,
     handleDuplicateSubModule,
+    handleMoveModule,
+    handleMoveSubModule,
+    // Quiz & Assignment state
+    quizQuestions,
+    setQuizQuestions,
+    assignmentInstructions,
+    setAssignmentInstructions,
+    assignmentDueDate,
+    setAssignmentDueDate,
+    assignmentSubmissionType,
+    setAssignmentSubmissionType,
+    assignmentMaxScore,
+    setAssignmentMaxScore,
+    activeBlock,
+    setActiveBlock,
+    editingBlock,
+    setEditingBlock,
+    handleDuplicateBlock,
     // Multi course props
     loadedCourses,
-    setLoadedCourses,
+    setLoadedCourses: changeLoadedCourses,
     activeCourseId,
-    setActiveCourseId,
+    setActiveCourseId: changeActiveCourseId,
     expandedCourses,
     setExpandedCourses,
   };
 }
-

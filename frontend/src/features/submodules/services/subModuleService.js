@@ -6,6 +6,11 @@ const subModuleService = {
     return response.data.data;
   },
 
+  getSubModulesByModuleId: async (moduleId, config) => {
+    const response = await api.get(`/submodules?moduleId=${moduleId}`, config);
+    return response.data.data;
+  },
+
   createSubModule: async (subModuleData, config) => {
     const response = await api.post("/submodules", subModuleData, config);
     return response.data.data;
@@ -18,6 +23,11 @@ const subModuleService = {
 
   deleteSubModule: async (id, config) => {
     const response = await api.delete(`/submodules/${id}`, config);
+    return response.data;
+  },
+
+  reorderSubModules: async (reorderList) => {
+    const response = await api.put("/submodules/reorder", reorderList);
     return response.data;
   },
 };

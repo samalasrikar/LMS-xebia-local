@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -8,30 +8,49 @@ import {
   Layers,
   FileText,
   Users,
-  Award,
-  Trophy,
   Calendar,
-  Search,
-  Settings,
-  Shield,
-  Plug,
   GraduationCap,
-  ChevronsUpDown,
-  HelpCircle,
-  TrendingUp,
-  Brain,
-  Clock,
-  LineChart,
-  X,
-
-  Briefcase,
-  Target,
-
   LayoutTemplate,
-
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 
-import adminProfileIcon from "../../assets/admin_profile_icon.svg";
+/* ─── Tooltip on hover (collapsed mode) ─── */
+function NavTooltip({ label, children }) {
+  const [show, setShow] = useState(false);
+  const ref = useRef(null);
+  const [top, setTop] = useState(0);
+
+  const handleEnter = () => {
+    if (ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      setTop(rect.top + rect.height / 2);
+    }
+    setShow(true);
+  };
+
+  return (
+    <div
+      ref={ref}
+      className="relative"
+      onMouseEnter={handleEnter}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {show && (
+        <div
+          className="fixed z-[9999] ml-2 -translate-y-1/2 pointer-events-none"
+          style={{ left: "60px", top }}
+        >
+          <div className="bg-slate-900 text-white text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
+            {label}
+            <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-slate-900 rotate-45" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const NAV_GROUPS = [
   {
@@ -47,7 +66,6 @@ const NAV_GROUPS = [
       },
     ],
   },
-
   {
     label: "Content",
     items: [
@@ -58,180 +76,149 @@ const NAV_GROUPS = [
       { title: "Content Library", path: "/content-library", icon: FileText },
     ],
   },
-
   {
     label: "Learning",
     items: [
       { title: "Learners", path: "/learners", icon: Users },
-      { title: "Schedule", path: "/schedule", icon: Calendar },
-    ],
-  },
-
-  {
-    label: "System",
-    items: [
-      { title: "SEO & Meta", path: "/seo", icon: Search },
-      { title: "Design System", path: "/design-system", icon: LayoutTemplate },
-      { title: "Settings", path: "/settings", icon: Settings },
-      { title: "Permissions", path: "/permissions", icon: Shield },
-      { title: "Integrations", path: "/integrations", icon: Plug },
-      { title: "Support", path: "/support", icon: HelpCircle },
+      { title: "Events Management", path: "/admin/events", icon: Calendar },
     ],
   },
 ];
 
-
-
-
-export default function Sidebar() {
+export default function Sidebar({ collapsed, setCollapsed }) {
   const location = useLocation();
-  const [searchQuery, setSearchQuery] = useState("");
 
   const isActive = (path) => {
     if (path === "/admin") return location.pathname === "/admin";
     return location.pathname.startsWith(path);
   };
 
-  // Helper to highlight matching text case-insensitively
-  const highlightText = (text, highlight) => {
-    if (!highlight.trim()) return <span>{text}</span>;
-    const regex = new RegExp(`(${highlight.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")})`, "gi");
-    const parts = text.split(regex);
-    return (
-      <span>
-        {parts.map((part, i) =>
-          regex.test(part) ? (
-            <mark key={i} className="bg-amber-100 text-[#6C1D5F] font-semibold px-0.5 rounded-[3px]">
-              {part}
-            </mark>
-          ) : (
-            part
-          )
-        )}
-      </span>
-    );
-  };
-
-  // Filter groups and items based on search query
-  const filteredGroups = NAV_GROUPS.map((group) => ({
-    ...group,
-    items: group.items.filter((item) =>
-      item.title.toLowerCase().includes(searchQuery.toLowerCase())
-    ),
-  })).filter((group) => group.items.length > 0);
-
   return (
-    <aside className="fixed left-0 top-0 hidden h-screen w-[220px] flex-col border-r border-slate-200 bg-white md:flex z-40">
-      {/* ── Logo ─────────────────────────────────── */}
-      <div className="flex items-center gap-2.5 px-4 py-[18px] border-b border-slate-200 flex-shrink-0">
-        <div className="w-[30px] h-[30px] rounded-lg bg-[#6C1D5F] flex items-center justify-center flex-shrink-0">
-          <GraduationCap size={16} className="text-white" />
+    <aside
+      className={`fixed left-0 top-0 hidden h-screen bg-white border-r border-slate-200/80 flex-col md:flex z-40 transition-all duration-300 ease-in-out shadow-[1px_0_3px_rgba(0,0,0,0.02)] ${
+        collapsed ? "w-[60px]" : "w-[240px]"
+      }`}
+    >
+      {/* ── Logo ── */}
+      <div
+        className={`flex items-center border-b border-slate-200/80 shrink-0 transition-all duration-300 ${
+          collapsed ? "justify-center py-3.5" : "gap-3 px-5 py-[18px]"
+        }`}
+      >
+        <div
+          className={`rounded-xl bg-gradient-to-br from-[#6C1D5F] to-[#84117C] flex items-center justify-center shrink-0 shadow-sm shadow-[#6C1D5F]/20 transition-all duration-300 ${
+            collapsed ? "w-8 h-8" : "w-9 h-9"
+          }`}
+        >
+          <GraduationCap size={collapsed ? 16 : 18} className="text-white" />
         </div>
-        <div>
-          <div className="text-[14px] font-bold text-slate-900 tracking-tight leading-none">Xebia LMS</div>
-          <div className="text-[9px] text-slate-400 font-semibold tracking-widest uppercase mt-0.5">Admin Portal</div>
-        </div>
-      </div>
-
-      {/* ── Search ───────────────────────────────── */}
-      <div className="mx-3 my-2.5 relative">
-        <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search pages..."
-          className="w-full bg-slate-50 border border-slate-200 rounded-md py-1.5 pl-7 pr-6 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F] transition-all"
-        />
-        {searchQuery && (
-          <button
-            onClick={() => setSearchQuery("")}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-          >
-            <X size={12} />
-          </button>
+        {!collapsed && (
+          <div>
+            <div className="text-[14px] font-bold text-slate-900 tracking-tight leading-none whitespace-nowrap">
+              Xebia LMS
+            </div>
+            <div className="text-[9px] text-[#6C1D5F] font-semibold tracking-widest uppercase mt-1 whitespace-nowrap">
+              Admin Portal
+            </div>
+          </div>
         )}
       </div>
 
-      {/* ── Nav Groups ───────────────────────────── */}
-      <nav className="flex-1 overflow-y-auto pb-2">
-        {filteredGroups.length === 0 ? (
-          <div className="px-4 py-8 text-center text-[12px] text-slate-400">
-            No pages found.
-          </div>
-        ) : (
-          filteredGroups.map((group) => (
-            <div key={group.label}>
-              <div className="px-4 pt-3.5 pb-1.5 text-[10px] font-bold text-slate-400 tracking-widest uppercase">
+      {/* ── Nav Groups (scrollable) ── */}
+      <nav className="flex-1 overflow-y-auto py-2">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.label}>
+            {!collapsed && (
+              <div className="px-4 pt-3 pb-1.5 text-[10px] font-bold text-slate-400 tracking-widest uppercase">
                 {group.label}
               </div>
-              {group.items.map((item) => {
-                const Icon = item.icon;
-                const active = isActive(item.path);
-                return (
-                  <NavLink
-                    key={item.title}
-                    to={item.path}
-                    onClick={() => setSearchQuery("")}
-                    className={() =>
-                      `flex items-center gap-2.5 mx-1.5 px-3 py-1.5 my-px rounded-md text-[13px] font-medium transition-all ${active
-                        ? "bg-[#6C1D5F]/10 text-[#6C1D5F] font-semibold"
-                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                      }`
-                    }
-                  >
-                    <Icon
-                      size={14}
-                      className={`flex-shrink-0 ${active ? "text-[#6C1D5F]" : "text-slate-400"}`}
-                    />
-                    <span className="flex-1 whitespace-nowrap">
-                      {highlightText(item.title, searchQuery)}
-                    </span>
-                    {item.badge && (
-                      <span
-                        className={`text-[10px] font-semibold px-1.5 py-px rounded-full border ${item.badgeAccent
+            )}
+            {group.items.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.path);
+
+              const linkEl = collapsed ? (
+                <NavLink
+                  to={item.path}
+                  className={`flex items-center justify-center w-9 h-9 mx-auto rounded-xl transition-all duration-200 ${
+                    active
+                      ? "bg-[#6C1D5F]/10 text-[#6C1D5F] shadow-sm"
+                      : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  }`}
+                >
+                  <Icon size={18} className="shrink-0" />
+                </NavLink>
+              ) : (
+                <NavLink
+                  to={item.path}
+                  className={`group flex items-center gap-3 mx-2 rounded-xl text-[13px] font-medium transition-all duration-200 relative px-3.5 py-2 ${
+                    active
+                      ? "bg-[#6C1D5F]/10 text-[#6C1D5F] font-semibold"
+                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                  }`}
+                >
+                  {active && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#6C1D5F] rounded-r-full" />
+                  )}
+                  <Icon
+                    size={16}
+                    className={`shrink-0 transition-colors duration-200 ${
+                      active
+                        ? "text-[#6C1D5F]"
+                        : "text-slate-400 group-hover:text-slate-600"
+                    }`}
+                  />
+                  <span className="whitespace-nowrap">{item.title}</span>
+                  {item.badge && (
+                    <span
+                      className={`text-[10px] font-semibold px-1.5 py-px rounded-full border ${
+                        item.badgeAccent
                           ? "bg-[#6C1D5F] text-white border-[#6C1D5F]"
                           : "bg-slate-100 text-slate-500 border-slate-200"
-                          }`}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
-                  </NavLink>
-                );
-              })}
-            </div>
-          ))
-        )}
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </NavLink>
+              );
+
+              return collapsed ? (
+                <NavTooltip key={item.title} label={item.title}>
+                  <div className="py-0.5">{linkEl}</div>
+                </NavTooltip>
+              ) : (
+                <div key={item.title}>{linkEl}</div>
+              );
+            })}
+            {collapsed && <div className="my-1.5 mx-3 border-t border-slate-100" />}
+          </div>
+        ))}
       </nav>
 
-      {/* ── Student Panel Switch ── */}
-      <div className="flex-shrink-0 border-t border-slate-200 p-3 bg-slate-50/50">
-        <NavLink
-          to="/student"
-          className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[#6C1D5F] hover:bg-[#521347] text-white text-[12px] font-semibold transition-all shadow-sm shadow-[#6C1D5F]/15 hover:shadow-md cursor-pointer text-center w-full"
+      {/* ── Toggle button (pinned bottom) ── */}
+      <div
+        className={`shrink-0 border-t border-slate-200/80 py-2.5 ${
+          collapsed ? "flex justify-center" : "px-2 bg-white"
+        }`}
+      >
+        <button
+          onClick={() => setCollapsed((prev) => !prev)}
+          className={`flex items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all cursor-pointer border-none outline-none ${
+            collapsed ? "w-9 h-9" : "w-full gap-2 px-3.5 py-2 text-[12px] font-semibold"
+          }`}
+          title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          aria-label={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
-          <GraduationCap size={13} className="shrink-0" />
-          <span>Student Panel</span>
-        </NavLink>
-      </div>
-
-      {/* ── User Footer ──────────────────────────── */}
-      <div className="flex-shrink-0 border-t border-slate-200 p-3">
-        <div className="flex items-center gap-2.5 cursor-pointer rounded-md p-1 hover:bg-slate-50 transition-colors">
-          <img
-            src={adminProfileIcon}
-            alt="Admin"
-            className="w-[30px] h-[30px] rounded-full object-cover flex-shrink-0"
-          />
-          <div className="flex-1 min-w-0">
-            <div className="text-[12px] font-bold text-slate-900 whitespace-nowrap overflow-hidden text-ellipsis">
-              Admin
-            </div>
-            <div className="text-[10px] text-slate-400 font-medium">Super Admin</div>
-          </div>
-          <ChevronsUpDown size={13} className="text-slate-400 flex-shrink-0" />
-        </div>
+          {collapsed ? (
+            <PanelLeftOpen size={16} />
+          ) : (
+            <>
+              <PanelLeftClose size={16} />
+              <span className="whitespace-nowrap">Collapse</span>
+            </>
+          )}
+        </button>
       </div>
     </aside>
   );

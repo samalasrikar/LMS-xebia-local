@@ -3,7 +3,6 @@ import {
   TrendingUp,
   Award,
   Flame,
-  Download,
   Brain,
 } from "lucide-react";
 import {
@@ -88,9 +87,6 @@ export default function StudentAnalytics() {
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">Analytics Overview</h2>
           <p className="text-[13px] text-slate-400 mt-1">Track your academic progress and skill development.</p>
         </div>
-        <button className="flex items-center gap-1.5 bg-[#6C1D5F]/10 hover:bg-[#6C1D5F]/15 text-[#6C1D5F] px-4.5 py-2 rounded-xl text-[12px] font-bold transition-all cursor-pointer border-none outline-none">
-          <Download size={13} /> Export Report
-        </button>
       </div>
 
       {/* ── Top Stats Row ── */}
