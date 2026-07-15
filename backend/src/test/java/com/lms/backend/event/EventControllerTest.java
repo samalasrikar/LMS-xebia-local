@@ -1,7 +1,6 @@
 package com.lms.backend.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lms.backend.common.ApiResponse;
 import com.lms.backend.exception.BadRequestException;
 import com.lms.backend.exception.GlobalExceptionHandler;
 import com.lms.backend.exception.ResourceAlreadyExistsException;
@@ -17,11 +16,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -33,6 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SuppressWarnings("null")
 public class EventControllerTest {
 
     private MockMvc mockMvc;

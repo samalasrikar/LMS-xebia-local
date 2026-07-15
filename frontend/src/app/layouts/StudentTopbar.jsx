@@ -100,42 +100,41 @@ const PATH_METADATA = {
   },
 };
 
-/* ── Mock notifications (API-ready structure) ────────────────────── */
-const MOCK_NOTIFICATIONS = [
-  {
-    id: 1,
-    type: "reminder",
-    title: "Assignment Due Tomorrow",
-    description: "Advanced Data Structures — Final project due at 11:59 PM.",
-    time: "2h ago",
-    read: false,
-    icon: ClipboardList,
-    color: "text-[#6C1D5F]",
-    bg: "bg-[#6C1D5F]/10",
-  },
-  {
-    id: 2,
-    type: "system",
-    title: "New Grade Posted",
-    description: "Data Visualization — Score: A (94%)",
-    time: "5h ago",
-    read: false,
-    icon: Megaphone,
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-  },
-  {
-    id: 3,
-    type: "community",
-    title: "Discussion Reply",
-    description: 'Sarah Jenkins replied to your post in "Ethical AI".',
-    time: "Yesterday",
-    read: true,
-    icon: MessageSquare,
-    color: "text-teal-600",
-    bg: "bg-teal-50",
-  },
-];
+const getDropdownIconDetails = (category) => {
+  switch (category) {
+    case "reminder":
+      return { icon: ClipboardList, color: "text-[#6C1D5F]", bg: "bg-[#6C1D5F]/10" };
+    case "system":
+      return { icon: Megaphone, color: "text-amber-600", bg: "bg-amber-50" };
+    case "community":
+      return { icon: MessageSquare, color: "text-teal-600", bg: "bg-teal-50" };
+    default:
+      return { icon: ClipboardList, color: "text-slate-500", bg: "bg-slate-50" };
+  }
+};
+
+const formatRelativeTime = (dateString) => {
+  if (!dateString) return "";
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    
+    if (diffMins < 60) {
+      return diffMins <= 0 ? "Just now" : `${diffMins}m ago`;
+    } else if (diffHours < 24) {
+      return `${diffHours}h ago`;
+    } else if (diffHours < 48) {
+      return "Yesterday";
+    } else {
+      return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    }
+  } catch (e) {
+    return "";
+  }
+};
 
 export default function StudentTopbar() {
   const location = useLocation();
@@ -145,7 +144,36 @@ export default function StudentTopbar() {
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [scrolled, setScrolled] = useState(false);
-  const [notifications] = useState(MOCK_NOTIFICATIONS);
+  
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchNotificationsData = useCallback(async () => {
+    try {
+      const countRes = await api.get("/notifications/unread-count", {
+        params: { role: "student", userId: "s4" }
+      });
+      setUnreadCount(countRes.data?.data || 0);
+
+      const listRes = await api.get("/notifications", {
+        params: { role: "student", userId: "s4", page: 0, size: 5 }
+      });
+      if (listRes.data && listRes.data.data) {
+        const content = Array.isArray(listRes.data.data) 
+          ? listRes.data.data 
+          : (listRes.data.data.content || []);
+        setNotifications(content);
+      }
+    } catch (err) {
+      console.error("Failed to fetch student topbar notifications:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchNotificationsData();
+    const interval = setInterval(fetchNotificationsData, 10000);
+    return () => clearInterval(interval);
+  }, [fetchNotificationsData]);
 
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -301,7 +329,6 @@ export default function StudentTopbar() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
   const isMac =
     typeof navigator !== "undefined" &&
     /Mac|iPhone|iPad/.test(navigator.userAgent);
@@ -314,20 +341,8 @@ export default function StudentTopbar() {
           : "border-slate-200/80"
       }`}
     >
-      {/* ── Left: Title ──────────────────────────── */}
-      <div className="flex flex-col min-w-0 shrink-0 mr-4">
-        {/* Title + description */}
-        <div className="flex items-baseline gap-2">
-          <h1 className="text-[15px] font-bold text-slate-800 leading-tight truncate">
-            {meta.title}
-          </h1>
-          {meta.description && (
-            <span className="hidden xl:inline text-[11px] text-slate-400 font-medium border-l border-slate-200 pl-2 truncate">
-              {meta.description}
-            </span>
-          )}
-        </div>
-      </div>
+      {/* ── Left: Empty ────────────────────────── */}
+      <div className="flex-1 max-w-[200px]" />
 
       {/* ── Center: Global Search ─────────────────────────────── */}
       <div ref={searchWrapperRef} className="hidden md:flex flex-1 max-w-md mx-auto relative">
@@ -450,7 +465,7 @@ export default function StudentTopbar() {
             <ScrollArea className="max-h-72">
               <div className="py-1">
                 {notifications.map((n) => {
-                  const Icon = n.icon;
+                  const { icon: Icon, color, bg } = getDropdownIconDetails(n.category);
                   return (
                     <button
                       key={n.id}
@@ -460,9 +475,9 @@ export default function StudentTopbar() {
                       onClick={() => navigate("/student/notifications")}
                     >
                       <div
-                        className={`shrink-0 w-8 h-8 rounded-lg ${n.bg} flex items-center justify-center mt-0.5`}
+                        className={`shrink-0 w-8 h-8 rounded-lg ${bg} flex items-center justify-center mt-0.5`}
                       >
-                        <Icon size={14} className={n.color} />
+                        <Icon size={14} className={color} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
@@ -477,7 +492,7 @@ export default function StudentTopbar() {
                           {n.description}
                         </p>
                         <span className="text-[10.5px] text-slate-400 mt-0.5 block">
-                          {n.time}
+                          {formatRelativeTime(n.createdAt)}
                         </span>
                       </div>
                     </button>

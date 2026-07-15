@@ -44,9 +44,9 @@ export default function AppLayout({ children }) {
   let marginLeft = "";
   if (!isAnalytics) {
     if (isTrainer) {
-      marginLeft = trainerCollapsed ? "md:ml-[72px]" : "md:ml-[250px]";
+      marginLeft = trainerCollapsed ? "md:ml-[60px]" : "md:ml-[240px]";
     } else {
-      marginLeft = adminCollapsed ? "md:ml-[72px]" : "md:ml-[220px]";
+      marginLeft = adminCollapsed ? "md:ml-[60px]" : "md:ml-[240px]";
     }
   }
 

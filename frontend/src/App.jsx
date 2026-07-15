@@ -19,10 +19,7 @@ import ApprovalCenter from "@/features/manager/pages/ApprovalCenter";
 
 // Admin features
 import Dashboard from "@/features/admin/pages/Dashboard";
-import DesignSystem from "@/features/admin/pages/DesignSystem";
-import Integrations from "@/features/admin/pages/Integrations";
 import Learners from "@/features/admin/pages/Learners";
-import SEOMeta from "@/features/admin/pages/SEOMeta";
 import Settings from "@/features/admin/pages/Settings";
 
 // Categories Feature
@@ -113,6 +110,11 @@ import StudentCourseOverview from "@/features/student/pages/StudentCourseOvervie
 import StudentModuleDetail from "@/features/student/pages/StudentModuleDetail";
 import StudentLessonDetail from "@/features/student/pages/StudentLessonDetail";
 import StudentCourseCompletion from "@/features/student/pages/StudentCourseCompletion";
+
+// Additional Portal Notifications Pages
+import AdminNotifications from "@/features/admin/pages/AdminNotifications";
+import ManagerNotifications from "@/features/manager/pages/ManagerNotifications";
+import TrainerNotifications from "@/features/trainer/pages/TrainerNotifications";
  
 function App() {
   return (
@@ -135,17 +137,16 @@ function App() {
         <Route path="batches" element={<BatchManagement />} />
         <Route path="approvals" element={<ApprovalCenter />} />
         <Route path="profile" element={<StudentProfile />} />
+        <Route path="notifications" element={<ManagerNotifications />} />
       </Route>
 
       <Route path="/admin" element={<Dashboard />} />
       <Route path="/admin/profile" element={<StudentProfile />} />
+      <Route path="/admin/notifications" element={<AdminNotifications />} />
 
-      {/* Stitch-integrated Admin pages */}
-      <Route path="/seo" element={<SEOMeta />} />
+      {/* Admin pages */}
       <Route path="/learners" element={<Learners />} />
-      <Route path="/integrations" element={<Integrations />} />
       <Route path="/settings" element={<Settings />} />
-      <Route path="/design-system" element={<DesignSystem />} />
       <Route path="/admin/events" element={<EventsManagement />} />
       <Route path="/admin/events/create" element={<CreateEvent />} />
       <Route path="/admin/events/edit/:id" element={<CreateEvent />} />
@@ -184,6 +185,7 @@ function App() {
       <Route path="/trainer/profile" element={<StudentProfile />} />
       <Route path="/trainer/events" element={<EventsCatalog />} />
       <Route path="/trainer/events/:id" element={<EventDetail />} />
+      <Route path="/trainer/notifications" element={<TrainerNotifications />} />
 
       {/* ── Student Portal (sidebar layout) ── */}
       <Route path="/student" element={<StudentLayout />}>
