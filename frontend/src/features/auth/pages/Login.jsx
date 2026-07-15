@@ -1,26 +1,35 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { 
-  GraduationCap, 
-  Eye, 
-  EyeOff, 
-  Shield, 
-  Users, 
-  ArrowLeft, 
-  ArrowRight, 
-  Lock, 
-  Mail, 
-  CheckCircle2, 
-  Briefcase, 
-  BookOpen 
+import { Link, useNavigate } from "react-router-dom";
+import {
+  GraduationCap,
+  ArrowLeft,
+  ArrowRight,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  Shield,
+  Users,
+  Briefcase,
+  BookOpen,
+  CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 
+/* ─── Demo credentials (unchanged) ─── */
 const DEMO_CREDS = {
-  admin: { email: "admin@xebia.com", password: "Xebia@2024", role: "admin", label: "Admin Console", route: "/admin" },
-  trainer: { email: "trainer@xebia.com", password: "Xebia@2024", role: "trainer", label: "Trainer Workspace", route: "/trainer" },
-  student: { email: "student@xebia.com", password: "Xebia@2024", role: "student", label: "Student Portal", route: "/student" },
-  manager: { email: "manager@xebia.com", password: "Xebia@2024", role: "manager", label: "Manager Console", route: "/manager" },
+  admin:   { email: "admin@xebia.com",   password: "Xebia@2024", role: "admin",   label: "Admin Console",     route: "/admin" },
+  trainer: { email: "trainer@xebia.com", password: "Xebia@2024", role: "trainer", label: "Trainer Workspace",  route: "/trainer" },
+  student: { email: "student@xebia.com", password: "Xebia@2024", role: "student", label: "Student Portal",     route: "/student" },
+  manager: { email: "manager@xebia.com", password: "Xebia@2024", role: "manager", label: "Manager Console",    route: "/manager" },
 };
+
+const CARD_META = [
+  { key: "admin",   icon: Shield,    color: "#84117C", bg: "rgba(108,29,95,0.08)",  border: "rgba(108,29,95,0.2)" },
+  { key: "trainer", icon: BookOpen,  color: "#84117C", bg: "rgba(108,29,95,0.08)",  border: "rgba(108,29,95,0.2)" },
+  { key: "manager", icon: Briefcase, color: "#84117C", bg: "rgba(132,17,124,0.08)", border: "rgba(132,17,124,0.2)" },
+  { key: "student", icon: Users,     color: "#01ac9f", bg: "rgba(1,172,159,0.08)",  border: "rgba(1,172,159,0.2)" },
+];
 
 export default function Login() {
   const navigate = useNavigate();
@@ -31,7 +40,9 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [activeCard, setActiveCard] = useState(null);
+  const [hoveredCard, setHoveredCard] = useState(null);
 
+  /* ── Handlers (unchanged logic) ── */
   const doLogin = (route) => {
     setLoading(true);
     setError("");
@@ -57,7 +68,7 @@ export default function Login() {
     const trainerCred = DEMO_CREDS.trainer;
     const studentCred = DEMO_CREDS.student;
     const managerCred = DEMO_CREDS.manager;
-    
+
     if (email === adminCred.email && password === adminCred.password) {
       doLogin(adminCred.route);
     } else if (email === trainerCred.email && password === trainerCred.password) {
@@ -71,28 +82,37 @@ export default function Login() {
     }
   };
 
+  /* ── Render ── */
   return (
     <div style={{ minHeight: "100vh", display: "flex", fontFamily: "'Geist Variable', sans-serif", background: "#ffffff", color: "#1b1c1c", overflow: "hidden" }}>
 
-      {/* ── Left panel ──────────────────────────────── */}
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        padding: "48px 48px",
-        width: "45%",
-        minWidth: "380px",
-        background: "linear-gradient(160deg, #f8f7fa 0%, #f0ecf4 40%, #e8e0ec 100%)",
-        borderRight: "1px solid rgba(0,0,0,0.08)",
-        position: "relative",
-        overflow: "hidden",
-        flexShrink: 0,
-      }}
+      {/* ════════════════ LEFT PANEL ════════════════ */}
+      <div
         className="hidden-mobile"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "48px 48px",
+          width: "45%",
+          minWidth: "380px",
+          background: "linear-gradient(160deg, #f8f7fa 0%, #f0ecf4 40%, #e8e0ec 100%)",
+          borderRight: "1px solid rgba(0,0,0,0.08)",
+          position: "relative",
+          overflow: "hidden",
+          flexShrink: 0,
+        }}
       >
         {/* Decorative glows */}
         <div style={{ position: "absolute", top: "-80px", right: "-80px", width: "320px", height: "320px", background: "radial-gradient(circle, rgba(132,17,124,0.1) 0%, transparent 70%)", borderRadius: "50%", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: "-60px", left: "-60px", width: "260px", height: "260px", background: "radial-gradient(circle, rgba(1,172,159,0.08) 0%, transparent 70%)", borderRadius: "50%", pointerEvents: "none" }} />
+
+        {/* Grid pattern overlay */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none", opacity: 0.03,
+          backgroundImage: "linear-gradient(rgba(108,29,95,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(108,29,95,0.3) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }} />
 
         {/* Top: back link */}
         <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "rgba(27,28,28,0.55)", fontSize: "13px", fontWeight: 600, textDecoration: "none", transition: "color 0.2s", position: "relative" }}
@@ -104,7 +124,13 @@ export default function Login() {
 
         {/* Middle: branding + text */}
         <div style={{ position: "relative" }}>
-          <div style={{ width: "56px", height: "56px", borderRadius: "16px", background: "linear-gradient(135deg, #6C1D5F, #84117C)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "28px", boxShadow: "0 8px 24px rgba(108,29,95,0.25)" }}>
+          <div style={{
+            width: "56px", height: "56px", borderRadius: "16px",
+            background: "linear-gradient(135deg, #6C1D5F, #84117C)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            marginBottom: "28px",
+            boxShadow: "0 8px 24px rgba(108,29,95,0.25)",
+          }}>
             <GraduationCap size={26} color="#fff" />
           </div>
           <h2 style={{ fontSize: "clamp(22px, 2.5vw, 32px)", fontWeight: 800, color: "#1b1c1c", lineHeight: 1.2, letterSpacing: "-0.02em", marginBottom: "16px" }}>
@@ -133,7 +159,7 @@ export default function Login() {
         </div>
       </div>
 
-      {/* ── Right panel: login form ──────────────────── */}
+      {/* ════════════════ RIGHT PANEL ════════════════ */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px", background: "#ffffff", position: "relative", overflow: "auto" }}>
         {/* Subtle background pattern */}
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 70% 30%, rgba(108,29,95,0.04), transparent 60%)", pointerEvents: "none" }} />
@@ -155,60 +181,55 @@ export default function Login() {
 
           {/* ── Quick Access Cards ── */}
           <div style={{ marginBottom: "24px" }}>
-            <div style={{ fontSize: "11px", fontWeight: 700, color: "rgba(27,28,28,0.45)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>Quick Access</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "8px" }}>
-              
-              {/* Admin card */}
-              <button type="button" onClick={() => handleQuickLogin("admin")}
-                style={{ padding: "12px 8px", borderRadius: "12px", background: activeCard === "admin" ? "rgba(108,29,95,0.08)" : "#f8f7fa", border: activeCard === "admin" ? "1px solid rgba(108,29,95,0.4)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
-                onMouseEnter={e => { if (activeCard !== "admin") { e.currentTarget.style.background = "rgba(108,29,95,0.05)"; e.currentTarget.style.border = "1px solid rgba(108,29,95,0.25)"; } }}
-                onMouseLeave={e => { if (activeCard !== "admin") { e.currentTarget.style.background = "#f8f7fa"; e.currentTarget.style.border = "1px solid rgba(0,0,0,0.08)"; } }}
-              >
-                <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(108,29,95,0.1)", border: "1px solid rgba(108,29,95,0.2)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
-                  <Shield size={15} color="#84117C" />
-                </div>
-                <div style={{ fontSize: "11px", fontWeight: 700, color: "#1b1c1c", marginBottom: "3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Admin Console</div>
-                <div style={{ fontSize: "9px", color: "rgba(27,28,28,0.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>admin@xebia.com</div>
-              </button>
-
-              {/* Trainer card */}
-              <button type="button" onClick={() => handleQuickLogin("trainer")}
-                style={{ padding: "12px 8px", borderRadius: "12px", background: activeCard === "trainer" ? "rgba(108,29,95,0.08)" : "#f8f7fa", border: activeCard === "trainer" ? "1px solid rgba(108,29,95,0.4)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
-                onMouseEnter={e => { if (activeCard !== "trainer") { e.currentTarget.style.background = "rgba(108,29,95,0.05)"; e.currentTarget.style.border = "1px solid rgba(108,29,95,0.25)"; } }}
-                onMouseLeave={e => { if (activeCard !== "trainer") { e.currentTarget.style.background = "#f8f7fa"; e.currentTarget.style.border = "1px solid rgba(0,0,0,0.08)"; } }}
-              >
-                <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(108,29,95,0.1)", border: "1px solid rgba(108,29,95,0.2)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
-                  <BookOpen size={15} color="#84117C" />
-                </div>
-                <div style={{ fontSize: "11px", fontWeight: 700, color: "#1b1c1c", marginBottom: "3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Trainer Workspace</div>
-                <div style={{ fontSize: "9px", color: "rgba(27,28,28,0.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>trainer@xebia.com</div>
-              </button>
-
-              {/* Manager card */}
-              <button type="button" onClick={() => handleQuickLogin("manager")}
-                style={{ padding: "12px 8px", borderRadius: "12px", background: activeCard === "manager" ? "rgba(132,17,124,0.08)" : "#f8f7fa", border: activeCard === "manager" ? "1px solid rgba(132,17,124,0.4)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
-                onMouseEnter={e => { if (activeCard !== "manager") { e.currentTarget.style.background = "rgba(132,17,124,0.05)"; e.currentTarget.style.border = "1px solid rgba(132,17,124,0.25)"; } }}
-                onMouseLeave={e => { if (activeCard !== "manager") { e.currentTarget.style.background = "#f8f7fa"; e.currentTarget.style.border = "1px solid rgba(0,0,0,0.08)"; } }}
-              >
-                <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(132,17,124,0.1)", border: "1px solid rgba(132,17,124,0.2)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
-                  <Briefcase size={15} color="#84117C" />
-                </div>
-                <div style={{ fontSize: "11px", fontWeight: 700, color: "#1b1c1c", marginBottom: "3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Manager Console</div>
-                <div style={{ fontSize: "9px", color: "rgba(27,28,28,0.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>manager@xebia.com</div>
-              </button>
-
-              {/* Student card */}
-              <button type="button" onClick={() => handleQuickLogin("student")}
-                style={{ padding: "12px 8px", borderRadius: "12px", background: activeCard === "student" ? "rgba(1,172,159,0.08)" : "#f8f7fa", border: activeCard === "student" ? "1px solid rgba(1,172,159,0.35)" : "1px solid rgba(0,0,0,0.08)", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
-                onMouseEnter={e => { if (activeCard !== "student") { e.currentTarget.style.background = "rgba(1,172,159,0.05)"; e.currentTarget.style.border = "1px solid rgba(1,172,159,0.2)"; } }}
-                onMouseLeave={e => { if (activeCard !== "student") { e.currentTarget.style.background = "#f8f7fa"; e.currentTarget.style.border = "1px solid rgba(0,0,0,0.08)"; } }}
-              >
-                <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(1,172,159,0.1)", border: "1px solid rgba(1,172,159,0.2)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
-                  <Users size={15} color="#01ac9f" />
-                </div>
-                <div style={{ fontSize: "11px", fontWeight: 700, color: "#1b1c1c", marginBottom: "3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Student Portal</div>
-                <div style={{ fontSize: "9px", color: "rgba(27,28,28,0.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>student@xebia.com</div>
-              </button>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", fontWeight: 700, color: "rgba(27,28,28,0.45)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+              <Sparkles size={12} />
+              Quick Access
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+              {CARD_META.map(({ key, icon: Icon, color, bg, border }) => {
+                const cred = DEMO_CREDS[key];
+                const isActive = activeCard === key;
+                const isHovered = hoveredCard === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => handleQuickLogin(key)}
+                    onMouseEnter={() => setHoveredCard(key)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                    style={{
+                      padding: "12px 8px",
+                      borderRadius: "12px",
+                      background: isActive ? bg : isHovered ? "#ffffff" : "#f8f7fa",
+                      border: isActive ? `1.5px solid ${border}` : isHovered ? "1.5px solid rgba(108,29,95,0.25)" : "1.5px solid rgba(0,0,0,0.08)",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)",
+                      boxShadow: isHovered
+                        ? "0 8px 24px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04)"
+                        : "0 1px 2px rgba(0,0,0,0.03)",
+                      transform: isHovered ? "translateY(-2px)" : "none",
+                    }}
+                  >
+                    <div style={{
+                      width: "30px", height: "30px", borderRadius: "8px",
+                      background: bg, border: `1px solid ${border}`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      marginBottom: "10px",
+                      transition: "transform 0.2s",
+                      transform: isHovered ? "scale(1.05)" : "scale(1)",
+                    }}>
+                      <Icon size={15} color={color} />
+                    </div>
+                    <div style={{ fontSize: "11px", fontWeight: 700, color: "#1b1c1c", marginBottom: "3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {cred.label}
+                    </div>
+                    <div style={{ fontSize: "9px", color: "rgba(27,28,28,0.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {cred.email}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -230,21 +251,23 @@ export default function Login() {
                   if (r === "admin") activeBg = "#6C1D5F";
                   if (r === "manager") activeBg = "#84117C";
                   if (r === "trainer") activeBg = "#84117C";
-                  
+                  const isSelected = role === r;
+
                   return (
-                    <button key={r} type="button" onClick={() => { setRole(r); setEmail(DEMO_CREDS[r].email); setPassword(""); }}
-                      style={{ 
-                        flex: "1 1 calc(50% - 4px)", 
+                    <button key={r} type="button" onClick={() => { setRole(r); setEmail(DEMO_CREDS[r].email); setPassword(DEMO_CREDS[r].password); }}
+                      style={{
+                        flex: "1 1 calc(50% - 4px)",
                         minWidth: "75px",
-                        padding: "7px 0", 
-                        borderRadius: "7px", 
-                        fontSize: "12px", 
-                        fontWeight: 700, 
-                        cursor: "pointer", 
-                        border: "none", 
-                        transition: "all 0.2s",
-                        background: role === r ? activeBg : "transparent",
-                        color: role === r ? "#fff" : "rgba(27,28,28,0.45)"
+                        padding: "7px 0",
+                        borderRadius: "7px",
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        border: "none",
+                        transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+                        background: isSelected ? activeBg : "transparent",
+                        color: isSelected ? "#fff" : "rgba(27,28,28,0.45)",
+                        boxShadow: isSelected ? `0 2px 8px ${r === "student" ? "rgba(1,172,159,0.25)" : "rgba(108,29,95,0.25)"}` : "none",
                       }}
                     >
                       {r === "student" ? "Student" : r === "trainer" ? "Trainer" : r === "manager" ? "Manager" : "Admin"}
@@ -261,9 +284,9 @@ export default function Login() {
                 <Mail size={15} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "rgba(27,28,28,0.35)", pointerEvents: "none" }} />
                 <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
                   placeholder={DEMO_CREDS[role]?.email}
-                  style={{ width: "100%", paddingLeft: "40px", paddingRight: "14px", paddingTop: "11px", paddingBottom: "11px", background: "#ffffff", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "13px", color: "#1b1c1c", outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "border-color 0.2s" }}
-                  onFocus={e => e.target.style.borderColor = "rgba(108,29,95,0.5)"}
-                  onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"}
+                  style={{ width: "100%", paddingLeft: "40px", paddingRight: "14px", paddingTop: "11px", paddingBottom: "11px", background: "#ffffff", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "13px", color: "#1b1c1c", outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "all 0.2s" }}
+                  onFocus={e => { e.target.style.borderColor = "rgba(108,29,95,0.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(108,29,95,0.06)"; }}
+                  onBlur={e => { e.target.style.borderColor = "rgba(0,0,0,0.12)"; e.target.style.boxShadow = "none"; }}
                 />
               </div>
             </div>
@@ -278,9 +301,9 @@ export default function Login() {
                 <Lock size={15} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "rgba(27,28,28,0.35)", pointerEvents: "none" }} />
                 <input type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  style={{ width: "100%", paddingLeft: "40px", paddingRight: "44px", paddingTop: "11px", paddingBottom: "11px", background: "#ffffff", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "13px", color: "#1b1c1c", outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "border-color 0.2s" }}
-                  onFocus={e => e.target.style.borderColor = "rgba(108,29,95,0.5)"}
-                  onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"}
+                  style={{ width: "100%", paddingLeft: "40px", paddingRight: "44px", paddingTop: "11px", paddingBottom: "11px", background: "#ffffff", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "13px", color: "#1b1c1c", outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "all 0.2s" }}
+                  onFocus={e => { e.target.style.borderColor = "rgba(108,29,95,0.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(108,29,95,0.06)"; }}
+                  onBlur={e => { e.target.style.borderColor = "rgba(0,0,0,0.12)"; e.target.style.boxShadow = "none"; }}
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
                   style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "rgba(27,28,28,0.4)", padding: 0, display: "flex" }}>
@@ -298,10 +321,19 @@ export default function Login() {
 
             {/* Submit */}
             <button type="submit" disabled={loading}
-              style={{ width: "100%", padding: "13px", borderRadius: "10px", fontSize: "13px", fontWeight: 700, color: "#fff", cursor: loading ? "not-allowed" : "pointer", border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", transition: "opacity 0.2s",
+              style={{
+                width: "100%", padding: "13px", borderRadius: "10px", fontSize: "13px", fontWeight: 700, color: "#fff",
+                cursor: loading ? "not-allowed" : "pointer", border: "none",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+                transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)",
                 background: role === "admin" ? "linear-gradient(to right, #6C1D5F, #84117C)" : role === "manager" || role === "trainer" ? "linear-gradient(to right, #84117C, #a8249f)" : "linear-gradient(to right, #009e92, #01ac9f)",
                 boxShadow: role === "admin" ? "0 6px 20px rgba(108,29,95,0.25)" : role === "manager" || role === "trainer" ? "0 6px 20px rgba(132,17,124,0.2)" : "0 6px 20px rgba(1,172,159,0.2)",
-                opacity: loading ? 0.7 : 1 }}>
+                opacity: loading ? 0.7 : 1,
+                transform: "translateY(0)",
+              }}
+              onMouseEnter={e => { if (!loading) e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => { if (!loading) e.currentTarget.style.transform = "translateY(0)"; }}
+            >
               {loading ? (
                 <>
                   <span style={{ width: "16px", height: "16px", border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid #fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
