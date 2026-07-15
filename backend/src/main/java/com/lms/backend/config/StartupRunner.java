@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import com.lms.backend.learning.content.Content;
 import com.lms.backend.notification.NotificationService;
 
 @Component
+@Order(2)
 public class StartupRunner implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(StartupRunner.class);
