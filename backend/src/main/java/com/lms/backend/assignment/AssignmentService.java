@@ -30,6 +30,9 @@ public class AssignmentService {
     @Autowired
     private SubmissionRepository submissionRepository;
 
+    @Autowired
+    private com.lms.backend.notification.NotificationService notificationService;
+
     public List<Assignment> getAllAssignments() {
 
         List<Assignment> assignments =
@@ -164,7 +167,13 @@ public class AssignmentService {
                 assignment
         );
 
-        return assignmentRepository.save(assignment);
+        Assignment saved = assignmentRepository.save(assignment);
+        try {
+            notificationService.createNotification("s4", "student", "reminder", "ClipboardList", "New Assignment Assigned", "Assignment '" + saved.getTitle() + "' has been published. Due date: " + saved.getDueDate());
+        } catch (Exception e) {
+            // Suppress exception during tests or if seeding
+        }
+        return saved;
     }
 
     public Optional<Assignment> updateAssignment(

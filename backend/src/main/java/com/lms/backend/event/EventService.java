@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@SuppressWarnings("null")
 public class EventService {
 
     @Autowired
@@ -26,6 +27,9 @@ public class EventService {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private com.lms.backend.notification.NotificationService notificationService;
 
     public Event createEvent(Event event) {
         if (event.getId() == null || event.getId().trim().isEmpty()) {
@@ -46,7 +50,14 @@ public class EventService {
             }
         }
         
-        return eventRepository.save(event);
+        Event saved = eventRepository.save(event);
+        try {
+            notificationService.createNotification("s4", "student", "community", "MessageSquare", "New Event: " + saved.getTitle(), "A new event has been scheduled: " + saved.getDescription());
+            notificationService.createNotification("t1", "trainer", "community", "MessageSquare", "New Event: " + saved.getTitle(), "A new event has been scheduled: " + saved.getDescription());
+        } catch (Exception e) {
+            // Suppress exception during tests or if seeding
+        }
+        return saved;
     }
 
     public Page<Event> getEventsPaginated(Pageable pageable) {

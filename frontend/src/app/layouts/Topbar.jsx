@@ -9,6 +9,10 @@ import {
   Settings,
   LogOut,
   X,
+  ClipboardList,
+  Megaphone,
+  MessageSquare,
+  ExternalLink,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -19,8 +23,46 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
 import { Separator } from "@/shared/components/ui/separator";
+import { Badge } from "@/shared/components/ui/badge";
+import { ScrollArea } from "@/shared/components/ui/scroll-area";
 import api from "@/shared/services/api";
 import adminProfileIcon from "../../assets/admin_profile_icon.svg";
+
+const getDropdownIconDetails = (category) => {
+  switch (category) {
+    case "reminder":
+      return { icon: ClipboardList, color: "text-[#6C1D5F]", bg: "bg-[#6C1D5F]/10" };
+    case "system":
+      return { icon: Megaphone, color: "text-amber-600", bg: "bg-amber-50" };
+    case "community":
+      return { icon: MessageSquare, color: "text-teal-600", bg: "bg-teal-50" };
+    default:
+      return { icon: ClipboardList, color: "text-slate-500", bg: "bg-slate-50" };
+  }
+};
+
+const formatRelativeTime = (dateString) => {
+  if (!dateString) return "";
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    
+    if (diffMins < 60) {
+      return diffMins <= 0 ? "Just now" : `${diffMins}m ago`;
+    } else if (diffHours < 24) {
+      return `${diffHours}h ago`;
+    } else if (diffHours < 48) {
+      return "Yesterday";
+    } else {
+      return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    }
+  } catch (e) {
+    return "";
+  }
+};
 
 const PATH_LABELS = {
   "/admin": "Dashboard",
@@ -47,11 +89,7 @@ const PATH_LABELS = {
   "/certifications": "Certifications",
   "/assessments": "Assessments",
   "/schedule": "Schedule",
-  "/seo": "SEO & Meta",
   "/settings": "Settings",
-  "/permissions": "Permissions",
-  "/integrations": "Integrations",
-  "/support": "Support",
   "/manager": "Dashboard",
   "/manager/learning": "Learning Dashboard",
   "/manager/admin-dashboard": "Admin Dashboard",
@@ -99,6 +137,39 @@ export default function Topbar() {
   const isMac =
     typeof navigator !== "undefined" &&
     /Mac|iPhone|iPad/.test(navigator.userAgent);
+
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchNotificationsData = useCallback(async () => {
+    try {
+      const activeRole = isManager ? "manager" : "admin";
+      const activeId = isManager ? "m1" : "a1";
+
+      const countRes = await api.get("/notifications/unread-count", {
+        params: { role: activeRole, userId: activeId }
+      });
+      setUnreadCount(countRes.data?.data || 0);
+
+      const listRes = await api.get("/notifications", {
+        params: { role: activeRole, userId: activeId, page: 0, size: 5 }
+      });
+      if (listRes.data && listRes.data.data) {
+        const content = Array.isArray(listRes.data.data) 
+          ? listRes.data.data 
+          : (listRes.data.data.content || []);
+        setNotifications(content);
+      }
+    } catch (err) {
+      console.error("Failed to fetch topbar notifications:", err);
+    }
+  }, [isManager]);
+
+  useEffect(() => {
+    fetchNotificationsData();
+    const interval = setInterval(fetchNotificationsData, 10000);
+    return () => clearInterval(interval);
+  }, [fetchNotificationsData]);
 
   // Keyboard focus Ctrl+K
   const handleKeyDown = useCallback((e) => {
@@ -227,10 +298,8 @@ export default function Topbar() {
   return (
     <header className="sticky top-0 z-30 flex h-[52px] items-center justify-between border-b border-slate-200 bg-white px-8 flex-shrink-0">
 
-      {/* ── Left: Header ─────────────────────── */}
-      <div className="flex items-center gap-1.5 mr-4">
-        <span className="text-slate-900 font-bold text-[14px] whitespace-nowrap">Xebia LMS</span>
-      </div>
+      {/* ── Left: Empty ────────────────────────── */}
+      <div className="flex-1 max-w-[200px]" />
 
       {/* ── Center: Global Search ─────────────────────────────── */}
       <div ref={searchWrapperRef} className="hidden md:flex flex-1 max-w-md mx-auto relative">
@@ -316,11 +385,99 @@ export default function Topbar() {
       {/* ── Right: Actions ───────────────────────── */}
       <div className="flex items-center gap-3 shrink-0 ml-auto">
 
-        {/* Bell btn */}
-        <button className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors relative border-none bg-transparent cursor-pointer">
-          <Bell size={16} />
-          <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-red-500" />
-        </button>
+        {/* ── Notifications dropdown ── */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors relative border-none bg-transparent cursor-pointer outline-none"
+              aria-label="Notifications"
+            >
+              <Bell size={16} />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#6C1D5F]/60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#6C1D5F]" />
+                </span>
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="w-80 p-0 rounded-xl shadow-lg border border-slate-200 bg-white"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+              <span className="text-[13px] font-semibold text-slate-800">
+                Notifications
+              </span>
+              {unreadCount > 0 && (
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] h-5 bg-[#6C1D5F]/10 text-[#6C1D5F] font-semibold"
+                >
+                  {unreadCount} new
+                </Badge>
+              )}
+            </div>
+
+            {/* Notification list */}
+            <ScrollArea className="max-h-72">
+              <div className="py-1">
+                {notifications.length > 0 ? (
+                  notifications.map((n) => {
+                    const { icon: Icon, color, bg } = getDropdownIconDetails(n.category);
+                    return (
+                      <button
+                        key={n.id}
+                        className={`w-full flex items-start gap-3 px-4 py-2.5 text-left hover:bg-slate-50 transition-colors cursor-pointer border-none bg-transparent ${
+                          !n.read ? "bg-[#6C1D5F]/[0.02]" : ""
+                        }`}
+                        onClick={() => navigate(isManager ? "/manager/notifications" : "/admin/notifications")}
+                      >
+                        <div
+                          className={`shrink-0 w-8 h-8 rounded-lg ${bg} flex items-center justify-center mt-0.5`}
+                        >
+                          <Icon size={14} className={color} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            {!n.read && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#6C1D5F] shrink-0" />
+                            )}
+                            <span className="text-[12.5px] font-semibold text-slate-700 truncate">
+                              {n.title}
+                            </span>
+                          </div>
+                          <p className="text-[11.5px] text-slate-500 mt-0.5 line-clamp-1">
+                            {n.description}
+                          </p>
+                          <span className="text-[10.5px] text-slate-400 mt-0.5 block">
+                            {formatRelativeTime(n.createdAt)}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="px-4 py-6 text-center text-[12.5px] text-slate-400">
+                    No new notifications.
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+
+            {/* Footer */}
+            <div className="border-t border-slate-100 px-4 py-2.5">
+              <Link
+                to={isManager ? "/manager/notifications" : "/admin/notifications"}
+                className="flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#6C1D5F] hover:text-[#84117C] transition-colors"
+              >
+                View All Notifications
+                <ExternalLink size={11} />
+              </Link>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* ── Profile dropdown ── */}
         <DropdownMenu>

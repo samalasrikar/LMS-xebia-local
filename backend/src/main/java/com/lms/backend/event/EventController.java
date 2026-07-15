@@ -24,6 +24,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/events")
+@SuppressWarnings("null")
 public class EventController {
 
     @Autowired

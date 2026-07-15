@@ -28,7 +28,7 @@ export default function TrainerLayout() {
     return () => clearInterval(interval);
   }, []);
 
-  const marginLeft = collapsed ? "md:ml-[72px]" : "md:ml-[250px]";
+  const marginLeft = collapsed ? "md:ml-[60px]" : "md:ml-[240px]";
 
   return (
     <div className="min-h-screen bg-slate-50/80 flex">
