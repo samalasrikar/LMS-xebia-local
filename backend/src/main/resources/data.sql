@@ -1,1 +1,1 @@
--- No startup deletes or dummy data seeding
+-- Clean up all seed and dummy data to start with a clean database

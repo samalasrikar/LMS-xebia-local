@@ -3,7 +3,7 @@ import {
   ChevronDown,
   Menu,
 } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import {
   Avatar,
   AvatarFallback,
@@ -44,8 +44,8 @@ export default function Navbar() {
         </button>
 
         <div>
-          <h1 className="text-lg font-bold text-[#6C1D5F]">
-            {formatPath(location.pathname)}
+          <h1 className="text-base font-bold text-[#6C1D5F]">
+            Xebia LMS
           </h1>
         </div>
 
@@ -86,16 +86,22 @@ export default function Navbar() {
 
           <DropdownMenuContent align="end">
 
-            <DropdownMenuItem>
-              Profile
+            <DropdownMenuItem asChild>
+              <Link to="/manager/profile">
+                Profile
+              </Link>
             </DropdownMenuItem>
 
-            <DropdownMenuItem>
-              Settings
+            <DropdownMenuItem asChild>
+              <Link to="/manager/settings">
+                Settings
+              </Link>
             </DropdownMenuItem>
 
-            <DropdownMenuItem className="text-red-600">
-              Logout
+            <DropdownMenuItem asChild className="text-red-600 cursor-pointer">
+              <Link to="/login">
+                Logout
+              </Link>
             </DropdownMenuItem>
 
           </DropdownMenuContent>

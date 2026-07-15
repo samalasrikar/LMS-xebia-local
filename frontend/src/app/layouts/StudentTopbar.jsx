@@ -314,8 +314,20 @@ export default function StudentTopbar() {
           : "border-slate-200/80"
       }`}
     >
-      {/* ── Left: Empty ────────────────────────── */}
-      <div className="flex-1 max-w-[200px]" />
+      {/* ── Left: Title ──────────────────────────── */}
+      <div className="flex flex-col min-w-0 shrink-0 mr-4">
+        {/* Title + description */}
+        <div className="flex items-baseline gap-2">
+          <h1 className="text-[15px] font-bold text-slate-800 leading-tight truncate">
+            {meta.title}
+          </h1>
+          {meta.description && (
+            <span className="hidden xl:inline text-[11px] text-slate-400 font-medium border-l border-slate-200 pl-2 truncate">
+              {meta.description}
+            </span>
+          )}
+        </div>
+      </div>
 
       {/* ── Center: Global Search ─────────────────────────────── */}
       <div ref={searchWrapperRef} className="hidden md:flex flex-1 max-w-md mx-auto relative">

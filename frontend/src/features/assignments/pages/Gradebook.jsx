@@ -366,32 +366,7 @@ export default function Gradebook() {
         <PageHeader
           title="Gradebook"
           subtitle="Review submission details, grade assignments, and track class performance."
-        >
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-md text-[13px] font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm h-9 cursor-pointer"
-              >
-                <Download size={14} /> Export
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white border border-slate-200 shadow-md rounded-lg p-1 min-w-[140px] z-50">
-              <DropdownMenuItem
-                onClick={handleExportCSV}
-                className="flex items-center gap-2 px-2.5 py-2 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-md cursor-pointer text-xs font-medium"
-              >
-                Export as CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleExportExcel}
-                className="flex items-center gap-2 px-2.5 py-2 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-md cursor-pointer text-xs font-medium"
-              >
-                Export as Excel
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </PageHeader>
+        />
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -497,6 +472,31 @@ export default function Gradebook() {
                 ))}
               </SelectContent>
             </Select>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12.5px] text-slate-650 bg-white border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm h-8 font-semibold cursor-pointer"
+                >
+                  <Download size={14} /> Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-white border border-slate-200 shadow-md rounded-lg p-1 min-w-[140px] z-50">
+                <DropdownMenuItem
+                  onClick={handleExportCSV}
+                  className="flex items-center gap-2 px-2.5 py-2 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-md cursor-pointer text-xs font-medium"
+                >
+                  Export as CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleExportExcel}
+                  className="flex items-center gap-2 px-2.5 py-2 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-md cursor-pointer text-xs font-medium"
+                >
+                  Export as Excel
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SearchToolbar>
 
           <GradebookTable

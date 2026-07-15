@@ -77,9 +77,10 @@ function getBreadcrumb(pathname) {
 export default function Topbar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const isManager = location.pathname.startsWith("/manager");
+  const profileLink = isManager ? "/manager/profile" : "/admin/profile";
   const pageLabel = getBreadcrumb(location.pathname);
 
-  const isManager = location.pathname.startsWith("/manager");
   const userName = isManager ? "Manager" : "Admin";
   const userRole = isManager ? "Manager Console" : "Super Admin";
   const userEmail = isManager ? "manager@xebia.com" : "admin@xebia.com";
@@ -226,8 +227,10 @@ export default function Topbar() {
   return (
     <header className="sticky top-0 z-30 flex h-[52px] items-center justify-between border-b border-slate-200 bg-white px-8 flex-shrink-0">
 
-      {/* ── Left: Empty ────────────────────────── */}
-      <div className="flex-1 max-w-[200px]" />
+      {/* ── Left: Header ─────────────────────── */}
+      <div className="flex items-center gap-1.5 mr-4">
+        <span className="text-slate-900 font-bold text-[14px] whitespace-nowrap">Xebia LMS</span>
+      </div>
 
       {/* ── Center: Global Search ─────────────────────────────── */}
       <div ref={searchWrapperRef} className="hidden md:flex flex-1 max-w-md mx-auto relative">
@@ -350,7 +353,7 @@ export default function Topbar() {
               className="focus:bg-[#6C1D5F]/5 focus:text-[#6C1D5F] rounded-lg cursor-pointer"
             >
               <Link
-                to={settingsLink}
+                to={profileLink}
                 className="flex items-center gap-2.5 px-3 py-2 text-[12.5px] font-medium w-full text-slate-700"
               >
                 <User size={14} />
@@ -385,7 +388,7 @@ export default function Topbar() {
               className="focus:bg-rose-50 focus:text-rose-600 rounded-lg cursor-pointer"
             >
               <Link
-                to="/"
+                to="/login"
                 className="flex items-center gap-2.5 px-3 py-2 text-[12.5px] font-medium w-full text-slate-700 hover:text-rose-600"
               >
                 <LogOut size={14} className="text-rose-500" />
@@ -394,7 +397,6 @@ export default function Topbar() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
       </div>
     </header>
   );

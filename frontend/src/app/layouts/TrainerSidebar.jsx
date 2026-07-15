@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, Link } from "react-router-dom";
 import {
   GraduationCap,
   LayoutDashboard,
@@ -178,9 +178,24 @@ export default function TrainerSidebar({ collapsed, setCollapsed }) {
           {BOTTOM_MENU.map(renderLink)}
         </div>
 
-
-
-
+        {/* Trainer User Card */}
+        {!collapsed && (
+          <div className="border-t border-slate-200/80 p-3 bg-white">
+            <Link to="/trainer/profile" className="flex items-center gap-2.5 cursor-pointer rounded-md p-1 hover:bg-slate-50 transition-colors text-slate-800 hover:text-slate-900 no-underline">
+              <img
+                src={adminProfileIcon}
+                alt="Trainer"
+                className="w-[30px] h-[30px] rounded-full object-cover flex-shrink-0"
+              />
+              <div className="flex-1 min-w-0 text-left">
+                <div className="text-[12px] font-bold text-slate-900 whitespace-nowrap overflow-hidden text-ellipsis">
+                  Lead Instructor
+                </div>
+                <div className="text-[10px] text-[#6C1D5F] font-bold">Trainer</div>
+              </div>
+            </Link>
+          </div>
+        )}
 
         {/* Toggle button */}
         <div className={`border-t border-slate-200/80 py-2.5 ${collapsed ? "flex justify-center" : "px-2 bg-white"}`}>

@@ -203,7 +203,6 @@ export default function StudentSidebar() {
         </div>
 
 
-
         {/* Toggle button */}
         <div className={`border-t border-slate-200/80 py-2.5 ${collapsed ? "flex justify-center" : "px-2"}`}>
           <button

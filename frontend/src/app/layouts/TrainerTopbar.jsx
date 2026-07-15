@@ -227,8 +227,20 @@ export default function TrainerTopbar() {
           : "border-slate-200/80"
       }`}
     >
-      {/* ── Left: Empty ────────────────────────── */}
-      <div className="flex-1 max-w-[200px]" />
+      {/* ── Left: Title ── */}
+      <div className="flex flex-col min-w-0 shrink-0 mr-4">
+        {/* Title + description */}
+        <div className="flex items-baseline gap-2">
+          <h1 className="text-[15px] font-bold text-slate-800 leading-tight truncate">
+            {meta.title}
+          </h1>
+          {meta.description && (
+            <span className="hidden xl:inline text-[11px] text-slate-400 font-medium border-l border-slate-200 pl-2 truncate">
+              {meta.description}
+            </span>
+          )}
+        </div>
+      </div>
 
       {/* ── Center: Global Search ─────────────────────────────── */}
       <div ref={searchWrapperRef} className="hidden md:flex flex-1 max-w-md mx-auto relative">
@@ -335,6 +347,13 @@ export default function TrainerTopbar() {
               <p className="text-[11px] text-slate-400 mt-0.5">instructor@xebia.com</p>
             </div>
             <DropdownMenuSeparator className="bg-slate-100" />
+
+            <DropdownMenuItem asChild className="focus:bg-[#6C1D5F]/5 focus:text-[#6C1D5F] rounded-lg cursor-pointer">
+              <Link to="/trainer/profile" className="flex items-center gap-2.5 px-3 py-2 text-[12.5px] font-medium w-full text-slate-700">
+                <User size={14} />
+                My Profile
+              </Link>
+            </DropdownMenuItem>
 
             <DropdownMenuItem asChild className="focus:bg-[#6C1D5F]/5 focus:text-[#6C1D5F] rounded-lg cursor-pointer">
               <Link to="/trainer" className="flex items-center gap-2.5 px-3 py-2 text-[12.5px] font-medium w-full text-slate-700">
