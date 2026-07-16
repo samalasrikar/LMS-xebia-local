@@ -1,6 +1,7 @@
-import { Layers, Edit, Trash2, BookOpen, Loader2, ArrowRight } from "lucide-react";
+import { Layers, Edit, Trash2, BookOpen, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EmptyState from "@/shared/components/EmptyState";
+import { Spinner } from "@/shared/components/ui/spinner";
 
 export default function CategoryGrid({
   categories,
@@ -14,7 +15,7 @@ export default function CategoryGrid({
   if (loading) {
     return (
       <div className="bg-white border border-slate-200 rounded-xl p-20 flex flex-col items-center justify-center text-slate-400 shadow-sm">
-        <Loader2 className="animate-spin text-[#6C1D5F] mb-3" size={32} />
+        <Spinner className="h-8 w-8 text-[#6C1D5F] mb-3" />
         <p className="text-[13px] font-medium">Loading category grid...</p>
       </div>
     );

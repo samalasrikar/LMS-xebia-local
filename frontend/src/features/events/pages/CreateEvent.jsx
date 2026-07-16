@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Image, MapPin, Calendar, Info, Upload, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowLeft, Image, MapPin, Calendar as CalendarIcon, Info, Upload, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import AppLayout from "@/app/layouts/AppLayout";
 import eventService from "../services/eventService";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Textarea } from "@/shared/components/ui/textarea";
+import { Calendar } from "@/shared/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover";
+import { format, parseISO, isValid, startOfDay, isAfter } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export default function CreateEvent() {
   const navigate = useNavigate();
@@ -23,6 +27,12 @@ export default function CreateEvent() {
     timelineEnd: ""
   });
   const [timelineEntries, setTimelineEntries] = useState([]);
+
+  // Local states for shadcn/ui Date Pickers
+  const [dateRange, setDateRange] = useState({ from: undefined, to: undefined });
+  const [registrationDeadlineDate, setRegistrationDeadlineDate] = useState(undefined);
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("17:00");
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
 
@@ -50,6 +60,32 @@ export default function CreateEvent() {
             timelineStart: eventData.timelineStart ? eventData.timelineStart.substring(0, 16) : "",
             timelineEnd: eventData.timelineEnd ? eventData.timelineEnd.substring(0, 16) : ""
           });
+
+          // Prepopulate local Date Picker states
+          if (eventData.timelineStart) {
+            const startD = parseISO(eventData.timelineStart);
+            if (isValid(startD)) {
+              setDateRange(prev => ({ ...prev, from: startD }));
+              const hh = String(startD.getHours()).padStart(2, "0");
+              const mm = String(startD.getMinutes()).padStart(2, "0");
+              setStartTime(`${hh}:${mm}`);
+            }
+          }
+          if (eventData.timelineEnd) {
+            const endD = parseISO(eventData.timelineEnd);
+            if (isValid(endD)) {
+              setDateRange(prev => ({ ...prev, to: endD }));
+              const hh = String(endD.getHours()).padStart(2, "0");
+              const mm = String(endD.getMinutes()).padStart(2, "0");
+              setEndTime(`${hh}:${mm}`);
+            }
+          }
+          if (eventData.registrationDeadline) {
+            const deadD = parseISO(eventData.registrationDeadline);
+            if (isValid(deadD)) {
+              setRegistrationDeadlineDate(deadD);
+            }
+          }
 
           // Prepopulate timeline entries sorted by sortOrder
           const entries = eventData.timelineEntries || [];
@@ -186,12 +222,36 @@ export default function CreateEvent() {
       showToast("Event title is required", "error");
       return;
     }
-    if (!formData.timelineStart || !formData.timelineEnd) {
-      showToast("Event start and end times are required", "error");
+    
+    // Validate Date Picker selections
+    if (!dateRange || !dateRange.from || !dateRange.to) {
+      showToast("Event start and end dates are required", "error");
       return;
     }
-    if (!formData.registrationDeadline) {
+    if (!registrationDeadlineDate) {
       showToast("Registration deadline is required", "error");
+      return;
+    }
+
+    // Construct final timelineStart, timelineEnd, and registrationDeadline strings
+    const timelineStartStr = `${format(dateRange.from, "yyyy-MM-dd")}T${startTime}`;
+    const timelineEndStr = `${format(dateRange.to, "yyyy-MM-dd")}T${endTime}`;
+    const regDeadlineStr = format(registrationDeadlineDate, "yyyy-MM-dd");
+
+    // Perform Date-related Validation:
+    // 1. Timeline start date/time must be before timeline end date/time.
+    const startDateTime = parseISO(timelineStartStr);
+    const endDateTime = parseISO(timelineEndStr);
+    if (!isAfter(endDateTime, startDateTime)) {
+      showToast("Timeline end date/time must be after start date/time", "error");
+      return;
+    }
+
+    // 2. Registration deadline must not be after timeline start date.
+    const deadlineDay = startOfDay(registrationDeadlineDate);
+    const startDay = startOfDay(dateRange.from);
+    if (isAfter(deadlineDay, startDay)) {
+      showToast("Registration deadline cannot be after the event start date", "error");
       return;
     }
 
@@ -214,17 +274,9 @@ export default function CreateEvent() {
       }
 
       // Format dates to complete LocalDateTime format (e.g. YYYY-MM-DDTHH:MM:SS)
-      const formattedDeadline = formData.registrationDeadline.includes("T") 
-        ? formData.registrationDeadline 
-        : `${formData.registrationDeadline}T23:59:59`;
-      
-      const formattedStart = formData.timelineStart.includes("T") && formData.timelineStart.split("T")[1].split(":").length === 3
-        ? formData.timelineStart
-        : (formData.timelineStart.includes(":") ? `${formData.timelineStart}:00` : formData.timelineStart);
-
-      const formattedEnd = formData.timelineEnd.includes("T") && formData.timelineEnd.split("T")[1].split(":").length === 3
-        ? formData.timelineEnd
-        : (formData.timelineEnd.includes(":") ? `${formData.timelineEnd}:00` : formData.timelineEnd);
+      const formattedDeadline = `${regDeadlineStr}T23:59:59`;
+      const formattedStart = `${timelineStartStr}:00`;
+      const formattedEnd = `${timelineEndStr}:00`;
 
       const payload = {
         ...formData,
@@ -392,51 +444,105 @@ export default function CreateEvent() {
             </div>
             <div className="flex flex-col gap-2">
               <Label className="text-slate-700 font-semibold text-sm">Deadline to Register</Label>
-              <div className="relative">
-                <Calendar size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <Input
-                  name="registrationDeadline"
-                  value={formData.registrationDeadline}
-                  onChange={handleInputChange}
-                  className="w-full h-12 pl-10 pr-4 rounded-lg border border-slate-200 bg-slate-50 hover:border-slate-300 focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F] outline-none transition-all text-slate-800 focus-visible:ring-0 focus-visible:border-[#6C1D5F]"
-                  type="date"
-                  required
-                />
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={cn(
+                      "w-full h-12 px-4 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 focus:border-[#6C1D5F] transition-all text-slate-800 flex items-center justify-start gap-2 font-normal text-sm focus:ring-1 focus:ring-[#6C1D5F] cursor-pointer",
+                      !registrationDeadlineDate && "text-slate-400"
+                    )}
+                  >
+                    <CalendarIcon size={18} className="text-slate-400 shrink-0" />
+                    {registrationDeadlineDate ? (
+                      format(registrationDeadlineDate, "PPP")
+                    ) : (
+                      <span>Pick registration deadline</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-white border border-slate-200 shadow-md rounded-lg" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={registrationDeadlineDate}
+                    onSelect={setRegistrationDeadlineDate}
+                    initialFocus
+                    className="[--primary:#6C1D5F] [--primary-foreground:#ffffff] [--accent:rgba(108,29,95,0.1)] [--accent-foreground:#6C1D5F] rounded-md"
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 
           {/* Timeline: Date Range */}
           <div className="flex flex-col gap-4 p-4 rounded-lg bg-slate-50 border border-slate-200">
             <Label className="text-slate-755 font-semibold text-sm flex items-center gap-2">
-              <Calendar size={18} className="text-[#6C1D5F]" />
+              <CalendarIcon size={18} className="text-[#6C1D5F]" />
               Event Timeline
             </Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">Start Date & Time</span>
-                <Input
-                  name="timelineStart"
-                  value={formData.timelineStart}
-                  onChange={handleInputChange}
-                  className="w-full h-11 px-4 rounded-lg border border-slate-200 bg-white focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F] outline-none transition-all text-sm text-slate-850 focus-visible:ring-0 focus-visible:border-[#6C1D5F]"
-                  type="datetime-local"
-                  required
-                />
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">Timeline Dates</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={cn(
+                        "w-full h-11 px-4 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 flex items-center justify-start gap-2 font-normal text-sm focus:ring-1 focus:ring-[#6C1D5F] focus:border-[#6C1D5F] transition-all cursor-pointer",
+                        (!dateRange || !dateRange.from) && "text-slate-400"
+                      )}
+                    >
+                      <CalendarIcon size={18} className="text-slate-400 shrink-0" />
+                      {dateRange?.from ? (
+                        dateRange.to ? (
+                          <>
+                            {format(dateRange.from, "LLL dd, yyyy")} – {format(dateRange.to, "LLL dd, yyyy")}
+                          </>
+                        ) : (
+                          format(dateRange.from, "LLL dd, yyyy")
+                        )
+                      ) : (
+                        <span>Pick event start & end dates</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-white border border-slate-200 shadow-md rounded-lg" align="start">
+                    <Calendar
+                      mode="range"
+                      selected={dateRange}
+                      onSelect={setDateRange}
+                      numberOfMonths={2}
+                      className="[--primary:#6C1D5F] [--primary-foreground:#ffffff] [--accent:rgba(108,29,95,0.1)] [--accent-foreground:#6C1D5F] rounded-md"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
-              <div className="flex flex-col gap-1.5">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">End Date & Time</span>
-                <Input
-                  name="timelineEnd"
-                  value={formData.timelineEnd}
-                  onChange={handleInputChange}
-                  className="w-full h-11 px-4 rounded-lg border border-slate-200 bg-white focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F] outline-none transition-all text-sm text-slate-850 focus-visible:ring-0 focus-visible:border-[#6C1D5F]"
-                  type="datetime-local"
-                  required
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">Start Time</span>
+                  <Input
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    className="w-full h-11 px-4 rounded-lg border border-slate-200 bg-white focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F] outline-none transition-all text-sm text-slate-850 focus-visible:ring-0 focus-visible:border-[#6C1D5F]"
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">End Time</span>
+                  <Input
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    className="w-full h-11 px-4 rounded-lg border border-slate-200 bg-white focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F] outline-none transition-all text-sm text-slate-850 focus-visible:ring-0 focus-visible:border-[#6C1D5F]"
+                    required
+                  />
                 </div>
               </div>
             </div>
+          </div>
 
             {/* Detailed Day-by-Day Timeline */}
             <div className="flex flex-col gap-4 p-5 rounded-lg border border-slate-200 bg-white">

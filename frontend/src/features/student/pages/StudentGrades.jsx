@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import {
   Award,
   Download,
@@ -195,38 +197,20 @@ export default function StudentGrades() {
       </section>
 
       {/* ── Subpage Navigation Tabs ── */}
-      <div className="border-b border-slate-200/60 flex gap-6">
-        <button
-          onClick={() => {
-            setActiveTab("grades");
-            setSearchQuery("");
-            setCurrentPage(1);
-          }}
-          className={`pb-3 font-bold text-[13px] transition-all cursor-pointer border-none outline-none relative bg-transparent ${
-            activeTab === "grades" ? "text-[#6C1D5F]" : "text-slate-400 hover:text-slate-650"
-          }`}
-        >
-          Course Grades
-          {activeTab === "grades" && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#6C1D5F] rounded-full" />
-          )}
-        </button>
-        <button
-          onClick={() => {
-            setActiveTab("certificates");
-            setSearchQuery("");
-            setCurrentPage(1);
-          }}
-          className={`pb-3 font-bold text-[13px] transition-all cursor-pointer border-none outline-none relative bg-transparent ${
-            activeTab === "certificates" ? "text-[#6C1D5F]" : "text-slate-400 hover:text-slate-650"
-          }`}
-        >
-          My Certificates
-          {activeTab === "certificates" && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#6C1D5F] rounded-full" />
-          )}
-        </button>
-      </div>
+      <Tabs value={activeTab} onValueChange={(val) => {
+        setActiveTab(val);
+        setSearchQuery("");
+        setCurrentPage(1);
+      }} className="w-full">
+        <TabsList variant="line" className="w-full justify-start border-b border-slate-200/60 rounded-none bg-transparent gap-6 h-10 p-0">
+          <TabsTrigger value="grades" className="data-active:text-[#6C1D5F] data-active:border-[#6C1D5F] after:bg-[#6C1D5F] pb-3 font-bold text-[13px] border-none shadow-none bg-transparent">
+            Course Grades
+          </TabsTrigger>
+          <TabsTrigger value="certificates" className="data-active:text-[#6C1D5F] data-active:border-[#6C1D5F] after:bg-[#6C1D5F] pb-3 font-bold text-[13px] border-none shadow-none bg-transparent">
+            My Certificates
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       {/* ── Search & Filter Controls ── */}
       <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/50 flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -252,56 +236,59 @@ export default function StudentGrades() {
               {/* Semester Filter */}
               <div className="flex items-center gap-1">
                 <span className="text-[11px] text-slate-400 font-bold uppercase mr-1">Semester</span>
-                <select
-                  value={selectedSemester}
-                  onChange={(e) => {
-                    setSelectedSemester(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11.5px] text-slate-650 outline-none focus:ring-1 focus:ring-[#6C1D5F]"
-                >
-                  <option value="all">All</option>
-                  <option value="Semester 2">Semester 2</option>
-                  <option value="Semester 3">Semester 3</option>
-                  <option value="Semester 4">Semester 4</option>
-                  <option value="Semester 5">Semester 5</option>
-                </select>
+                <Select value={selectedSemester} onValueChange={(val) => {
+                  setSelectedSemester(val);
+                  setCurrentPage(1);
+                }}>
+                  <SelectTrigger className="h-[28px] bg-white border border-slate-200 text-slate-700 text-[11.5px] rounded-lg font-medium focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-slate-250 shadow-md">
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="Semester 2">Semester 2</SelectItem>
+                    <SelectItem value="Semester 3">Semester 3</SelectItem>
+                    <SelectItem value="Semester 4">Semester 4</SelectItem>
+                    <SelectItem value="Semester 5">Semester 5</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Year Filter */}
               <div className="flex items-center gap-1">
                 <span className="text-[11px] text-slate-400 font-bold uppercase mr-1">Year</span>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => {
-                    setSelectedYear(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11.5px] text-slate-650 outline-none focus:ring-1 focus:ring-[#6C1D5F]"
-                >
-                  <option value="all">All</option>
-                  <option value="2022-2023">2022-2023</option>
-                  <option value="2023-2024">2023-2024</option>
-                </select>
+                <Select value={selectedYear} onValueChange={(val) => {
+                  setSelectedYear(val);
+                  setCurrentPage(1);
+                }}>
+                  <SelectTrigger className="h-[28px] bg-white border border-slate-200 text-slate-700 text-[11.5px] rounded-lg font-medium focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-slate-250 shadow-md">
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="2022-2023">2022-2023</SelectItem>
+                    <SelectItem value="2023-2024">2023-2024</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </>
           ) : (
             /* Certificate Type Filter */
             <div className="flex items-center gap-1">
               <span className="text-[11px] text-slate-400 font-bold uppercase mr-1">Type</span>
-              <select
-                value={selectedCertType}
-                onChange={(e) => {
-                  setSelectedCertType(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11.5px] text-slate-650 outline-none focus:ring-1 focus:ring-[#6C1D5F]"
-              >
-                <option value="all">All Types</option>
-                <option value="Specialization">Specialization</option>
-                <option value="Course Completion">Course Completion</option>
-                <option value="External Certification">External Certification</option>
-              </select>
+              <Select value={selectedCertType} onValueChange={(val) => {
+                setSelectedCertType(val);
+                setCurrentPage(1);
+              }}>
+                <SelectTrigger className="h-[28px] bg-white border border-slate-200 text-slate-700 text-[11.5px] rounded-lg font-medium focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-slate-250 shadow-md">
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="Specialization">Specialization</SelectItem>
+                  <SelectItem value="Course Completion">Course Completion</SelectItem>
+                  <SelectItem value="External Certification">External Certification</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           )}
         </div>

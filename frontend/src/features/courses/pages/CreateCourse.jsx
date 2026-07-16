@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/app/layouts/AppLayout";
+import { Spinner } from "@/shared/components/ui/spinner";
 import useCreateCourse from "@/features/courses/hooks/useCreateCourse";
 import { ChevronRight } from "lucide-react";
 import CourseForm from "@/features/courses/components/CourseForm";
@@ -106,7 +107,7 @@ export default function CreateCourse() {
 
         {loadingCourse ? (
           <div className="bg-white border border-slate-200 rounded-xl p-20 flex flex-col items-center justify-center text-slate-400">
-            <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6C1D5F] mb-3" />
+            <Spinner className="h-8 w-8 text-[#6C1D5F] mb-3" />
             <p className="text-[13px] font-medium">Loading course data...</p>
           </div>
         ) : (

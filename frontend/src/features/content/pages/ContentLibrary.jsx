@@ -1,5 +1,5 @@
-import { Loader2 } from "lucide-react";
 import AppLayout from "@/app/layouts/AppLayout";
+import { Spinner } from "@/shared/components/ui/spinner";
 import useContentLibrary from "@/features/content/hooks/useContentLibrary";
 import ContentLibraryHeader from "@/features/content/components/ContentLibraryHeader";
 import ContentLibraryGrid from "@/features/content/components/ContentLibraryGrid";
@@ -72,7 +72,7 @@ export default function ContentLibrary() {
 
         {loading ? (
           <div className="flex flex-col items-center justify-center p-20 bg-white border border-slate-200 rounded-xl shadow-sm text-slate-400">
-            <Loader2 className="animate-spin text-[#6C1D5F] mb-3" size={28} />
+            <Spinner className="h-7 w-7 text-[#6C1D5F] mb-3" />
             <p className="text-[13px] font-semibold">Loading content items...</p>
           </div>
         ) : (

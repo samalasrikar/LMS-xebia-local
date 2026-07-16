@@ -1,4 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { TooltipProvider } from "@/shared/components/ui/tooltip";
+import { Toaster } from "@/shared/components/ui/sonner";
 import Landing from "@/features/landing/pages/Landing";
 import Login from "@/features/auth/pages/Login";
 
@@ -118,8 +120,10 @@ import TrainerNotifications from "@/features/trainer/pages/TrainerNotifications"
  
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
+    <TooltipProvider>
+      <Toaster />
+      <Routes>
+        <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       
       {/* Manager Console routes */}
@@ -258,7 +262,8 @@ function App() {
       <Route path="/flagship-programs" element={<Navigate to="/analytics/flagship-programs" replace />} />
       <Route path="/learning-champions" element={<Navigate to="/analytics/learning-champions" replace />} />
 
-    </Routes>
+      </Routes>
+    </TooltipProvider>
   );
 }
 
