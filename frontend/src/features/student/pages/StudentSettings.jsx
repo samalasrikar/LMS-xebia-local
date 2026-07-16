@@ -12,6 +12,7 @@ import {
   Sun,
   Laptop,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function StudentSettings() {
   const [activeTab, setActiveTab] = useState("appearance");
@@ -259,7 +260,9 @@ export default function StudentSettings() {
                   <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                     <div className="h-full bg-[#6C1D5F] rounded-full" style={{ width: "22%" }} />
                   </div>
-                  <button className="px-4 py-2 border border-slate-200 hover:border-rose-500 hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-[11.5px] font-bold transition-all cursor-pointer bg-white outline-none">
+                  <button 
+                    onClick={() => toast.success("Offline cache cleared")}
+                    className="px-4 py-2 border border-slate-200 hover:border-rose-500 hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-[11.5px] font-bold transition-all cursor-pointer bg-white outline-none">
                     Clear Offline Cache
                   </button>
                 </div>

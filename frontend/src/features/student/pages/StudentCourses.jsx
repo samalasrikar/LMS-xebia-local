@@ -12,6 +12,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import courseService from "@/features/courses/services/courseService";
+import { toast } from "sonner";
 
 export default function StudentCourses() {
   const navigate = useNavigate();
@@ -19,7 +20,14 @@ export default function StudentCourses() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all"); // 'all', 'in_progress', 'completed', 'bookmarked'
-  const [favorites, setFavorites] = useState({});
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      const stored = localStorage.getItem("student_course_favorites");
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -37,10 +45,21 @@ export default function StudentCourses() {
 
   const toggleFavorite = (courseId, e) => {
     e.stopPropagation();
-    setFavorites((prev) => ({
-      ...prev,
-      [courseId]: !prev[courseId],
-    }));
+    setFavorites((prev) => {
+      const isCurrentlyFavorited = !!prev[courseId];
+      const updated = { ...prev, [courseId]: !isCurrentlyFavorited };
+      try {
+        localStorage.setItem("student_course_favorites", JSON.stringify(updated));
+      } catch {
+        // localStorage unavailable; state still updated in memory
+      }
+      if (isCurrentlyFavorited) {
+        toast("Removed from bookmarks");
+      } else {
+        toast.success("Added to bookmarks");
+      }
+      return updated;
+    });
   };
 
   // Mock statuses for demonstration matching the design

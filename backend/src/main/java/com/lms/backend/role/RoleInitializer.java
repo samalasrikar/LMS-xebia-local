@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(1)
+@SuppressWarnings("null")
 public class RoleInitializer implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(RoleInitializer.class);

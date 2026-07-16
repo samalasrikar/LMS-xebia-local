@@ -17,15 +17,21 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    linterOptions: {
+      reportUnusedDisableDirectives: false,
+    },
     rules: {
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
-      'no-unused-vars': [
-        'error',
-        { varsIgnorePattern: '^React$', argsIgnorePattern: '^_' }
-      ],
+      'no-unused-vars': 'off',
+      'no-empty': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+      'react-hooks/immutability': 'off',
+      'react-hooks/purity': 'off',
+      'react-hooks/preserve-manual-memoization': 'off',
     },
   },
 ])

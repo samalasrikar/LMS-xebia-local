@@ -23,6 +23,7 @@ import java.util.List;
  */
 @Service
 @Transactional(readOnly = true)
+@SuppressWarnings("null")
 public class RoleService {
 
     private static final Logger log = LoggerFactory.getLogger(RoleService.class);

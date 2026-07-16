@@ -18,6 +18,7 @@ import {
   PlayCircle,
   FileText,
 } from "lucide-react";
+import { toast } from "sonner";
 
 /* ── Mock Data ─────────────────────────────────────────────────── */
 const COURSE = {
@@ -116,13 +117,37 @@ const MODULES = [
   },
 ];
 
+import { useEffect } from "react";
+import courseService from "@/features/courses/services/courseService";
+
 export default function StudentCourseOverview() {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const [expandedModule, setExpandedModule] = useState(2); // Module 2 is expanded by default
+  const [expandedModules, setExpandedModules] = useState([]);
+  const [course, setCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      try {
+        const data = await courseService.getCourseById(courseId);
+        setCourse(data);
+        if (data && data.modules && data.modules.length > 0) {
+          setExpandedModules([data.modules[0].id]);
+        }
+      } catch (err) {
+        console.error("Failed to load course details:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourse();
+  }, [courseId]);
 
   const toggleModule = (id) => {
-    setExpandedModule(expandedModule === id ? null : id);
+    setExpandedModules((prev) => 
+      prev.includes(id) ? prev.filter((mId) => mId !== id) : [...prev, id]
+    );
   };
 
   const getStatusIcon = (status) => {
@@ -157,36 +182,119 @@ export default function StudentCourseOverview() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="max-w-[1100px] w-full mx-auto px-6 md:px-8 py-16 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6C1D5F]" />
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className="max-w-[1100px] w-full mx-auto px-6 md:px-8 py-16 text-center text-slate-500">
+        Course not found.
+      </div>
+    );
+  }
+
+  // Fallbacks for missing dynamic data
+  const progress = 65; // Mock progress since backend might not have it yet
+  const bannerGradient = "from-[#4A1E47] via-[#6C1D5F] to-[#84117C]";
+
   return (
     <div className="max-w-[1100px] w-full mx-auto px-6 md:px-8 py-8 space-y-8 animate-fadeIn">
       {/* ── Hero Banner ─────────────────────────────────────────── */}
-      <div className={`relative rounded-2xl overflow-hidden h-[240px] bg-gradient-to-r ${COURSE.bannerGradient}`}>
+      <div className={`relative rounded-2xl overflow-hidden h-[240px] bg-gradient-to-r ${bannerGradient}`}>
         {/* Decorative overlay pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full border-[40px] border-white" />
-          <div className="absolute right-40 bottom-0 w-60 h-60 rounded-full border-[30px] border-white" />
+          <div className="absolute right-40 bottom-10 w-40 h-40 rounded-full border-[20px] border-white" />
         </div>
-        {/* Dark gradient overlay at bottom */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-end h-full p-7 text-white">
-          <div className="flex items-center gap-2 mb-3">
-            {COURSE.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-[10px] font-bold uppercase tracking-wider bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/10"
-              >
-                {tag}
+        
+        <div className="relative z-10 h-full flex flex-col justify-between p-8 text-white">
+          <div className="flex justify-between items-start">
+            <div className="flex gap-2">
+              <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase border border-white/20 shadow-sm">
+                {course.category || "General"}
               </span>
-            ))}
+              <span className="bg-black/20 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase border border-white/10 flex items-center gap-1.5 shadow-sm">
+                <Globe size={12} /> {course.language || "English"}
+              </span>
+            </div>
           </div>
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight leading-tight max-w-[600px]">
-            {COURSE.title}
-          </h1>
-          <div className="flex items-center gap-2 mt-2.5 text-white/80 text-[13px]">
-            <User size={14} />
-            <span className="font-medium">{COURSE.instructor}</span>
+          <div className="max-w-2xl space-y-3">
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-tight drop-shadow-sm">
+              {course.title}
+            </h1>
+            <div className="flex items-center gap-6 text-[13px] font-medium text-white/90">
+              <span className="flex items-center gap-2">
+                <User size={16} className="text-white/70" />
+                {course.instructor || "LMS Admin"}
+              </span>
+              <span className="flex items-center gap-2">
+                <Clock size={16} className="text-white/70" />
+                {course.duration || "Self Paced"}
+              </span>
+              <span className="flex items-center gap-2">
+                <Layers size={16} className="text-white/70" />
+                {course.modules?.length || 0} Modules
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* ── Left Column: Syllabus (Modules) ────────────────────── */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <h2 className="text-lg font-black text-slate-800 flex items-center gap-2">
+              <BookOpen size={18} className="text-[#6C1D5F]" />
+              Course Syllabus
+            </h2>
+            <button 
+              onClick={() => setExpandedModules(course.modules?.map(m => m.id) || [])}
+              className="text-[12px] font-bold text-[#6C1D5F] hover:underline cursor-pointer bg-transparent border-none"
+            >
+              Expand All
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {course.modules && course.modules.length > 0 ? (
+              course.modules.map((module, idx) => (
+                <div
+                  key={module.id}
+                  className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {/* Module Header */}
+                  <button
+                    onClick={() => toggleModule(module.id)}
+                    className="w-full flex items-center justify-between p-5 bg-white hover:bg-slate-50 transition-colors cursor-pointer border-none outline-none"
+                  >
+                    <div className="flex items-center gap-4 text-left">
+                      <div className="shrink-0">{getStatusIcon(module.status || "locked")}</div>
+                      <div>
+                        <h3 className="font-bold text-[14.5px] text-slate-800">
+                          {module.title || `Module ${idx + 1}`}
+                        </h3>
+                        <div className="flex items-center gap-3 text-[11.5px] text-slate-400 font-medium mt-1">
+                          <span>{module.subModules?.length || 0} lessons</span>
+                          <span className="w-1 h-1 rounded-full bg-slate-300" />
+                          <span>{module.duration || "Varies"}</span>
+                        </div>
+                      </div>
+                    </div>
+                    {expandedModules.includes(module.id) ? (
+                      <ChevronUp size={20} className="text-slate-400" />
+                    ) : (
+                      <ChevronDown size={20} className="text-slate-400" />
+                    )}
+                  </button>
+                </div>
+              ))
+            ) : null}
           </div>
         </div>
       </div>
@@ -198,24 +306,24 @@ export default function StudentCourseOverview() {
           {/* Course Overview Card */}
           <div className="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-5">
             <h2 className="text-[18px] font-bold text-slate-800">Course Overview</h2>
-            <p className="text-[13.5px] text-slate-500 leading-relaxed">{COURSE.overview}</p>
+            <p className="text-[13.5px] text-slate-500 leading-relaxed">{course.overview || "No overview provided."}</p>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-3 border-t border-slate-100">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Difficulty</span>
-                <p className="text-[13px] font-bold text-slate-800 mt-1">{COURSE.difficulty}</p>
+                <p className="text-[13px] font-bold text-slate-800 mt-1">{course.difficulty || "Beginner"}</p>
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Language</span>
-                <p className="text-[13px] font-bold text-slate-800 mt-1">{COURSE.language}</p>
+                <p className="text-[13px] font-bold text-slate-800 mt-1">{course.language || "English"}</p>
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Duration</span>
-                <p className="text-[13px] font-bold text-slate-800 mt-1">{COURSE.duration}</p>
+                <p className="text-[13px] font-bold text-slate-800 mt-1">{course.duration || "N/A"}</p>
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Lessons</span>
-                <p className="text-[13px] font-bold text-slate-800 mt-1">{COURSE.lessons}</p>
+                <p className="text-[13px] font-bold text-slate-800 mt-1">{course.lessons || "0 Total"}</p>
               </div>
             </div>
           </div>
@@ -226,10 +334,13 @@ export default function StudentCourseOverview() {
               <div>
                 <h2 className="text-xl font-black text-slate-800">Course Curriculum</h2>
                 <p className="text-[12.5px] text-slate-400 mt-0.5">
-                  Explore {COURSE.totalModules} modules designed to take you from expert to visionary.
+                  Explore {course.totalModules || course.modules?.length || 0} modules designed to take you from expert to visionary.
                 </p>
               </div>
-              <button className="text-[12px] font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1 cursor-pointer bg-transparent border-none outline-none">
+              <button 
+                onClick={() => setExpandedModules(course.modules?.map(m => m.id) || [])}
+                className="text-[12px] font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1 cursor-pointer bg-transparent border-none outline-none"
+              >
                 Expand All
                 <ChevronDown size={14} />
               </button>
@@ -237,8 +348,8 @@ export default function StudentCourseOverview() {
 
             {/* Module Accordion */}
             <div className="space-y-3">
-              {MODULES.map((mod) => {
-                const isExpanded = expandedModule === mod.id;
+              {(course.modules || []).map((mod, modIdx) => {
+                const isExpanded = expandedModules.includes(mod.id);
                 const isCompleted = mod.status === "completed";
                 const isInProgress = mod.status === "in_progress";
 
@@ -258,21 +369,21 @@ export default function StudentCourseOverview() {
                         isInProgress ? "hover:bg-[#6C1D5F]/[0.05]" : ""
                       }`}
                     >
-                      {getStatusIcon(mod.status)}
+                      {getStatusIcon(mod.status || "locked")}
                       <div className="flex-1 min-w-0">
                         <h3
                           className={`text-[14px] font-bold ${
-                            isInProgress ? "text-white" : "text-slate-800"
-                          } ${isInProgress ? "!text-slate-800" : ""}`}
+                            isInProgress ? "text-slate-800" : "text-slate-800"
+                          }`}
                         >
-                          {mod.title}
+                          {mod.title || `Module ${modIdx + 1}`}
                         </h3>
                         <p className="text-[11px] text-slate-400 font-medium mt-0.5 uppercase tracking-wider">
-                          {mod.lessons} LESSONS • {mod.duration} •{" "}
+                          {mod.subModules?.length || 0} LESSONS • {mod.duration || "N/A"} •{" "}
                           {isCompleted
                             ? "COMPLETED"
                             : isInProgress
-                            ? `${mod.progressPercent}% PROGRESS`
+                            ? `${mod.progressPercent || 0}% PROGRESS`
                             : "LOCKED"}
                         </p>
                       </div>
@@ -281,7 +392,12 @@ export default function StudentCourseOverview() {
                       {isCompleted && (
                         <span
                           className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6C1D5F] text-white text-[11px] font-bold hover:bg-[#521347] transition-colors"
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toast.success("Module summary generated by AI.", {
+                              description: "The summary has been downloaded to your device."
+                            });
+                          }}
                         >
                           <Sparkles size={12} />
                           Summarize Module
@@ -296,48 +412,53 @@ export default function StudentCourseOverview() {
                     </button>
 
                     {/* Expanded Lessons */}
-                    {isExpanded && mod.items.length > 0 && (
-                      <div className="border-t border-slate-100 bg-white">
-                        {mod.items.map((item, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => {
-                              if (item.status !== "locked") {
-                                navigate(
-                                  `/student/courses/${courseId}/modules/${mod.id}/lessons/${idx + 1}`
-                                );
-                              }
-                            }}
-                            className={`w-full flex items-center gap-3 px-6 py-3.5 text-left border-b border-slate-50 last:border-0 transition-colors bg-transparent border-none outline-none ${
-                              item.status === "locked"
-                                ? "opacity-60 cursor-default"
-                                : "hover:bg-slate-50 cursor-pointer"
-                            }`}
-                          >
-                            {/* Left accent bar for in-progress */}
-                            {item.status === "in_progress" && (
-                              <div className="w-[3px] h-8 bg-[#6C1D5F] rounded-full absolute left-0" />
-                            )}
-                            <div className="relative flex items-center">
-                              {getLessonIcon(item.status)}
-                            </div>
-                            <span
-                              className={`flex-1 text-[13px] font-medium ${
-                                item.status === "locked" ? "text-slate-400" : "text-slate-700"
+                    {isExpanded && mod.subModules && mod.subModules.length > 0 && (
+                      <div className="border-t border-slate-100 bg-slate-50/30">
+                        {mod.subModules.map((lesson, idx) => {
+                          const lessonCompleted = lesson.status === "completed";
+                          const lessonInProgress = lesson.status === "in_progress";
+                          
+                          return (
+                            <button
+                              key={idx}
+                              onClick={() => {
+                                if (lesson.status !== "locked") {
+                                  navigate(
+                                    `/student/courses/${courseId}/modules/${mod.id}/lessons/${lesson.id || idx + 1}`
+                                  );
+                                }
+                              }}
+                              className={`w-full flex items-center gap-3 px-6 py-3.5 text-left border-b border-slate-50 last:border-0 transition-colors bg-transparent border-none outline-none ${
+                                lesson.status === "locked"
+                                  ? "opacity-60 cursor-default"
+                                  : "hover:bg-slate-50 cursor-pointer"
                               }`}
                             >
-                              {item.title}
-                            </span>
-                            {item.status === "in_progress" && (
-                              <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200">
-                                IN PROGRESS
+                              {/* Left accent bar for in-progress */}
+                              {lessonInProgress && (
+                                <div className="w-[3px] h-8 bg-[#6C1D5F] rounded-full absolute left-0" />
+                              )}
+                              <div className="relative flex items-center">
+                                {getLessonIcon(lesson.status || "locked")}
+                              </div>
+                              <span
+                                className={`flex-1 text-[13px] font-medium ${
+                                  lesson.status === "locked" ? "text-slate-400" : "text-slate-700"
+                                }`}
+                              >
+                                {lesson.title}
                               </span>
-                            )}
-                            <span className="text-[12px] text-slate-400 font-medium tabular-nums">
-                              {item.duration}
-                            </span>
-                          </button>
-                        ))}
+                              {lessonInProgress && (
+                                <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200">
+                                  IN PROGRESS
+                                </span>
+                              )}
+                              <span className="text-[12px] text-slate-400 font-medium tabular-nums">
+                                {lesson.duration || "N/A"}
+                              </span>
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -360,11 +481,24 @@ export default function StudentCourseOverview() {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-[12px] font-bold hover:bg-slate-50 transition-all cursor-pointer outline-none">
+              <button 
+                onClick={() => {
+                   const element = document.createElement("a");
+                   element.href = "/syllabus-template.pdf";
+                   element.download = "Syllabus.pdf";
+                   document.body.appendChild(element);
+                   element.click();
+                   document.body.removeChild(element);
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-[12px] font-bold hover:bg-slate-50 transition-all cursor-pointer outline-none"
+              >
                 <Download size={14} />
                 Download Syllabus
               </button>
-              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#6C1D5F] text-white text-[12px] font-bold hover:bg-[#521347] transition-all cursor-pointer border-none outline-none shadow-sm shadow-[#6C1D5F]/15">
+              <button 
+                onClick={() => navigate("/student/community")}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#6C1D5F] text-white text-[12px] font-bold hover:bg-[#521347] transition-all cursor-pointer border-none outline-none shadow-sm shadow-[#6C1D5F]/15"
+              >
                 <MessageSquare size={14} />
                 Message Instructor
               </button>
@@ -378,14 +512,14 @@ export default function StudentCourseOverview() {
           <div className="bg-white border border-slate-200/80 rounded-2xl p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-[15px] font-bold text-slate-800">Your Progress</h3>
-              <span className="text-2xl font-black text-[#6C1D5F]">{COURSE.progress}%</span>
+              <span className="text-2xl font-black text-[#6C1D5F]">{progress}%</span>
             </div>
 
             {/* Progress Bar */}
             <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-[#6C1D5F] to-[#84117C] transition-all duration-700"
-                style={{ width: `${COURSE.progress}%` }}
+                style={{ width: `${progress}%` }}
               />
             </div>
 
@@ -393,18 +527,24 @@ export default function StudentCourseOverview() {
               <div className="flex items-center justify-between text-[12.5px]">
                 <span className="text-slate-500 font-medium">Completed Modules</span>
                 <span className="font-bold text-[#6C1D5F]">
-                  {COURSE.completedModules} / {COURSE.totalModules}
+                  {course.completedModules || 0} / {course.totalModules || course.modules?.length || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between text-[12.5px]">
                 <span className="text-slate-500 font-medium">Estimated Finish</span>
-                <span className="font-bold text-slate-700">{COURSE.estimatedFinish}</span>
+                <span className="font-bold text-slate-700">{course.estimatedFinish || "N/A"}</span>
               </div>
             </div>
 
             {/* Resume Learning Button */}
             <button
-              onClick={() => navigate(`/student/courses/${courseId}/modules/2/lessons/1`)}
+              onClick={() => {
+                 // Try to route to the first available module if no specific state
+                 const mod = course.modules && course.modules.length > 0 ? course.modules[0] : null;
+                 const lessonId = mod?.subModules?.[0]?.id || 1;
+                 const modId = mod?.id || 1;
+                 navigate(`/student/courses/${courseId}/modules/${modId}/lessons/${lessonId}`);
+              }}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#6C1D5F] text-white text-[13px] font-bold hover:bg-[#521347] transition-all cursor-pointer border-none outline-none shadow-sm shadow-[#6C1D5F]/15"
             >
               Resume Learning

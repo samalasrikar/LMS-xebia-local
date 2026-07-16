@@ -444,10 +444,11 @@ export default function StudentTopbar() {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="w-80 p-0 rounded-xl shadow-lg border border-slate-200"
+            className="w-80 p-0 rounded-xl shadow-lg border border-slate-200 flex flex-col overflow-hidden"
+            style={{ maxHeight: "min(420px, 80vh)" }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 flex-shrink-0">
               <span className="text-[13px] font-semibold text-slate-800">
                 Notifications
               </span>
@@ -461,15 +462,15 @@ export default function StudentTopbar() {
               )}
             </div>
 
-            {/* Notification list */}
-            <ScrollArea className="max-h-72">
+            {/* Notification list — ONLY this div scrolls */}
+            <div className="flex-1 min-h-0 overflow-y-auto">
               <div className="py-1">
                 {notifications.map((n) => {
                   const { icon: Icon, color, bg } = getDropdownIconDetails(n.category);
                   return (
                     <button
                       key={n.id}
-                      className={`w-full flex items-start gap-3 px-4 py-2.5 text-left hover:bg-slate-50 transition-colors cursor-pointer ${
+                      className={`w-full flex items-start gap-3 px-4 py-2.5 text-left hover:bg-slate-50 transition-colors cursor-pointer border-none bg-transparent ${
                         !n.read ? "bg-[#6C1D5F]/[0.02]" : ""
                       }`}
                       onClick={() => navigate("/student/notifications")}
@@ -499,13 +500,13 @@ export default function StudentTopbar() {
                   );
                 })}
               </div>
-            </ScrollArea>
+            </div>
 
             {/* Footer */}
-            <div className="border-t border-slate-100 px-4 py-2.5">
+            <div className="flex-shrink-0 border-t border-slate-100 px-4 py-2.5 bg-white">
               <Link
                 to="/student/notifications"
-                className="flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#6C1D5F] hover:text-[#84117C] transition-colors"
+                className="flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#6C1D5F] hover:text-[#84117C] transition-colors w-full cursor-pointer"
               >
                 View All Notifications
                 <ExternalLink size={11} />
