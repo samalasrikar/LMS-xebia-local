@@ -21,6 +21,10 @@ public class NotificationService {
     }
 
     public Notification createNotification(String recipientId, String recipientRole, String category, String icon, String title, String description) {
+        return createNotification(recipientId, recipientRole, category, icon, title, description, null, null);
+    }
+
+    public Notification createNotification(String recipientId, String recipientRole, String category, String icon, String title, String description, String targetType, String targetId) {
         Notification notification = Notification.builder()
                 .id("n_" + UUID.randomUUID().toString().replace("-", ""))
                 .recipientId(recipientId)
@@ -31,6 +35,8 @@ public class NotificationService {
                 .description(description)
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
+                .targetType(targetType)
+                .targetId(targetId)
                 .build();
         return repository.save(notification);
     }

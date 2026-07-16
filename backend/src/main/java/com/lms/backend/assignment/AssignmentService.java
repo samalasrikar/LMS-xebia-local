@@ -219,13 +219,10 @@ public class AssignmentService {
                                 updatedAssignment.getDueDate()
                         );
 
-                    // Only allow Draft manually
+                    // Allow updating to any valid status (Draft, Active, etc.)
                     if (updatedAssignment.getStatus() != null &&
-                            "Draft".equalsIgnoreCase(
-                                    updatedAssignment.getStatus()
-                            )) {
-
-                        existing.setStatus("Draft");
+                            !updatedAssignment.getStatus().isBlank()) {
+                        existing.setStatus(updatedAssignment.getStatus());
                     }
 
                     if (updatedAssignment.getMaxMarks() != null)
