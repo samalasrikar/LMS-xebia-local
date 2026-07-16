@@ -4,7 +4,7 @@ import AppLayout from "@/app/layouts/AppLayout";
 import assignmentService from "../services/assignmentService";
 import DeleteDialog from "@/shared/components/DeleteDialog";
 import { Download } from "lucide-react";
-import * as XLSX from "xlsx";
+// xlsx is dynamically imported at export time to avoid adding ~800 kB to the initial bundle
 
 import {
   Select,
@@ -288,7 +288,7 @@ export default function Gradebook() {
     document.body.removeChild(link);
   }, [filteredSubmissions]);
 
-  const handleExportExcel = useCallback(() => {
+  const handleExportExcel = useCallback(async () => {
     const worksheetData = filteredSubmissions.map((s) => ({
       "Student": s.studentName || "",
       "Batch": s.batch || "",
@@ -298,6 +298,7 @@ export default function Gradebook() {
       "Date": s.submittedAt || "",
     }));
 
+    const XLSX = await import("xlsx");
     const worksheet = XLSX.utils.json_to_sheet(worksheetData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Gradebook");
@@ -306,6 +307,7 @@ export default function Gradebook() {
       `LMS_Gradebook_${new Date().toISOString().split("T")[0]}.xlsx`
     );
   }, [filteredSubmissions]);
+
 
   const handleConfirmDelete = useCallback(() => {
     if (deleteTarget) {
