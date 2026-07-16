@@ -13,6 +13,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Badge } from "@/shared/components/ui/badge";
 import { Card, CardContent } from "@/shared/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -283,39 +284,29 @@ export default function QuizDashboard() {
 
             {/* Filter Bar and Tabs Row */}
             <div className="space-y-4 pt-2">
-              {/* Tab bar */}
-              <div
-                role="tablist"
-                aria-label="Quiz filter tabs"
-                className="flex items-end gap-1 border-b border-slate-200 overflow-x-auto scrollbar-hide"
-              >
-                {["All Quizzes", "Published", "Draft", "Archived"].map(tab => {
-                  let count = quizzes.length;
-                  if (tab === "Published") count = quizzes.filter(q => q.status === "Published").length;
-                  else if (tab === "Draft") count = quizzes.filter(q => q.status === "Draft").length;
-                  else if (tab === "Archived") count = quizzes.filter(q => q.status === "Archived").length;
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList variant="line" className="w-full justify-start border-b border-slate-200 rounded-none bg-transparent gap-6 h-10 p-0 overflow-x-auto scrollbar-hide">
+                  {["All Quizzes", "Published", "Draft", "Archived"].map(tab => {
+                    let count = quizzes.length;
+                    if (tab === "Published") count = quizzes.filter(q => q.status === "Published").length;
+                    else if (tab === "Draft") count = quizzes.filter(q => q.status === "Draft").length;
+                    else if (tab === "Archived") count = quizzes.filter(q => q.status === "Archived").length;
 
-                  const isActive = activeTab === tab;
-                  return (
-                    <button
-                      key={tab}
-                      role="tab"
-                      aria-selected={isActive}
-                      onClick={() => setActiveTab(tab)}
-                      className={`flex items-center gap-1.5 pb-2.5 px-1 font-bold text-xs whitespace-nowrap cursor-pointer transition-all border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6C1D5F]/40 rounded-sm
-                        ${isActive
-                          ? "border-[#6C1D5F] text-[#6C1D5F]"
-                          : "border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-300"
-                        }`}
-                    >
-                      <span>{tab}</span>
-                      <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold transition-colors ${
-                        isActive ? "bg-[#6C1D5F]/10 text-[#6C1D5F]" : "bg-slate-100 text-slate-450"
-                      }`}>{count}</span>
-                    </button>
-                  );
-                })}
-              </div>
+                    return (
+                      <TabsTrigger
+                        key={tab}
+                        value={tab}
+                        className="data-active:text-[#6C1D5F] data-active:border-[#6C1D5F] after:bg-[#6C1D5F] pb-2.5 px-1 font-bold text-xs whitespace-nowrap border-none shadow-none bg-transparent flex items-center gap-1.5"
+                      >
+                        <span>{tab}</span>
+                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold transition-colors ${
+                          activeTab === tab ? "bg-[#6C1D5F]/10 text-[#6C1D5F]" : "bg-slate-100 text-slate-450"
+                        }`}>{count}</span>
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
+              </Tabs>
 
               {/* Filters Panel */}
               <div className="p-4 border border-slate-100 bg-white rounded-xl shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-center">

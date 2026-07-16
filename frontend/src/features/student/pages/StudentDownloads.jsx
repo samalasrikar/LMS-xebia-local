@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import {
   Download,
   Search,
@@ -181,63 +182,66 @@ export default function StudentDownloads() {
         {/* Filter selectors */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-100">
           {/* File Type Filter */}
-          <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Resource Type</label>
-            <select
-              value={selectedType}
-              onChange={(e) => {
-                setSelectedType(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-650 focus:outline-none focus:ring-1 focus:ring-[#6C1D5F] outline-none"
-            >
-              <option value="all">All Formats</option>
-              <option value="PDF">PDF Documents</option>
-              <option value="ZIP">ZIP Archives</option>
-              <option value="PPT">PPT Slide Decks</option>
-              <option value="CODE">Python / Code</option>
-              <option value="VIDEO">Video Recordings</option>
-            </select>
+          <div className="space-y-1 flex flex-col justify-end">
+            <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1">Resource Type</label>
+            <Select value={selectedType} onValueChange={(val) => {
+              setSelectedType(val);
+              setCurrentPage(1);
+            }}>
+              <SelectTrigger className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-650 h-[38px] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                <SelectValue placeholder="All Formats" />
+              </SelectTrigger>
+              <SelectContent className="bg-white border border-slate-250 shadow-md">
+                <SelectItem value="all">All Formats</SelectItem>
+                <SelectItem value="PDF">PDF Documents</SelectItem>
+                <SelectItem value="ZIP">ZIP Archives</SelectItem>
+                <SelectItem value="PPT">PPT Slide Decks</SelectItem>
+                <SelectItem value="CODE">Python / Code</SelectItem>
+                <SelectItem value="VIDEO">Video Recordings</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Course Filter */}
-          <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Course Context</label>
-            <select
-              value={selectedCourse}
-              onChange={(e) => {
-                setSelectedCourse(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-650 focus:outline-none focus:ring-1 focus:ring-[#6C1D5F] outline-none"
-            >
-              <option value="all">All Courses</option>
-              {uniqueCourses.map((course) => (
-                <option key={course} value={course}>
-                  {course}
-                </option>
-              ))}
-            </select>
+          <div className="space-y-1 flex flex-col justify-end">
+            <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1">Course Context</label>
+            <Select value={selectedCourse} onValueChange={(val) => {
+              setSelectedCourse(val);
+              setCurrentPage(1);
+            }}>
+              <SelectTrigger className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-650 h-[38px] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                <SelectValue placeholder="All Courses" />
+              </SelectTrigger>
+              <SelectContent className="bg-white border border-slate-250 shadow-md">
+                <SelectItem value="all">All Courses</SelectItem>
+                {uniqueCourses.map((course) => (
+                  <SelectItem key={course} value={course}>
+                    {course}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Instructor Filter */}
-          <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Instructor</label>
-            <select
-              value={selectedInstructor}
-              onChange={(e) => {
-                setSelectedInstructor(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-650 focus:outline-none focus:ring-1 focus:ring-[#6C1D5F] outline-none"
-            >
-              <option value="all">All Instructors</option>
-              {uniqueInstructors.map((inst) => (
-                <option key={inst} value={inst}>
-                  {inst}
-                </option>
-              ))}
-            </select>
+          <div className="space-y-1 flex flex-col justify-end">
+            <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1">Instructor</label>
+            <Select value={selectedInstructor} onValueChange={(val) => {
+              setSelectedInstructor(val);
+              setCurrentPage(1);
+            }}>
+              <SelectTrigger className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[12px] text-slate-650 h-[38px] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                <SelectValue placeholder="All Instructors" />
+              </SelectTrigger>
+              <SelectContent className="bg-white border border-slate-250 shadow-md">
+                <SelectItem value="all">All Instructors</SelectItem>
+                {uniqueInstructors.map((inst) => (
+                  <SelectItem key={inst} value={inst}>
+                    {inst}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Results Badge */}
