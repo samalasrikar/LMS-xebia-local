@@ -17,6 +17,8 @@ export default function useCourses() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting]         = useState(false);
   const [toast, setToast]               = useState(null);
+  const [sortBy, setSortBy]             = useState("newest");
+  const [analyticsCourse, setAnalyticsCourse] = useState(null);
 
   useEffect(() => { loadData(); }, []);
 
@@ -36,6 +38,13 @@ export default function useCourses() {
       ]);
       setCategories(catsData || []);
       if (coursesData?.length) {
+        let featuredIds = [];
+        try {
+          featuredIds = JSON.parse(localStorage.getItem("lms-featured-courses")) || [];
+        } catch (e) {
+          featuredIds = [];
+        }
+        const featuredSet = new Set(featuredIds);
         setCourses(
           coursesData.map((c) => ({
             id:          c.id,
@@ -47,7 +56,7 @@ export default function useCourses() {
             duration:    c.duration || "—",
             difficulty:  c.difficulty || "Intermediate",
             status:      (c.status || "published").toLowerCase(),
-            featured:    false,
+            featured:    featuredSet.has(c.id),
             active:      true,
             modules:     0,
             rating:      "4.5",
@@ -67,14 +76,27 @@ export default function useCourses() {
     }
   }
 
-  /* ─── Filtering ──────────────────────────────────────────────── */
-  const filtered = courses.filter((c) => {
-    const matchSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchTab    = TABS[activeTab].filter === null || c.status === TABS[activeTab].filter;
-    const matchCat    = selectedCat === "All" || c.category === selectedCat;
-    const matchDiff   = selectedDiff === "All" || c.difficulty === selectedDiff;
-    return matchSearch && matchTab && matchCat && matchDiff;
-  });
+  /* ─── Filtering & Sorting ────────────────────────────────────── */
+  const filtered = courses
+    .filter((c) => {
+      const matchSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchTab    = TABS[activeTab].filter === null || c.status === TABS[activeTab].filter;
+      const matchCat    = selectedCat === "All" || c.category === selectedCat;
+      const matchDiff   = selectedDiff === "All" || c.difficulty === selectedDiff;
+      return matchSearch && matchTab && matchCat && matchDiff;
+    })
+    .sort((a, b) => {
+      if (sortBy === "title-asc") {
+        return a.title.localeCompare(b.title);
+      }
+      if (sortBy === "title-desc") {
+        return b.title.localeCompare(a.title);
+      }
+      if (sortBy === "learners-desc") {
+        return (b.learners || 0) - (a.learners || 0);
+      }
+      return b.id - a.id;
+    });
 
   /* ─── Selection ──────────────────────────────────────────────── */
   const toggleSelect = (id) =>
@@ -90,7 +112,12 @@ export default function useCourses() {
     );
 
   const toggleFeatured = (id) =>
-    setCourses((prev) => prev.map((c) => (c.id === id ? { ...c, featured: !c.featured } : c)));
+    setCourses((prev) => {
+      const updated = prev.map((c) => (c.id === id ? { ...c, featured: !c.featured } : c));
+      const featuredIds = updated.filter(c => c.featured).map(c => c.id);
+      localStorage.setItem("lms-featured-courses", JSON.stringify(featuredIds));
+      return updated;
+    });
 
   const toggleActive = (id) =>
     setCourses((prev) => prev.map((c) => (c.id === id ? { ...c, active: !c.active } : c)));
@@ -182,11 +209,43 @@ export default function useCourses() {
   };
 
   const handleBulkFeature = () => {
-    setCourses((prev) =>
-      prev.map((c) => (selected.has(c.id) ? { ...c, featured: true } : c))
-    );
+    setCourses((prev) => {
+      const updated = prev.map((c) => (selected.has(c.id) ? { ...c, featured: true } : c));
+      const featuredIds = updated.filter(c => c.featured).map(c => c.id);
+      localStorage.setItem("lms-featured-courses", JSON.stringify(featuredIds));
+      return updated;
+    });
     setSelected(new Set());
     showToast("Successfully marked selected courses as Featured.", "success");
+  };
+
+  const duplicateCourse = async (id) => {
+    setLoading(true);
+    try {
+      const c = await courseService.getCourseById(id);
+      if (!c) {
+        showToast("Failed to fetch course details.", "error");
+        return;
+      }
+      const req = {
+        title: `${c.title} (Copy)`,
+        description: c.description || "",
+        thumbnail: c.thumbnail || DEFAULT_THUMBNAIL,
+        curriculum: c.curriculum || "",
+        difficulty: c.difficulty || "Intermediate",
+        duration: c.duration || "—",
+        categoryId: c.categoryId,
+        status: (c.status || "draft").toLowerCase(),
+      };
+      await courseService.createCourse(req);
+      showToast(`Course "${c.title}" duplicated successfully.`, "success");
+      await loadData();
+    } catch (err) {
+      console.error("Failed to duplicate course:", err);
+      showToast("Error duplicating course.", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return {
@@ -221,5 +280,10 @@ export default function useCourses() {
     handleBulkStatusChange,
     handleBulkFeature,
     loadData,
+    sortBy,
+    setSortBy,
+    analyticsCourse,
+    setAnalyticsCourse,
+    duplicateCourse,
   };
 }

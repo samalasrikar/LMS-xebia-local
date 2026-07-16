@@ -76,6 +76,31 @@ export default function EventRegistrations() {
     return false;
   });
 
+  const handleExport = () => {
+    if (registrations.length === 0) {
+      showToast("No registrations to export", "error");
+      return;
+    }
+    const headers = ["Registration ID", "Student Name", "Student Email", "Registration Date"];
+    const rows = registrations.map(reg => [
+      reg.id,
+      `"${(reg.studentName || "").replace(/"/g, '""')}"`,
+      reg.studentEmail,
+      reg.registeredAt ? new Date(reg.registeredAt).toISOString().split('T')[0] : "-"
+    ]);
+    const csvContent = [headers.join(","), ...rows.map(row => row.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    const filename = `${(event?.title || "event").toLowerCase().replace(/[^a-z0-9]+/g, "-")}-registrations.csv`;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast("Registrations exported successfully!", "success");
+  };
+
   return (
     <AppLayout>
       <div className="pt-4 pb-12 px-4 sm:px-6 lg:px-8 max-w-[1000px] mx-auto space-y-6 animate-fadeIn">
@@ -119,7 +144,7 @@ export default function EventRegistrations() {
               </div>
               <div className="flex gap-2 w-full md:w-auto">
                 <button
-                  onClick={() => showToast("Exporting registrations is not implemented yet", "error")}
+                  onClick={handleExport}
                   className="flex-1 md:flex-none flex items-center justify-center gap-2 h-10 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-650 rounded-lg font-bold text-xs cursor-pointer transition-colors"
                 >
                   <Download size={14} />

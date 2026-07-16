@@ -19,6 +19,8 @@ export default function CoursesFilterBar({
   setViewMode,
   categories,
   filteredCount,
+  sortBy,
+  setSortBy,
 }) {
   return (
     <div className="flex items-center gap-2.5 flex-wrap pt-1">
@@ -98,9 +100,51 @@ export default function CoursesFilterBar({
       </DropdownMenu>
 
       {/* Sort */}
-      <button className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-md px-2.5 h-8 text-[12px] font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
-        <ArrowUpDown size={12} /> Sort: Updated <ChevronDown size={11} />
-      </button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            className="h-8 border border-slate-200 font-semibold text-slate-600 text-[12px] bg-white hover:bg-slate-50 hover:text-slate-800 transition-all rounded-md px-3 flex items-center gap-1.5 cursor-pointer"
+          >
+            <ArrowUpDown size={12} className="text-slate-400 shrink-0" />
+            <span>Sort: {
+              sortBy === "newest" ? "Newest" :
+              sortBy === "title-asc" ? "Title A-Z" :
+              sortBy === "title-desc" ? "Title Z-A" :
+              sortBy === "learners-desc" ? "Popularity" : "Newest"
+            }</span>
+            <ChevronDown size={11} className="opacity-50" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="bg-white border border-slate-200 shadow-md rounded-md z-50">
+          <DropdownMenuRadioGroup value={sortBy} onValueChange={setSortBy}>
+            <DropdownMenuRadioItem
+              value="newest"
+              className="text-slate-700 text-xs hover:bg-slate-50 py-1.5 px-3 rounded cursor-pointer"
+            >
+              Newest
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem
+              value="title-asc"
+              className="text-slate-700 text-xs hover:bg-slate-50 py-1.5 px-3 rounded cursor-pointer"
+            >
+              Title A-Z
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem
+              value="title-desc"
+              className="text-slate-700 text-xs hover:bg-slate-50 py-1.5 px-3 rounded cursor-pointer"
+            >
+              Title Z-A
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem
+              value="learners-desc"
+              className="text-slate-700 text-xs hover:bg-slate-50 py-1.5 px-3 rounded cursor-pointer"
+            >
+              Popularity (Learners)
+            </DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {/* Result count + view toggle */}
       <div className="ml-auto flex items-center gap-2">

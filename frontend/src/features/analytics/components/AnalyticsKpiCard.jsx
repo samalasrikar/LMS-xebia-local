@@ -49,7 +49,7 @@ export default function AnalyticsKpiCard({
       bg-white p-5 rounded-2xl border border-[#d5c1cc]/80
       shadow-[0_4px_12px_-4px_rgba(108,29,95,0.05)]
       hover:-translate-y-1 hover:shadow-[0_12px_24px_-10px_rgba(108,29,95,0.15)]
-      transition-all duration-200 flex flex-col justify-between min-h-[120px] relative group
+      transition-all duration-200 flex flex-col justify-between min-h-[120px] relative group overflow-visible
       ${accent.bg}
     `}>
       <div className="flex justify-between items-start gap-2">
@@ -62,7 +62,7 @@ export default function AnalyticsKpiCard({
           </p>
         </div>
         {IconComponent && (
-          <div className={`p-2.5 bg-white rounded-xl shadow-xs border border-slate-100/60 ${accent.text} group-hover:scale-105 transition-transform`}>
+          <div className="p-2.5 bg-white rounded-xl shadow-xs border border-slate-100/60 text-[#6C1D5F] group-hover:scale-105 transition-transform">
             <IconComponent size={16} />
           </div>
         )}
@@ -71,9 +71,9 @@ export default function AnalyticsKpiCard({
       <div className="mt-3 flex items-center justify-between gap-2">
         {getTrendIcon()}
         {tooltip && (
-          <div className="relative inline-block ml-auto group/tooltip cursor-help text-slate-350 hover:text-slate-500">
-            <Info size={12} />
-            <div className="absolute right-0 bottom-6 hidden group-hover/tooltip:block w-48 bg-slate-850 text-white text-[10px] font-medium p-2 rounded-lg shadow-lg z-50 pointer-events-none leading-relaxed">
+          <div className="relative inline-block ml-auto group/tooltip cursor-help text-slate-400 hover:text-slate-600">
+            <Info size={14} />
+            <div className="absolute right-0 bottom-6 hidden group-hover/tooltip:block w-48 bg-slate-800 text-white text-[10px] font-medium p-2 rounded-lg shadow-lg z-50 pointer-events-none leading-relaxed">
               {tooltip}
             </div>
           </div>

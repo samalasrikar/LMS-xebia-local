@@ -51,12 +51,12 @@ export default function AnalyticsPageLayout({
       />
 
       {/* Main Panel Content Render */}
-      {isError ? (
-        <AnalyticsErrorState message={errorMessage} onRetry={onRetry} />
-      ) : isLoading ? (
-        <AnalyticsLoadingState />
-      ) : isEmpty ? (
-        <AnalyticsEmptyState onReset={onRetry} />
+      {isError || isLoading || isEmpty ? (
+        <div className="space-y-6">
+          {isError && <AnalyticsErrorState message={errorMessage} onRetry={onRetry} />}
+          {isLoading && <AnalyticsLoadingState />}
+          {isEmpty && <AnalyticsEmptyState onReset={onRetry} />}
+        </div>
       ) : (
         <div className="space-y-8 animate-fadeIn">
           {children}

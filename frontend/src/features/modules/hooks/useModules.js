@@ -176,7 +176,7 @@ export default function useModules() {
 
   // SubModule Actions
   const handleOpenSubModuleModal = (subMod = null) => {
-    if (subMod) {
+    if (subMod && typeof subMod === "object" && !subMod.nativeEvent && subMod.title !== undefined) {
       setEditingSubModule(subMod);
       setSubModuleTitle(subMod.title);
       setSubModuleDescription(subMod.description || "");

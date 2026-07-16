@@ -135,7 +135,8 @@ export default function useCategories() {
     setNewCatPublishState(cat.publishState || "Published");
     setNewCatSlug(cat.slug || "");
     setNewCatParentCat(cat.parentCat || "");
-    setModalMode("view");
+    setSelectedCatDbId(cat.dbId);
+    setModalMode("edit");
     setErrorMsg("");
     setShowModal(true);
   };

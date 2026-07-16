@@ -215,6 +215,11 @@ export default function useContentLibrary() {
     }
   };
 
+  const handleCourseChange = (val) => {
+    setSelectedCourseId(val);
+    setSelectedModuleId("All");
+  };
+
   return {
     contents,
     submodules,
@@ -230,7 +235,7 @@ export default function useContentLibrary() {
     selectedModuleId,
     setSelectedModuleId,
     selectedCourseId,
-    setSelectedCourseId,
+    setSelectedCourseId: handleCourseChange,
     selected,
     setSelected,
     isModalOpen,

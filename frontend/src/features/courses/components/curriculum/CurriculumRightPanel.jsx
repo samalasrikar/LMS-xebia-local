@@ -20,6 +20,8 @@ export default function CurriculumRightPanel({
   requestDelete,
   openAddModuleModal,
   activeBlock,
+  subModuleStatuses = {},
+  toggleSubModuleStatus,
 }) {
   return (
     <aside className="w-[264px] bg-white border-l border-slate-200 flex flex-col shrink-0">
@@ -51,9 +53,18 @@ export default function CurriculumRightPanel({
               <section className="space-y-2">
                 <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</h3>
                 <div className="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
-                  <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
-                  <span className="text-[12px] font-semibold text-slate-700 flex-1">Draft</span>
-                  <button className="text-[10px] font-bold text-[#6C1D5F] hover:underline cursor-pointer">Change</button>
+                  <div className={`w-2 h-2 rounded-full shrink-0 ${
+                    subModuleStatuses[activeSubModule.id] === "Published" ? "bg-emerald-500" : "bg-amber-400"
+                  }`} />
+                  <span className="text-[12px] font-semibold text-slate-700 flex-1">
+                    {subModuleStatuses[activeSubModule.id] === "Published" ? "Published" : "Draft"}
+                  </span>
+                  <button
+                    onClick={() => toggleSubModuleStatus(activeSubModule.id)}
+                    className="text-[10px] font-bold text-[#6C1D5F] hover:underline cursor-pointer bg-transparent border-none outline-none"
+                  >
+                    Change
+                  </button>
                 </div>
               </section>
 

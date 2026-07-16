@@ -1,5 +1,13 @@
 import AppLayout from "@/app/layouts/AppLayout";
 import DeleteDialog from "@/shared/components/DeleteDialog";
+import { TrendingUp } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/shared/components/ui/dialog";
 
 import CoursesPageHeader from "@/features/courses/components/CoursesPageHeader";
 import CoursesStatsBar   from "@/features/courses/components/CoursesStatsBar";
@@ -41,6 +49,11 @@ export default function Courses() {
     confirmDelete,
     handleBulkStatusChange,
     handleBulkFeature,
+    sortBy,
+    setSortBy,
+    analyticsCourse,
+    setAnalyticsCourse,
+    duplicateCourse,
   } = useCourses();
 
   const handleBulkDeleteInitiate = () => {
@@ -83,6 +96,8 @@ export default function Courses() {
           setViewMode={setViewMode}
           categories={categories}
           filteredCount={filtered.length}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
         />
 
         {viewMode === "grid" ? (
@@ -106,6 +121,8 @@ export default function Courses() {
             onBulkArchive={() => handleBulkStatusChange("archived")}
             onBulkFeature={handleBulkFeature}
             onBulkDelete={handleBulkDeleteInitiate}
+            onOpenAnalytics={setAnalyticsCourse}
+            onDuplicate={duplicateCourse}
           />
         ) : (
           <CoursesTableView
@@ -128,6 +145,8 @@ export default function Courses() {
             onBulkArchive={() => handleBulkStatusChange("archived")}
             onBulkFeature={handleBulkFeature}
             onBulkDelete={handleBulkDeleteInitiate}
+            onOpenAnalytics={setAnalyticsCourse}
+            onDuplicate={duplicateCourse}
           />
         )}
 
@@ -147,6 +166,59 @@ export default function Courses() {
         onCancel={() => setDeleteTarget(null)}
         onConfirm={confirmDelete}
       />
+
+      {/* ── Course Analytics Dialog ── */}
+      <Dialog open={analyticsCourse !== null} onOpenChange={(open) => !open && setAnalyticsCourse(null)}>
+        <DialogContent className="max-w-md bg-white p-6 rounded-2xl shadow-xl border border-slate-200">
+          {analyticsCourse && (
+            <>
+              <DialogHeader className="flex flex-row items-center gap-3 border-b border-slate-100 pb-3">
+                <div className="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                  <TrendingUp size={20} />
+                </div>
+                <div>
+                  <DialogTitle className="text-[16px] font-black text-slate-800">Course Analytics</DialogTitle>
+                  <DialogDescription className="text-[11px] text-slate-400">Key metrics for "{analyticsCourse.title}"</DialogDescription>
+                </div>
+              </DialogHeader>
+              <div className="space-y-3.5 my-4">
+                <div className="flex justify-between items-center text-[12.5px] border-b border-slate-50 pb-2">
+                  <span className="text-slate-500 font-medium">Category</span>
+                  <span className="font-semibold text-slate-800">{analyticsCourse.category}</span>
+                </div>
+                <div className="flex justify-between items-center text-[12.5px] border-b border-slate-50 pb-2">
+                  <span className="text-slate-500 font-medium">Difficulty Level</span>
+                  <span className="font-semibold text-slate-800">{analyticsCourse.difficulty}</span>
+                </div>
+                <div className="flex justify-between items-center text-[12.5px] border-b border-slate-50 pb-2">
+                  <span className="text-slate-500 font-medium">Total Enrolled Learners</span>
+                  <span className="font-bold text-slate-800">{analyticsCourse.learners}</span>
+                </div>
+                <div className="flex justify-between items-center text-[12.5px] border-b border-slate-50 pb-2">
+                  <span className="text-slate-500 font-medium">Average Rating</span>
+                  <span className="font-semibold text-amber-500">4.5 ★</span>
+                </div>
+                <div className="flex justify-between items-center text-[12.5px] border-b border-slate-50 pb-2">
+                  <span className="text-slate-500 font-medium">Course Completion Rate</span>
+                  <span className="font-semibold text-slate-800">76.5%</span>
+                </div>
+                <div className="flex justify-between items-center text-[12.5px]">
+                  <span className="text-slate-500 font-medium">Total Course Views</span>
+                  <span className="font-semibold text-slate-800">{analyticsCourse.learners * 3 + 47}</span>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 mt-4 pt-2 border-t border-slate-100">
+                <button
+                  onClick={() => setAnalyticsCourse(null)}
+                  className="px-4 py-2 text-[12px] font-bold text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200 cursor-pointer outline-none"
+                >
+                  Close
+                </button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Toast Notification */}
       {toast && (
