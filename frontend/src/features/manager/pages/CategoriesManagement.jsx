@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { FolderOpen, Users, Edit, Search, Filter, Grid, List, ChevronLeft, ChevronRight, X, Play } from "lucide-react";
+import { FolderOpen, Users, Edit, Search, Filter, Grid, List, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import categoryService from "@/features/categories/services/categoryService";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
 
 export default function CategoriesManagement() {
   const [viewType, setViewType] = useState("grid");
@@ -211,56 +212,50 @@ export default function CategoriesManagement() {
       </div>
 
       {/* Edit Category Modal */}
-      {editingCategory && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setEditingCategory(null)}></div>
-          <div className="relative bg-white w-full max-w-[448px] rounded-xl p-6 shadow-2xl flex flex-col gap-4 animate-scale-up border border-slate-100">
-            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-              <h3 className="text-[16px] font-bold text-slate-800">Edit Category</h3>
-              <button onClick={() => setEditingCategory(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                <X size={18} />
+      <Dialog open={!!editingCategory} onOpenChange={(open) => !open && setEditingCategory(null)}>
+        <DialogContent className="max-w-[448px] rounded-xl shadow-2xl bg-white border border-slate-200 p-6 flex flex-col gap-4">
+          <DialogHeader className="pb-2 border-b border-slate-100">
+            <DialogTitle className="text-[16px] font-bold text-slate-800">Edit Category</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSaveCategory} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-450 uppercase tracking-widest">Category Name</label>
+              <input
+                type="text"
+                required
+                value={editingCategory ? editingCategory.name : ""}
+                onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-[12px] text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-450 uppercase tracking-widest">Description</label>
+              <textarea
+                rows="3"
+                required
+                value={editingCategory ? editingCategory.desc : ""}
+                onChange={(e) => setEditingCategory({ ...editingCategory, desc: e.target.value })}
+                className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-[12px] text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary leading-relaxed"
+              />
+            </div>
+            <div className="flex gap-2 justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setEditingCategory(null)}
+                className="px-3.5 py-2 border border-slate-200 rounded-lg text-[12px] font-semibold text-slate-500 hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-3.5 py-2 bg-primary text-white rounded-lg text-[12px] font-bold hover:bg-primary-dark transition-colors"
+              >
+                Save Changes
               </button>
             </div>
-            <form onSubmit={handleSaveCategory} className="space-y-4">
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-450 uppercase tracking-widest">Category Name</label>
-                <input
-                  type="text"
-                  required
-                  value={editingCategory.name}
-                  onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
-                  className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-[12px] text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-450 uppercase tracking-widest">Description</label>
-                <textarea
-                  rows="3"
-                  required
-                  value={editingCategory.desc}
-                  onChange={(e) => setEditingCategory({ ...editingCategory, desc: e.target.value })}
-                  className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-[12px] text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary leading-relaxed"
-                />
-              </div>
-              <div className="flex gap-2 justify-end pt-2">
-                <button
-                  type="button"
-                  onClick={() => setEditingCategory(null)}
-                  className="px-3.5 py-2 border border-slate-200 rounded-lg text-[12px] font-semibold text-slate-500 hover:bg-slate-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-3.5 py-2 bg-primary text-white rounded-lg text-[12px] font-bold hover:bg-primary-dark transition-colors"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import AppLayout from "@/app/layouts/AppLayout";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { Calendar as CalendarComponent } from "@/shared/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover";
+import { format, parseISO } from "date-fns";
+import { Button } from "@/shared/components/ui/button";
+import { cn } from "@/lib/utils";
 import adminProfileIcon from "@/assets/admin_profile_icon.svg";
 import {
   User,
@@ -243,49 +250,26 @@ export default function StudentProfile() {
 
       {/* ── Tabs & Configurations ── */}
       <section className="bg-white rounded-3xl border border-slate-200/70 overflow-hidden shadow-sm">
-        {/* Navigation Tab list */}
-        <div className="flex border-b border-slate-100 px-6 overflow-x-auto whitespace-nowrap bg-slate-50/50">
-          <button
-            onClick={() => setActiveTab("general")}
-            className={`py-5 px-4 font-bold text-[13px] transition-all flex items-center gap-2 cursor-pointer border-none outline-none relative bg-transparent ${
-              activeTab === "general" ? "text-[#6C1D5F]" : "text-slate-400 hover:text-slate-650"
-            }`}
-          >
-            <User size={15} /> General Information
-            {activeTab === "general" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#6C1D5F] rounded-full" />}
-          </button>
-          {role === "student" && (
-            <>
-              <button
-                onClick={() => setActiveTab("academic")}
-                className={`py-5 px-4 font-bold text-[13px] transition-all flex items-center gap-2 cursor-pointer border-none outline-none relative bg-transparent ${
-                  activeTab === "academic" ? "text-[#6C1D5F]" : "text-slate-400 hover:text-slate-650"
-                }`}
-              >
-                <GraduationCap size={15} /> Academic Record
-                {activeTab === "academic" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#6C1D5F] rounded-full" />}
-              </button>
-              <button
-                onClick={() => setActiveTab("learning")}
-                className={`py-5 px-4 font-bold text-[13px] transition-all flex items-center gap-2 cursor-pointer border-none outline-none relative bg-transparent ${
-                  activeTab === "learning" ? "text-[#6C1D5F]" : "text-slate-400 hover:text-slate-650"
-                }`}
-              >
-                <BookOpen size={15} /> Learning Stats
-                {activeTab === "learning" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#6C1D5F] rounded-full" />}
-              </button>
-            </>
-          )}
-          <button
-            onClick={() => setActiveTab("account")}
-            className={`py-5 px-4 font-bold text-[13px] transition-all flex items-center gap-2 cursor-pointer border-none outline-none relative bg-transparent ${
-              activeTab === "account" ? "text-[#6C1D5F]" : "text-slate-400 hover:text-slate-650"
-            }`}
-          >
-            <Settings size={15} /> Security &amp; Settings
-            {activeTab === "account" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#6C1D5F] rounded-full" />}
-          </button>
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          {/* Navigation Tab list */}
+          <TabsList variant="line" className="w-full justify-start border-b border-slate-100 rounded-none px-6 bg-slate-50/50 gap-2 h-14 overflow-x-auto whitespace-nowrap">
+            <TabsTrigger value="general" className="data-active:text-[#6C1D5F] data-active:border-[#6C1D5F] after:bg-[#6C1D5F] py-4 px-4 font-bold text-[13px] border-none shadow-none bg-transparent">
+              <User size={15} /> General Information
+            </TabsTrigger>
+            {role === "student" && (
+              <>
+                <TabsTrigger value="academic" className="data-active:text-[#6C1D5F] data-active:border-[#6C1D5F] after:bg-[#6C1D5F] py-4 px-4 font-bold text-[13px] border-none shadow-none bg-transparent">
+                  <GraduationCap size={15} /> Academic Record
+                </TabsTrigger>
+                <TabsTrigger value="learning" className="data-active:text-[#6C1D5F] data-active:border-[#6C1D5F] after:bg-[#6C1D5F] py-4 px-4 font-bold text-[13px] border-none shadow-none bg-transparent">
+                  <BookOpen size={15} /> Learning Stats
+                </TabsTrigger>
+              </>
+            )}
+            <TabsTrigger value="account" className="data-active:text-[#6C1D5F] data-active:border-[#6C1D5F] after:bg-[#6C1D5F] py-4 px-4 font-bold text-[13px] border-none shadow-none bg-transparent">
+              <Settings size={15} /> Security &amp; Settings
+            </TabsTrigger>
+          </TabsList>
 
         {/* Tab content area */}
         <div className="p-8">
@@ -339,27 +323,49 @@ export default function StudentProfile() {
                     className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-[13px] text-slate-700 focus:outline-none focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F]"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11.5px] font-black uppercase text-slate-400 tracking-wider">Date of Birth</label>
-                  <input
-                    type="date"
-                    value={profile.dob}
-                    onChange={(e) => handleProfileChange("dob", e.target.value)}
-                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-[13px] text-slate-700 focus:outline-none focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F]"
-                  />
+                <div className="space-y-1.5 flex flex-col justify-end">
+                  <label className="text-[11.5px] font-black uppercase text-slate-400 tracking-wider mb-1">Date of Birth</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        type="button"
+                        className={cn(
+                          "w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-[13px] text-slate-700 h-[42px] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 justify-start text-left font-normal",
+                          !profile.dob && "text-muted-foreground"
+                        )}
+                      >
+                        <Calendar className="mr-2 h-4 w-4 text-slate-450" />
+                        {profile.dob ? format(parseISO(profile.dob), "PPP") : <span>Pick date of birth</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-white border border-slate-200 shadow-md" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={profile.dob ? parseISO(profile.dob) : undefined}
+                        onSelect={(date) => handleProfileChange("dob", date ? format(date, "yyyy-MM-dd") : "")}
+                        initialFocus
+                        className="[--primary:#6C1D5F] [--primary-foreground:#ffffff] [--accent:rgba(108,29,95,0.1)] [--accent-foreground:#6C1D5F]"
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11.5px] font-black uppercase text-slate-400 tracking-wider">Gender</label>
-                  <select
+                <div className="space-y-1.5 flex flex-col justify-end">
+                  <label className="text-[11.5px] font-black uppercase text-slate-400 tracking-wider mb-1">Gender</label>
+                  <Select
                     value={profile.gender}
-                    onChange={(e) => handleProfileChange("gender", e.target.value)}
-                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-[13px] text-slate-700 focus:outline-none focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F]"
+                    onValueChange={(val) => handleProfileChange("gender", val)}
                   >
-                    <option>Female</option>
-                    <option>Male</option>
-                    <option>Non-binary</option>
-                    <option>Prefer not to say</option>
-                  </select>
+                    <SelectTrigger className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-[13px] text-slate-700 h-[42px] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                      <SelectValue placeholder="Gender" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-slate-250 shadow-md">
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Non-binary">Non-binary</SelectItem>
+                      <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5 md:col-span-2">
                   <label className="text-[11.5px] font-black uppercase text-slate-400 tracking-wider">Permanent Address</label>
@@ -534,6 +540,7 @@ export default function StudentProfile() {
             </div>
           )}
         </div>
+        </Tabs>
       </section>
     </div>
   );

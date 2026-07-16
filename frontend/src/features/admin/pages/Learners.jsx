@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AppLayout from "@/app/layouts/AppLayout";
 import { Users, Bolt, School, Award, Search, Trash2, Edit, Eye, ChevronRight, UserPlus } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 
 const INITIAL_LEARNERS = [
   {
@@ -147,40 +148,30 @@ export default function Learners() {
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-[12px] font-semibold text-slate-600 uppercase tracking-wide">Department</label>
-                <select
-                  value={newDept}
-                  onChange={(e) => setNewDept(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-[13px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors appearance-none cursor-pointer"
-                  style={{
-                    backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpath d=\'m6 9 6 6 6-6\'/%3E%3C/svg%3E")',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 10px center',
-                    paddingRight: '32px'
-                  }}
-                >
-                  <option>Cloud Architecture</option>
-                  <option>Data Science</option>
-                  <option>Product Management</option>
-                  <option>Legal & Compliance</option>
-                </select>
+                <Select value={newDept} onValueChange={setNewDept}>
+                  <SelectTrigger className="w-full bg-white border border-slate-200 rounded-lg text-[13px] h-[38px] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                    <SelectValue placeholder="Select Department" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-slate-250 shadow-md">
+                    <SelectItem value="Cloud Architecture">Cloud Architecture</SelectItem>
+                    <SelectItem value="Data Science">Data Science</SelectItem>
+                    <SelectItem value="Product Management">Product Management</SelectItem>
+                    <SelectItem value="Legal & Compliance">Legal & Compliance</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-[12px] font-semibold text-slate-600 uppercase tracking-wide">Status</label>
-                <select
-                  value={newStatus}
-                  onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-[13px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors appearance-none cursor-pointer"
-                  style={{
-                    backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpath d=\'m6 9 6 6 6-6\'/%3E%3C/svg%3E")',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 10px center',
-                    paddingRight: '32px'
-                  }}
-                >
-                  <option>Active</option>
-                  <option>Pending</option>
-                  <option>Inactive</option>
-                </select>
+                <Select value={newStatus} onValueChange={setNewStatus}>
+                  <SelectTrigger className="w-full bg-white border border-slate-200 rounded-lg text-[13px] h-[38px] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-slate-250 shadow-md">
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="Inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="flex gap-3 justify-end pt-3">
@@ -284,27 +275,29 @@ export default function Learners() {
                   className="bg-transparent border-none focus:ring-0 text-[13px] w-full outline-none"
                 />
               </div>
-              <select
-                value={deptFilter}
-                onChange={(e) => setDeptFilter(e.target.value)}
-                className="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-[13px] focus:outline-none min-w-[130px]"
-              >
-                <option>Department</option>
-                <option>Cloud Architecture</option>
-                <option>Data Science</option>
-                <option>Product Management</option>
-                <option>Legal & Compliance</option>
-              </select>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-[13px] focus:outline-none min-w-[130px]"
-              >
-                <option>Status</option>
-                <option>Active</option>
-                <option>Pending</option>
-                <option>Inactive</option>
-              </select>
+              <Select value={deptFilter} onValueChange={setDeptFilter}>
+                <SelectTrigger className="h-[34px] bg-white border border-slate-200 text-slate-700 text-[13px] rounded-lg min-w-[130px] font-medium focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                  <SelectValue placeholder="Department" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-slate-250 shadow-md">
+                  <SelectItem value="Department">Department</SelectItem>
+                  <SelectItem value="Cloud Architecture">Cloud Architecture</SelectItem>
+                  <SelectItem value="Data Science">Data Science</SelectItem>
+                  <SelectItem value="Product Management">Product Management</SelectItem>
+                  <SelectItem value="Legal & Compliance">Legal & Compliance</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="h-[34px] bg-white border border-slate-200 text-slate-700 text-[13px] rounded-lg min-w-[130px] font-medium focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-slate-250 shadow-md">
+                  <SelectItem value="Status">Status</SelectItem>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

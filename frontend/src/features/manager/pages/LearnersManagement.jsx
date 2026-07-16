@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { Users, Activity, CheckCircle, Clock, Search, Filter, Plus, Download, Upload, X, CheckCircle2 } from "lucide-react";
+import { Users, Activity, CheckCircle, Clock, Search, Filter, Plus, Download, Upload, CheckCircle2 } from "lucide-react";
 import assignmentService from "@/features/assignments/services/assignmentService";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 
 export default function LearnersManagement() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -169,20 +171,21 @@ export default function LearnersManagement() {
             />
           </div>
           {/* Department Select */}
-          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-semibold text-slate-600">
-            <Filter size={11} className="text-slate-400" />
-            <select
-              value={deptFilter}
-              onChange={(e) => handleDeptFilterChange(e.target.value)}
-              className="bg-transparent border-none outline-none pr-3 py-0.5 cursor-pointer text-[12px] font-medium"
-            >
-              <option value="All Departments">All Departments</option>
-              <option value="Engineering">Engineering</option>
-              <option value="Design">Design</option>
-              <option value="Leadership">Leadership</option>
-              <option value="Marketing">Marketing</option>
-            </select>
-          </div>
+          <Select value={deptFilter} onValueChange={handleDeptFilterChange}>
+            <SelectTrigger className="h-8 w-44 bg-slate-50 border border-slate-200 text-slate-700 text-[11px] rounded-lg hover:bg-slate-100 transition-all font-semibold select-none flex items-center gap-1.5 focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+              <span className="flex items-center gap-1.5">
+                <Filter size={11} className="text-slate-400" />
+                <SelectValue placeholder="Department" />
+              </span>
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-slate-250 shadow-md">
+              <SelectItem value="All Departments">All Departments</SelectItem>
+              <SelectItem value="Engineering">Engineering</SelectItem>
+              <SelectItem value="Design">Design</SelectItem>
+              <SelectItem value="Leadership">Leadership</SelectItem>
+              <SelectItem value="Marketing">Marketing</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -257,88 +260,86 @@ export default function LearnersManagement() {
       </div>
 
       {/* Add Learner Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setShowAddModal(false)}></div>
-          <div className="relative bg-white w-full max-w-[448px] rounded-xl p-6 shadow-2xl flex flex-col gap-4 border border-slate-100 animate-scale-up">
-            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-              <h3 className="text-[16px] font-bold text-slate-800">Add New Learner</h3>
-              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                <X size={16} />
-              </button>
+      <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+        <DialogContent className="max-w-[448px] rounded-xl shadow-2xl bg-white border border-slate-200 p-6 flex flex-col gap-4">
+          <DialogHeader className="pb-2 border-b border-slate-100">
+            <DialogTitle className="text-[16px] font-bold text-slate-800">Add New Learner</DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleAddLearner} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Full Name</label>
+              <input
+                type="text"
+                required
+                value={newLearner.name}
+                onChange={(e) => setNewLearner({ ...newLearner, name: e.target.value })}
+                placeholder="e.g. John Doe"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
+              />
             </div>
 
-            <form onSubmit={handleAddLearner} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Email Address</label>
+              <input
+                type="email"
+                required
+                value={newLearner.email}
+                onChange={(e) => setNewLearner({ ...newLearner, email: e.target.value })}
+                placeholder="e.g. john.doe@xebia.com"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1 flex flex-col">
+                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Department</label>
+                <Select
+                  value={newLearner.dept}
+                  onValueChange={(val) => setNewLearner({ ...newLearner, dept: val })}
+                >
+                  <SelectTrigger className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 h-9 focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                    <SelectValue placeholder="Select Department" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-slate-250 shadow-md">
+                    <SelectItem value="Engineering">Engineering</SelectItem>
+                    <SelectItem value="Design">Design</SelectItem>
+                    <SelectItem value="Leadership">Leadership</SelectItem>
+                    <SelectItem value="Marketing">Marketing</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Full Name</label>
+                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Initial Course</label>
                 <input
                   type="text"
-                  required
-                  value={newLearner.name}
-                  onChange={(e) => setNewLearner({ ...newLearner, name: e.target.value })}
-                  placeholder="e.g. John Doe"
+                  value={newLearner.course}
+                  onChange={(e) => setNewLearner({ ...newLearner, course: e.target.value })}
+                  placeholder="e.g. AWS Basics"
                   className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
                 />
               </div>
+            </div>
 
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Email Address</label>
-                <input
-                  type="email"
-                  required
-                  value={newLearner.email}
-                  onChange={(e) => setNewLearner({ ...newLearner, email: e.target.value })}
-                  placeholder="e.g. john.doe@xebia.com"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Department</label>
-                  <select
-                    value={newLearner.dept}
-                    onChange={(e) => setNewLearner({ ...newLearner, dept: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 outline-none focus:border-primary transition-all"
-                  >
-                    <option value="Engineering">Engineering</option>
-                    <option value="Design">Design</option>
-                    <option value="Leadership">Leadership</option>
-                    <option value="Marketing">Marketing</option>
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Initial Course</label>
-                  <input
-                    type="text"
-                    value={newLearner.course}
-                    onChange={(e) => setNewLearner({ ...newLearner, course: e.target.value })}
-                    placeholder="e.g. AWS Basics"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-[12px] font-semibold cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-primary hover:bg-[#6c0f66] text-white rounded-lg text-[12px] font-semibold cursor-pointer flex items-center gap-1"
-                >
-                  <CheckCircle2 size={13} />
-                  <span>Save Learner</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowAddModal(false)}
+                className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-[12px] font-semibold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-primary hover:bg-[#6c0f66] text-white rounded-lg text-[12px] font-semibold cursor-pointer flex items-center gap-1"
+              >
+                <CheckCircle2 size={13} />
+                <span>Save Learner</span>
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AppLayout from "@/app/layouts/AppLayout";
 import assignmentService from "../services/assignmentService";
 import DeleteDialog from "@/shared/components/DeleteDialog";
-import { Plus } from "lucide-react";
+import { Plus, Calendar as CalendarIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -11,6 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
+import { Calendar } from "@/shared/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover";
+import { format, parseISO } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Button } from "@/shared/components/ui/button";
 
 import PageHeader from "../components/PageHeader";
 import StatsCard from "../components/StatsCard";
@@ -256,14 +261,32 @@ const filteredAssignments = useMemo(() => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex-1 min-w-[150px]">
+            <div className="flex-1 min-w-[150px] flex flex-col justify-end">
               <label className="block text-[11px] font-bold text-slate-450 uppercase mb-1.5">Due Date</label>
-              <input
-                className="w-full rounded-lg border border-slate-200 bg-white text-[13px] px-3 py-1.5 outline-none focus:border-[#6C1D5F] text-slate-700"
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    type="button"
+                    className={cn(
+                      "w-full justify-start text-left font-normal border border-slate-200 bg-white hover:bg-slate-50/50 rounded-lg text-slate-750 text-xs h-9 px-3",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4 text-slate-450" />
+                    {selectedDate ? format(parseISO(selectedDate), "PPP") : <span>Pick due date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-white border border-slate-200 shadow-md" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate ? parseISO(selectedDate) : undefined}
+                    onSelect={(date) => setSelectedDate(date ? format(date, "yyyy-MM-dd") : "")}
+                    initialFocus
+                    className="[--primary:#6C1D5F] [--primary-foreground:#ffffff] [--accent:rgba(108,29,95,0.1)] [--accent-foreground:#6C1D5F]"
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <button
               onClick={handleResetFilters}

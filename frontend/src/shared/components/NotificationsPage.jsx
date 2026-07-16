@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Bell,
   CheckCheck,
@@ -10,6 +11,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import api from "@/shared/services/api";
+import { Spinner } from "@/shared/components/ui/spinner";
 
 const getIconComponent = (iconName) => {
   switch (iconName) {
@@ -69,6 +71,7 @@ const formatRelativeTime = (dateString) => {
 };
 
 export default function NotificationsPage({ role, userId }) {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("all");
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -111,16 +114,41 @@ export default function NotificationsPage({ role, userId }) {
     }
   };
 
-  const toggleReadStatus = async (id, currentRead) => {
+  const handleNotificationClick = async (notification) => {
+    // Mark as read
     try {
-      if (!currentRead) {
-        await api.put(`/notifications/${id}/read`);
+      if (!notification.read) {
+        await api.put(`/notifications/${notification.id}/read`);
         setNotifications(prev =>
-          prev.map(n => (n.id === id ? { ...n, read: true } : n))
+          prev.map(n => (n.id === notification.id ? { ...n, read: true } : n))
         );
       }
     } catch (err) {
       console.error("Failed to mark notification as read:", err);
+    }
+
+    // Navigate to the target resource
+    const { targetType, targetId } = notification;
+    if (!targetType || !targetId) return;
+
+    const role = notification.recipientRole;
+    const base = role === "trainer" ? "/trainer" : role === "admin" ? "/admin" : "/student";
+
+    switch (targetType.toLowerCase()) {
+      case "assignment":
+        navigate(`${base}/assignments/${targetId}`);
+        break;
+      case "course":
+        navigate(`${base}/courses/${targetId}`);
+        break;
+      case "event":
+        navigate(`${base}/events/${targetId}`);
+        break;
+      case "assessment":
+        navigate(`${base}/assessments/${targetId}`);
+        break;
+      default:
+        break;
     }
   };
 
@@ -177,7 +205,7 @@ export default function NotificationsPage({ role, userId }) {
       {/* ── Notifications List ── */}
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6C1D5F]" />
+          <Spinner className="h-8 w-8 text-[#6C1D5F]" />
         </div>
       ) : notifications.length > 0 ? (
         <div className="space-y-4">
@@ -188,7 +216,7 @@ export default function NotificationsPage({ role, userId }) {
             return (
               <div
                 key={n.id}
-                onClick={() => toggleReadStatus(n.id, n.read)}
+                onClick={() => handleNotificationClick(n)}
                 className={`group relative border rounded-2xl p-5 flex gap-4 transition-all duration-200 cursor-pointer shadow-sm ${
                   !n.read
                     ? "bg-white border-[#6C1D5F]/20 hover:bg-[#6C1D5F]/5"

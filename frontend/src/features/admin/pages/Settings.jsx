@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import AppLayout from "@/app/layouts/AppLayout";
 import { Save, ChevronRight, CheckCircle2, X, Upload } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { Spinner } from "@/shared/components/ui/spinner";
 
 function Toast({ message, onClose }) {
   useEffect(() => {
@@ -115,7 +117,7 @@ export default function Settings() {
           >
             {saving ? (
               <>
-                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                <Spinner className="w-4 h-4 text-white" />
                 Saving…
               </>
             ) : (
@@ -161,29 +163,31 @@ export default function Settings() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[12px] font-semibold text-slate-600">Language</label>
-                  <select
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[13px] focus:outline-none bg-white"
-                  >
-                    <option>English (US)</option>
-                    <option>Dutch</option>
-                    <option>French</option>
-                    <option>German</option>
-                  </select>
+                  <Select value={language} onValueChange={setLanguage}>
+                    <SelectTrigger className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[13px] h-[38px] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 bg-white">
+                      <SelectValue placeholder="Select Language" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-slate-250 shadow-md">
+                      <SelectItem value="English (US)">English (US)</SelectItem>
+                      <SelectItem value="Dutch">Dutch</SelectItem>
+                      <SelectItem value="French">French</SelectItem>
+                      <SelectItem value="German">German</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[12px] font-semibold text-slate-600">Time Zone</label>
-                  <select
-                    value={timezone}
-                    onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[13px] focus:outline-none bg-white"
-                  >
-                    <option>(GMT+01:00) Central European Time</option>
-                    <option>(GMT-05:00) Eastern Time</option>
-                    <option>(GMT+05:30) India Standard Time</option>
-                    <option>(GMT+00:00) UTC</option>
-                  </select>
+                  <Select value={timezone} onValueChange={setTimezone}>
+                    <SelectTrigger className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[13px] h-[38px] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 bg-white">
+                      <SelectValue placeholder="Select Time Zone" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-slate-250 shadow-md">
+                      <SelectItem value="(GMT+01:00) Central European Time">(GMT+01:00) Central European Time</SelectItem>
+                      <SelectItem value="(GMT-05:00) Eastern Time">(GMT-05:00) Eastern Time</SelectItem>
+                      <SelectItem value="(GMT+05:30) India Standard Time">(GMT+05:30) India Standard Time</SelectItem>
+                      <SelectItem value="(GMT+00:00) UTC">(GMT+00:00) UTC</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>
@@ -323,15 +327,16 @@ export default function Settings() {
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-[12px] font-semibold text-slate-600">Encryption</label>
-                  <select
-                    value={smtpEncryption}
-                    onChange={(e) => setSmtpEncryption(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-[13px] bg-white focus:outline-none"
-                  >
-                    <option>STARTTLS</option>
-                    <option>SSL/TLS</option>
-                    <option>None</option>
-                  </select>
+                  <Select value={smtpEncryption} onValueChange={setSmtpEncryption}>
+                    <SelectTrigger className="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-[13px] h-[34px] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 bg-white">
+                      <SelectValue placeholder="Select Encryption" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-slate-250 shadow-md">
+                      <SelectItem value="STARTTLS">STARTTLS</SelectItem>
+                      <SelectItem value="SSL/TLS">SSL/TLS</SelectItem>
+                      <SelectItem value="None">None</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

@@ -15,6 +15,11 @@ public class BatchController {
     @Autowired
     private BatchService batchService;
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<String>> handleValidation(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(ex.getMessage()));
+    }
+
     @GetMapping
     public ApiResponse<?> getBatches(
             @RequestParam(required = false) String q,
