@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Badge } from "@/shared/components/ui/badge";
 import {
   FileText,
   Clock,
@@ -263,9 +264,9 @@ export default function StudentAssignments() {
                   <span className="text-[9.5px] font-black uppercase text-slate-400 tracking-wider">Attempt {sub.attempt}</span>
                   <p className="text-[12.5px] font-bold text-slate-700 truncate">{sub.filename}</p>
                   <p className="text-[10.5px] text-slate-450">{sub.date}</p>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded border text-[9.5px] font-black uppercase tracking-wider ${sub.statusColor}`}>
+                  <Badge className={`inline-flex items-center px-2 py-0.5 rounded border text-[9.5px] font-black uppercase tracking-wider pointer-events-none ${sub.statusColor}`}>
                     {sub.status}
-                  </span>
+                  </Badge>
                 </div>
               ))}
             </div>

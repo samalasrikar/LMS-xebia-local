@@ -11,6 +11,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import api from "@/shared/services/api";
+import { Spinner } from "@/shared/components/ui/spinner";
 
 const getIconComponent = (iconName) => {
   switch (iconName) {
@@ -204,7 +205,7 @@ export default function NotificationsPage({ role, userId }) {
       {/* ── Notifications List ── */}
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6C1D5F]" />
+          <Spinner className="h-8 w-8 text-[#6C1D5F]" />
         </div>
       ) : notifications.length > 0 ? (
         <div className="space-y-4">

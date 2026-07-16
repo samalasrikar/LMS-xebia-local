@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronRight, Search, X, Info, CheckSquare } from "lucide-react";
+import { ChevronRight, Search, X, Info, CheckSquare, Calendar as CalendarIcon } from "lucide-react";
 import AppLayout from "@/app/layouts/AppLayout";
 import batchService from "../services/batchService";
 import assignmentService from "@/features/assignments/services/assignmentService";
+import { Calendar } from "@/shared/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover";
+import { format, parseISO } from "date-fns";
+import { cn } from "@/lib/utils";
 
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -96,7 +100,6 @@ export default function CreateBatch() {
     if (!batchName.trim()) { setValidationError("Batch Name is required."); return; }
     if (!selectedCourse) { setValidationError("Please select a course."); return; }
     if (!startDate || !endDate) { setValidationError("Start and End dates are required."); return; }
-    if (endDate < startDate) { setValidationError("End date cannot be before start date."); return; }
 
     setIsSaving(true);
     const payload = {
@@ -202,31 +205,59 @@ export default function CreateBatch() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
+                <div className="flex flex-col">
                   <label className="block text-[11px] font-bold text-slate-500 mb-1.5">Start Date *</label>
-                  <Input
-                    type="date"
-                    className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 focus:border-[#6C1D5F] focus:bg-white outline-none transition-all cursor-pointer h-10"
-                    value={startDate}
-                    onChange={e => setStartDate(e.target.value)}
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        type="button"
+                        className={cn(
+                          "w-full justify-start text-left font-normal border border-slate-200 bg-slate-50 hover:bg-slate-100/50 rounded-lg text-slate-750 text-xs h-10 px-4",
+                          !startDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4 text-slate-450" />
+                        {startDate ? format(parseISO(startDate), "PPP") : <span>Pick start date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-white border border-slate-200 shadow-md" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate ? parseISO(startDate) : undefined}
+                        onSelect={(date) => setStartDate(date ? format(date, "yyyy-MM-dd") : "")}
+                        initialFocus
+                        className="[--primary:#6C1D5F] [--primary-foreground:#ffffff] [--accent:rgba(108,29,95,0.1)] [--accent-foreground:#6C1D5F]"
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
-                <div>
+                <div className="flex flex-col">
                   <label className="block text-[11px] font-bold text-slate-500 mb-1.5">End Date *</label>
-                  <Input
-                    type="date"
-                    className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 focus:border-[#6C1D5F] focus:bg-white outline-none transition-all cursor-pointer h-10"
-                    value={endDate}
-                    min={startDate || undefined}
-                    onChange={e => {
-                      setEndDate(e.target.value);
-                      if (startDate && e.target.value < startDate) {
-                        setValidationError("End date cannot be before start date.");
-                      } else {
-                        setValidationError(prev => prev === "End date cannot be before start date." ? "" : prev);
-                      }
-                    }}
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        type="button"
+                        className={cn(
+                          "w-full justify-start text-left font-normal border border-slate-200 bg-slate-50 hover:bg-slate-100/50 rounded-lg text-slate-750 text-xs h-10 px-4",
+                          !endDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4 text-slate-450" />
+                        {endDate ? format(parseISO(endDate), "PPP") : <span>Pick end date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-white border border-slate-200 shadow-md" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate ? parseISO(endDate) : undefined}
+                        onSelect={(date) => setEndDate(date ? format(date, "yyyy-MM-dd") : "")}
+                        initialFocus
+                        className="[--primary:#6C1D5F] [--primary-foreground:#ffffff] [--accent:rgba(108,29,95,0.1)] [--accent-foreground:#6C1D5F]"
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
             </Card>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Award, FileText, CheckCircle2, TrendingUp, Search, Plus, Download, X, Calendar, BookOpen, Clock, BarChart } from "lucide-react";
+import { Award, FileText, CheckCircle2, TrendingUp, Search, Plus, Download, Calendar, BookOpen, Clock, BarChart } from "lucide-react";
 import api from "@/shared/services/api";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
 
 export default function Assessments() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -241,97 +242,91 @@ export default function Assessments() {
       </div>
 
       {/* Create Assessment Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}></div>
-          <div className="relative bg-white w-full max-w-[448px] rounded-xl p-6 shadow-2xl flex flex-col gap-4 border border-slate-100 animate-scale-up">
-            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-              <h3 className="text-[16px] font-bold text-slate-800">Create New Assessment</h3>
-              <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                <X size={16} />
-              </button>
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="max-w-[448px] rounded-xl shadow-2xl bg-white border border-slate-200 p-6 flex flex-col gap-4">
+          <DialogHeader className="pb-2 border-b border-slate-100">
+            <DialogTitle className="text-[16px] font-bold text-slate-800">Create New Assessment</DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateAssessment} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Assessment Name</label>
+              <input
+                type="text"
+                required
+                value={newAssessment.name}
+                onChange={(e) => setNewAssessment({ ...newAssessment, name: e.target.value })}
+                placeholder="e.g. AWS Security Quiz"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
+              />
             </div>
 
-            <form onSubmit={handleCreateAssessment} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Associated Course</label>
+              <input
+                type="text"
+                required
+                value={newAssessment.course}
+                onChange={(e) => setNewAssessment({ ...newAssessment, course: e.target.value })}
+                placeholder="e.g. AWS Cloud Deployments"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Assessment Name</label>
+                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Questions</label>
+                <input
+                  type="number"
+                  required
+                  value={newAssessment.questions}
+                  onChange={(e) => setNewAssessment({ ...newAssessment, questions: parseInt(e.target.value) || 20 })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 outline-none focus:border-primary transition-all"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Duration</label>
                 <input
                   type="text"
                   required
-                  value={newAssessment.name}
-                  onChange={(e) => setNewAssessment({ ...newAssessment, name: e.target.value })}
-                  placeholder="e.g. AWS Security Quiz"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
+                  value={newAssessment.duration}
+                  onChange={(e) => setNewAssessment({ ...newAssessment, duration: e.target.value })}
+                  placeholder="e.g. 45 mins"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 outline-none focus:border-primary transition-all"
                 />
               </div>
-
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Associated Course</label>
+                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Passing Score</label>
                 <input
                   type="text"
                   required
-                  value={newAssessment.course}
-                  onChange={(e) => setNewAssessment({ ...newAssessment, course: e.target.value })}
-                  placeholder="e.g. AWS Cloud Deployments"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
+                  value={newAssessment.passScore}
+                  onChange={(e) => setNewAssessment({ ...newAssessment, passScore: e.target.value })}
+                  placeholder="e.g. 75%"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 outline-none focus:border-primary transition-all"
                 />
               </div>
+            </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Questions</label>
-                  <input
-                    type="number"
-                    required
-                    value={newAssessment.questions}
-                    onChange={(e) => setNewAssessment({ ...newAssessment, questions: parseInt(e.target.value) || 20 })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 outline-none focus:border-primary transition-all"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Duration</label>
-                  <input
-                    type="text"
-                    required
-                    value={newAssessment.duration}
-                    onChange={(e) => setNewAssessment({ ...newAssessment, duration: e.target.value })}
-                    placeholder="e.g. 45 mins"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 outline-none focus:border-primary transition-all"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Passing Score</label>
-                  <input
-                    type="text"
-                    required
-                    value={newAssessment.passScore}
-                    onChange={(e) => setNewAssessment({ ...newAssessment, passScore: e.target.value })}
-                    placeholder="e.g. 75%"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 outline-none focus:border-primary transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-[12px] font-semibold cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-primary hover:bg-[#6c0f66] text-white rounded-lg text-[12px] font-semibold cursor-pointer flex items-center gap-1"
-                >
-                  <CheckCircle2 size={13} />
-                  <span>Create</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(false)}
+                className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-[12px] font-semibold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-primary hover:bg-[#6c0f66] text-white rounded-lg text-[12px] font-semibold cursor-pointer flex items-center gap-1"
+              >
+                <CheckCircle2 size={13} />
+                <span>Create</span>
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

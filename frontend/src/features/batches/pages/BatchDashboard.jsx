@@ -380,9 +380,9 @@ export default function BatchDashboard() {
                           : "—"}
                       </TableCell>
                       <TableCell className="px-6 py-4">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${statusColor(batch.status)}`}>
+                        <Badge className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border-none pointer-events-none ${statusColor(batch.status)}`}>
                           {batch.status || "—"}
-                        </span>
+                        </Badge>
                       </TableCell>
                       <TableCell className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-1">

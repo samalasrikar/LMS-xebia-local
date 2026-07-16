@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { PlayCircle, Calendar, CheckCircle2, AlertCircle, Plus, Search, Filter, Download, X } from "lucide-react";
+import { PlayCircle, Calendar, CheckCircle2, AlertCircle, Plus, Search, Filter, Download } from "lucide-react";
 import assignmentService from "@/features/assignments/services/assignmentService";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
 
 export default function BatchManagement() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -221,98 +222,92 @@ export default function BatchManagement() {
       </div>
 
       {/* Create Batch Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}></div>
-          <div className="relative bg-white w-full max-w-[448px] rounded-xl p-6 shadow-2xl flex flex-col gap-4 border border-slate-100 animate-scale-up">
-            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-              <h3 className="text-[16px] font-bold text-slate-800">Create New Cohort</h3>
-              <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                <X size={16} />
-              </button>
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="max-w-[448px] rounded-xl shadow-2xl bg-white border border-slate-200 p-6 flex flex-col gap-4">
+          <DialogHeader className="pb-2 border-b border-slate-100">
+            <DialogTitle className="text-[16px] font-bold text-slate-800">Create New Cohort</DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateBatch} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Cohort / Batch Name</label>
+              <input
+                type="text"
+                required
+                value={newBatch.name}
+                onChange={(e) => setNewBatch({ ...newBatch, name: e.target.value })}
+                placeholder="e.g. Cohort B (Q4)"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
+              />
             </div>
 
-            <form onSubmit={handleCreateBatch} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Course Program</label>
+              <input
+                type="text"
+                required
+                value={newBatch.course}
+                onChange={(e) => setNewBatch({ ...newBatch, course: e.target.value })}
+                placeholder="e.g. Advanced Cloud Architecture"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Cohort / Batch Name</label>
+                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Trainer Name</label>
                 <input
                   type="text"
                   required
-                  value={newBatch.name}
-                  onChange={(e) => setNewBatch({ ...newBatch, name: e.target.value })}
-                  placeholder="e.g. Cohort B (Q4)"
+                  value={newBatch.trainer}
+                  onChange={(e) => setNewBatch({ ...newBatch, trainer: e.target.value })}
+                  placeholder="e.g. Sarah Jenkins"
                   className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
                 />
               </div>
-
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Course Program</label>
+                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Learners Size</label>
                 <input
-                  type="text"
+                  type="number"
                   required
-                  value={newBatch.course}
-                  onChange={(e) => setNewBatch({ ...newBatch, course: e.target.value })}
-                  placeholder="e.g. Advanced Cloud Architecture"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
+                  value={newBatch.learners}
+                  onChange={(e) => setNewBatch({ ...newBatch, learners: parseInt(e.target.value) || 0 })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 outline-none focus:border-primary transition-all"
                 />
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Trainer Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={newBatch.trainer}
-                    onChange={(e) => setNewBatch({ ...newBatch, trainer: e.target.value })}
-                    placeholder="e.g. Sarah Jenkins"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Learners Size</label>
-                  <input
-                    type="number"
-                    required
-                    value={newBatch.learners}
-                    onChange={(e) => setNewBatch({ ...newBatch, learners: parseInt(e.target.value) || 0 })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 outline-none focus:border-primary transition-all"
-                  />
-                </div>
-              </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Timeline Schedule</label>
+              <input
+                type="text"
+                required
+                value={newBatch.timeline}
+                onChange={(e) => setNewBatch({ ...newBatch, timeline: e.target.value })}
+                placeholder="e.g. Nov 10 - Dec 28, 2026"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
+              />
+            </div>
 
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Timeline Schedule</label>
-                <input
-                  type="text"
-                  required
-                  value={newBatch.timeline}
-                  onChange={(e) => setNewBatch({ ...newBatch, timeline: e.target.value })}
-                  placeholder="e.g. Nov 10 - Dec 28, 2026"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary transition-all"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-[12px] font-semibold cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-primary hover:bg-[#6c0f66] text-white rounded-lg text-[12px] font-semibold cursor-pointer flex items-center gap-1"
-                >
-                  <CheckCircle2 size={13} />
-                  <span>Create</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(false)}
+                className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-[12px] font-semibold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-primary hover:bg-[#6c0f66] text-white rounded-lg text-[12px] font-semibold cursor-pointer flex items-center gap-1"
+              >
+                <CheckCircle2 size={13} />
+                <span>Create</span>
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

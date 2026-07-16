@@ -25,6 +25,11 @@ import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Label } from "@/shared/components/ui/label";
 import { ScrollArea } from "@/shared/components/ui/scroll-area";
+import { Calendar as CalendarComponent } from "@/shared/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover";
+import { format, parseISO } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Calendar as CalendarIcon } from "lucide-react";
 import SafeMediaEmbed from "./SafeMediaEmbed";
 import EmptyState from "@/shared/components/EmptyState";
 
@@ -955,15 +960,33 @@ export default function CurriculumDialogs({
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="assignDueDate" className="text-[12px] font-bold text-slate-500">DUE DATE (OPTIONAL)</Label>
-                    <Input
-                      id="assignDueDate"
-                      type="date"
-                      value={assignmentDueDate}
-                      onChange={e => setAssignmentDueDate(e.target.value)}
-                      className="text-[13px] h-10 focus:ring-1 focus:ring-[#6C1D5F]/40 focus:border-[#6C1D5F]"
-                    />
+                  <div className="space-y-1.5 flex flex-col justify-end">
+                    <Label htmlFor="assignDueDate" className="text-[12px] font-bold text-slate-500 mb-1">DUE DATE (OPTIONAL)</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          id="assignDueDate"
+                          variant="outline"
+                          type="button"
+                          className={cn(
+                            "w-full justify-start text-left font-normal border border-slate-200 bg-white hover:bg-slate-50/50 rounded-lg text-slate-750 text-[13px] h-10 px-3",
+                            !assignmentDueDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4 text-slate-450" />
+                          {assignmentDueDate ? format(parseISO(assignmentDueDate), "PPP") : <span>Pick due date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 bg-white border border-slate-200 shadow-md" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={assignmentDueDate ? parseISO(assignmentDueDate) : undefined}
+                          onSelect={(date) => setAssignmentDueDate(date ? format(date, "yyyy-MM-dd") : "")}
+                          initialFocus
+                          className="[--primary:#6C1D5F] [--primary-foreground:#ffffff] [--accent:rgba(108,29,95,0.1)] [--accent-foreground:#6C1D5F]"
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
 
                   <div className="space-y-1.5">

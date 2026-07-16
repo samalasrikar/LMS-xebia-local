@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import {
   Palette,
   ToggleLeft,
@@ -39,41 +40,29 @@ export default function StudentSettings() {
         <p className="text-[13px] text-slate-400 mt-1">Manage your account preferences and application experience.</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="flex flex-col lg:flex-row gap-8 w-full">
         {/* Left: Section Selector Tab Buttons */}
         <div className="w-full lg:w-60 shrink-0">
-          <nav className="flex lg:flex-col gap-1.5 overflow-x-auto pb-3 lg:pb-0 hide-scrollbar">
-            <button
-              onClick={() => setActiveTab("appearance")}
-              className={`flex items-center gap-3 px-4.5 py-3 rounded-xl font-bold text-[12.5px] transition-all cursor-pointer border-none outline-none ${
-                activeTab === "appearance"
-                  ? "bg-[#6C1D5F]/10 border border-[#6C1D5F]/20 text-[#6C1D5F]"
-                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-              }`}
+          <TabsList className="flex lg:flex-col gap-1.5 overflow-x-auto pb-3 lg:pb-0 bg-transparent border-none w-full h-auto p-0">
+            <TabsTrigger
+              value="appearance"
+              className="flex items-center justify-start gap-3 px-4.5 py-3 rounded-xl font-bold text-[12.5px] transition-all border-none shadow-none cursor-pointer data-active:bg-[#6C1D5F]/10 data-active:text-[#6C1D5F] text-slate-500 hover:bg-slate-100 w-full"
             >
               <Palette size={16} /> Appearance & Accessibility
-            </button>
-            <button
-              onClick={() => setActiveTab("notifications")}
-              className={`flex items-center gap-3 px-4.5 py-3 rounded-xl font-bold text-[12.5px] transition-all cursor-pointer border-none outline-none ${
-                activeTab === "notifications"
-                  ? "bg-[#6C1D5F]/10 border border-[#6C1D5F]/20 text-[#6C1D5F]"
-                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-              }`}
+            </TabsTrigger>
+            <TabsTrigger
+              value="notifications"
+              className="flex items-center justify-start gap-3 px-4.5 py-3 rounded-xl font-bold text-[12.5px] transition-all border-none shadow-none cursor-pointer data-active:bg-[#6C1D5F]/10 data-active:text-[#6C1D5F] text-slate-500 hover:bg-slate-100 w-full"
             >
               <Bell size={16} /> Notifications & Alerts
-            </button>
-            <button
-              onClick={() => setActiveTab("downloads")}
-              className={`flex items-center gap-3 px-4.5 py-3 rounded-xl font-bold text-[12.5px] transition-all cursor-pointer border-none outline-none ${
-                activeTab === "downloads"
-                  ? "bg-[#6C1D5F]/10 border border-[#6C1D5F]/20 text-[#6C1D5F]"
-                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-              }`}
+            </TabsTrigger>
+            <TabsTrigger
+              value="downloads"
+              className="flex items-center justify-start gap-3 px-4.5 py-3 rounded-xl font-bold text-[12.5px] transition-all border-none shadow-none cursor-pointer data-active:bg-[#6C1D5F]/10 data-active:text-[#6C1D5F] text-slate-500 hover:bg-slate-100 w-full"
             >
               <Download size={16} /> Downloads & Storage
-            </button>
-          </nav>
+            </TabsTrigger>
+          </TabsList>
         </div>
 
         {/* Right: Section Panels */}
@@ -278,7 +267,7 @@ export default function StudentSettings() {
             </div>
           )}
         </div>
-      </div>
+      </Tabs>
     </div>
   );
 }

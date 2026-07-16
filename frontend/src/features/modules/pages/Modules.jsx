@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Loader2, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Spinner } from "@/shared/components/ui/spinner";
 import AppLayout from "@/app/layouts/AppLayout";
 import useModules from "@/features/modules/hooks/useModules";
 import ModulesHeader from "@/features/modules/components/ModulesHeader";
@@ -64,7 +65,7 @@ export default function Modules() {
 
         {loading ? (
           <div className="bg-white border border-slate-200 rounded-xl p-20 flex flex-col items-center justify-center text-slate-400">
-            <Loader2 className="animate-spin text-[#6C1D5F] mb-3" size={32} />
+            <Spinner className="h-8 w-8 text-[#6C1D5F] mb-3" />
             <p className="text-[13px] font-medium">Loading curriculum data...</p>
           </div>
         ) : !selectedCourseId ? (
