@@ -96,6 +96,7 @@ export default function CreateBatch() {
     if (!batchName.trim()) { setValidationError("Batch Name is required."); return; }
     if (!selectedCourse) { setValidationError("Please select a course."); return; }
     if (!startDate || !endDate) { setValidationError("Start and End dates are required."); return; }
+    if (endDate < startDate) { setValidationError("End date cannot be before start date."); return; }
 
     setIsSaving(true);
     const payload = {
@@ -216,7 +217,15 @@ export default function CreateBatch() {
                     type="date"
                     className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 focus:border-[#6C1D5F] focus:bg-white outline-none transition-all cursor-pointer h-10"
                     value={endDate}
-                    onChange={e => setEndDate(e.target.value)}
+                    min={startDate || undefined}
+                    onChange={e => {
+                      setEndDate(e.target.value);
+                      if (startDate && e.target.value < startDate) {
+                        setValidationError("End date cannot be before start date.");
+                      } else {
+                        setValidationError(prev => prev === "End date cannot be before start date." ? "" : prev);
+                      }
+                    }}
                   />
                 </div>
               </div>

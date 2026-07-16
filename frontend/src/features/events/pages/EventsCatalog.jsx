@@ -157,11 +157,33 @@ export default function EventsCatalog() {
           {filteredEvents.map((event) => {
             const badge = getStatusBadge(event);
             return (
-              <div key={event.id} className="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between">
+              <div
+                key={event.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(isTrainer ? `/trainer/events/${event.id}` : `/student/events/${event.id}`)}
+                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && navigate(isTrainer ? `/trainer/events/${event.id}` : `/student/events/${event.id}`)}
+                className="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#6C1D5F]/50"
+              >
                 <div>
                   <div className="relative h-44 bg-slate-50 border-b border-slate-100 flex items-center justify-center overflow-hidden">
                     {event.imageUrl ? (
-                      <img className="w-full h-full object-cover" src={getEventImageUrl(event.imageUrl)} alt={event.title} />
+                      <>
+                        <img
+                          className="w-full h-full object-cover"
+                          src={getEventImageUrl(event.imageUrl)}
+                          alt={event.title}
+                          loading="lazy"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            const fallback = e.target.parentElement.querySelector(".img-fallback");
+                            if (fallback) fallback.style.display = "flex";
+                          }}
+                        />
+                        <div className="img-fallback hidden w-full h-full items-center justify-center text-slate-300 font-black text-xl uppercase">
+                          Xebia LMS
+                        </div>
+                      </>
                     ) : (
                       <div className="text-slate-300 font-black text-xl uppercase">Xebia LMS</div>
                     )}
@@ -190,7 +212,10 @@ export default function EventsCatalog() {
                 
                 <div className="px-5 py-4 border-t border-slate-150 bg-slate-50/50 flex justify-end">
                   <button
-                    onClick={() => navigate(isTrainer ? `/trainer/events/${event.id}` : `/student/events/${event.id}`)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(isTrainer ? `/trainer/events/${event.id}` : `/student/events/${event.id}`);
+                    }}
                     className="flex items-center gap-1 text-[#6C1D5F] hover:text-[#4A1E47] font-bold text-xs bg-transparent border-none cursor-pointer transition-colors"
                   >
                     View Details
