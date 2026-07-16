@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { X, Upload, FileSpreadsheet, Trash2, Edit2, AlertCircle, CheckCircle, Download } from "lucide-react";
 import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
-import * as XLSX from "xlsx";
+// xlsx is dynamically imported at point-of-use to avoid adding ~800 kB to the initial bundle
 import assignmentService from "@/features/assignments/services/assignmentService";
 import quizService from "../services/quizService";
 
@@ -67,7 +67,7 @@ export default function ImportExcelModal({ isOpen, onClose, onSave }) {
   }, [isOpen]);
 
   // Download Sample Excel using SheetJS
-  const handleDownloadSample = () => {
+  const handleDownloadSample = async () => {
     const data = [
       {
         "Question": "What is the virtual DOM in React?",
@@ -87,6 +87,7 @@ export default function ImportExcelModal({ isOpen, onClose, onSave }) {
       }
     ];
 
+    const XLSX = await import("xlsx");
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sample Questions");
@@ -139,9 +140,10 @@ export default function ImportExcelModal({ isOpen, onClose, onSave }) {
       }
     };
 
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const data = new Uint8Array(e.target.result);
+        const XLSX = await import("xlsx");
         const workbook = XLSX.read(data, { type: "array" });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
