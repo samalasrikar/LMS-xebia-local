@@ -217,6 +217,9 @@ export default function CurriculumBuilder() {
     setActiveCourseId,
     expandedCourses,
     setExpandedCourses,
+    subModuleStatuses,
+    toggleSubModuleStatus,
+    handleSaveDraft,
   } = useCurriculumBuilder();
 
   const activeCourse = loadedCourses.find(c => c.id === activeCourseId);
@@ -313,7 +316,11 @@ export default function CurriculumBuilder() {
             <Eye size={13} /> Preview
           </button>
 
-          <button disabled={!course} className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg text-[12px] font-semibold transition-colors cursor-pointer bg-transparent outline-none disabled:opacity-40 disabled:cursor-not-allowed">
+          <button
+            onClick={handleSaveDraft}
+            disabled={!course}
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg text-[12px] font-semibold transition-colors cursor-pointer bg-transparent outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+          >
             <Save size={13} /> Save Draft
           </button>
 
@@ -407,6 +414,8 @@ export default function CurriculumBuilder() {
             requestDelete={requestDelete}
             openAddModuleModal={openAddModuleModal}
             activeBlock={activeBlock}
+            subModuleStatuses={subModuleStatuses}
+            toggleSubModuleStatus={toggleSubModuleStatus}
           />
         )}
       </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ClipboardCheck, UserPlus, CreditCard, Award, AlertTriangle } from "lucide-react";
 import courseService from "@/features/courses/services/courseService";
 
@@ -23,6 +24,7 @@ function formatTimeAgo(dateStr) {
 }
 
 export default function RecentActivity() {
+  const navigate = useNavigate();
   const [activities, setActivities] = useState([]);
   const [loading, setLoading]       = useState(true);
 
@@ -63,7 +65,7 @@ export default function RecentActivity() {
           <div className="text-[13px] font-bold text-slate-900">Recent Activity</div>
           <div className="text-[11px] text-slate-400 mt-0.5">Latest platform events</div>
         </div>
-        <button className="text-[12px] font-medium text-slate-500 border border-slate-200 rounded-md px-2.5 py-1 hover:bg-slate-50 transition-colors">
+        <button onClick={() => navigate("/admin/notifications")} className="text-[12px] font-medium text-slate-500 border border-slate-200 rounded-md px-2.5 py-1 hover:bg-slate-50 transition-colors cursor-pointer outline-none">
           View all
         </button>
       </div>

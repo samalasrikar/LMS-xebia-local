@@ -7,6 +7,14 @@ import AnalyticsKpiCard from "../components/AnalyticsKpiCard";
 import AnalyticsCard from "../components/AnalyticsCard";
 import AnalyticsChart from "../components/AnalyticsChart";
 import AnalyticsTable from "../components/AnalyticsTable";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
 
 export default function FresherJourney() {
   const { filters, search } = useAnalyticsFilters();
@@ -19,6 +27,7 @@ export default function FresherJourney() {
   const [simError, setSimError] = useState(false);
   const [simEmpty, setSimEmpty] = useState(false);
   const [page, setPage] = useState(1);
+  const [viewingTrainee, setViewingTrainee] = useState(null);
 
   const fetchDashboard = async () => {
     setLoading(true);
@@ -125,7 +134,10 @@ export default function FresherJourney() {
                 </span>
               </td>
               <td className="py-4 px-6 text-right">
-                <button className="p-1 hover:bg-slate-100 rounded text-slate-400 cursor-pointer">
+                <button
+                  onClick={() => setViewingTrainee(row)}
+                  className="p-1 hover:bg-slate-100 rounded text-slate-400 cursor-pointer border-none bg-transparent"
+                >
                   <Eye size={12} />
                 </button>
               </td>
@@ -133,6 +145,77 @@ export default function FresherJourney() {
           )}
         />
       </div>
+
+      {/* View Trainee Details Dialog */}
+      <Dialog open={!!viewingTrainee} onOpenChange={() => setViewingTrainee(null)}>
+        <DialogContent className="max-w-[480px] rounded-xl shadow-xl bg-white border border-slate-200 p-6 text-left">
+          <DialogHeader className="border-b border-slate-50 pb-4">
+            <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center shrink-0">
+                <Users size={16} />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="leading-tight">Trainee Onboarding Profile</span>
+                <span className="text-[11px] text-slate-400 font-medium mt-0.5 normal-case">
+                  Onboarding progression and competency verification records.
+                </span>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          {viewingTrainee && (
+            <div className="py-4 space-y-4 animate-fadeIn">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-primary/5 text-primary flex items-center justify-center font-bold text-base border border-primary/10">
+                  {viewingTrainee.name ? viewingTrainee.name.charAt(0) : ""}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-bold text-slate-850 text-sm truncate">{viewingTrainee.name}</h3>
+                  <p className="text-[11px] text-slate-450 font-mono truncate">Trainee ID: {viewingTrainee.id}</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div className="space-y-1">
+                  <span className="text-slate-450 font-semibold block uppercase tracking-wider text-[10px]">Department</span>
+                  <span className="text-slate-700 font-bold">{viewingTrainee.dept}</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-slate-450 font-semibold block uppercase tracking-wider text-[10px]">Start Date</span>
+                  <span className="text-slate-700 font-bold">{viewingTrainee.date}</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-slate-450 font-semibold block uppercase tracking-wider text-[10px]">Onboarding Stage</span>
+                  <span className="text-slate-700 font-bold">{viewingTrainee.stage || "Phase 1 Foundations"}</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-slate-450 font-semibold block uppercase tracking-wider text-[10px]">Status</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-purple-50 text-[#6C1D5F] border border-purple-100">
+                    {viewingTrainee.status}
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-1.5 pt-2 border-t border-slate-50">
+                <div className="flex justify-between items-center text-xs font-semibold text-slate-655">
+                  <span>Foundations Progress</span>
+                  <span>{viewingTrainee.progress}%</span>
+                </div>
+                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div className="bg-[#6C1D5F] h-full rounded-full" style={{ width: `${viewingTrainee.progress}%` }} />
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="pt-3 border-t border-slate-50 flex items-center justify-end">
+            <Button
+              type="button"
+              onClick={() => setViewingTrainee(null)}
+              className="text-[12.5px] font-semibold cursor-pointer border border-slate-200 text-slate-750 bg-white hover:bg-slate-50"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AnalyticsPageLayout>
   );
 }

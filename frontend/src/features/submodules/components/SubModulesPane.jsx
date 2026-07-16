@@ -56,7 +56,7 @@ export default function SubModulesPane({
               description="Add a submodule to structure lessons within this module."
               primaryAction={{
                 label: "Add Submodule",
-                onClick: handleOpenSubModuleModal,
+                onClick: () => handleOpenSubModuleModal(),
               }}
             />
           </div>

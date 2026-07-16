@@ -45,7 +45,8 @@ export default function CategoryGrid({
       {categories.map((cat) => (
         <div
           key={cat.id}
-          className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col shadow-sm group"
+          onClick={() => onView(cat)}
+          className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col shadow-sm group cursor-pointer"
         >
           {/* Card Header Cover */}
           <div className="h-32 relative bg-slate-100 shrink-0">
@@ -147,15 +148,15 @@ export default function CategoryGrid({
 
               <div className="flex items-center gap-1.5">
                 <button
-                  onClick={() => onEdit(cat)}
-                  className="p-2 hover:bg-slate-50 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
+                  onClick={(e) => { e.stopPropagation(); onEdit(cat); }}
+                  className="p-2 hover:bg-slate-50 rounded-lg text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                   title="Edit Category"
                 >
                   <Edit size={13} />
                 </button>
                 <button
-                  onClick={() => onDelete(cat)}
-                  className="p-2 hover:bg-red-50 rounded-lg text-slate-400 hover:text-red-600 transition-colors"
+                  onClick={(e) => { e.stopPropagation(); onDelete(cat); }}
+                  className="p-2 hover:bg-red-50 rounded-lg text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
                   title="Delete Category"
                 >
                   <Trash2 size={13} />

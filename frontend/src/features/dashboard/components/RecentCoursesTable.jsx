@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
-import { MoreHorizontal, BookOpen, ArrowRight } from "lucide-react";
+import { MoreHorizontal, BookOpen, ArrowRight, Edit, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import dashboardService from "@/features/dashboard/services/dashboardService";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
 /* ─── Category colour mapping ──────────────────────────────────────── */
 const CATEGORY_COLORS = {
   Design:      { bg: "bg-[#f5f3ff]", text: "text-[#7c3aed]", border: "border-[#ddd6fe]" },
@@ -152,9 +158,23 @@ export default function RecentCoursesTable() {
 
                     {/* Action */}
                     <td className="px-3.5 py-3">
-                      <button className="w-[26px] h-[26px] rounded-[4px] bg-slate-100 border border-slate-200 flex items-center justify-center hover:bg-slate-200 transition-colors">
-                        <MoreHorizontal size={12} className="text-slate-500" />
-                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="w-[26px] h-[26px] rounded-[4px] bg-slate-100 border border-slate-200 flex items-center justify-center hover:bg-slate-200 transition-colors cursor-pointer outline-none">
+                            <MoreHorizontal size={12} className="text-slate-500" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-36 bg-white p-1 rounded-xl shadow-lg border border-slate-200">
+                          <DropdownMenuItem onClick={() => navigate(`/courses/${course.id}/edit`)} className="flex items-center gap-2 px-3 py-1.5 text-[12px] font-semibold text-slate-700 hover:bg-[#6C1D5F]/5 hover:text-[#6C1D5F] rounded-lg cursor-pointer transition-colors">
+                            <Edit size={13} className="text-[#6C1D5F]" />
+                            Edit Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigate(`/courses/${course.id}/curriculum`)} className="flex items-center gap-2 px-3 py-1.5 text-[12px] font-semibold text-slate-700 hover:bg-[#6C1D5F]/5 hover:text-[#6C1D5F] rounded-lg cursor-pointer transition-colors">
+                            <Eye size={13} className="text-[#6C1D5F]" />
+                            Curriculum
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 );

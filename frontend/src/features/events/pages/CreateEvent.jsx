@@ -239,19 +239,26 @@ export default function CreateEvent() {
     const regDeadlineStr = format(registrationDeadlineDate, "yyyy-MM-dd");
 
     // Perform Date-related Validation:
-    // 1. Timeline start date/time must be before timeline end date/time.
-    const startDateTime = parseISO(timelineStartStr);
-    const endDateTime = parseISO(timelineEndStr);
-    if (!isAfter(endDateTime, startDateTime)) {
+    const startDateTime = new Date(timelineStartStr);
+    const endDateTime = new Date(timelineEndStr);
+
+    // 1. Check if start date/time is in the past for new events
+    const now = new Date();
+    if (!isEditMode && startDateTime < now) {
+      showToast("Event start date/time cannot be in the past", "error");
+      return;
+    }
+
+    // 2. Timeline start date/time must be before timeline end date/time.
+    if (startDateTime >= endDateTime) {
       showToast("Timeline end date/time must be after start date/time", "error");
       return;
     }
 
-    // 2. Registration deadline must not be after timeline start date.
-    const deadlineDay = startOfDay(registrationDeadlineDate);
-    const startDay = startOfDay(dateRange.from);
-    if (isAfter(deadlineDay, startDay)) {
-      showToast("Registration deadline cannot be after the event start date", "error");
+    // 3. Registration deadline must not be after timeline start date/time.
+    const deadlineDateTime = new Date(`${regDeadlineStr}T23:59:59`);
+    if (deadlineDateTime > startDateTime) {
+      showToast("Registration deadline cannot be after the event start date/time", "error");
       return;
     }
 

@@ -2,6 +2,14 @@ import { useState } from "react";
 import AppLayout from "@/app/layouts/AppLayout";
 import { Users, Bolt, School, Award, Search, Trash2, Edit, Eye, ChevronRight, UserPlus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
 
 const INITIAL_LEARNERS = [
   {
@@ -52,6 +60,8 @@ export default function Learners() {
   const [deptFilter, setDeptFilter] = useState("Department");
   const [statusFilter, setStatusFilter] = useState("Status");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [viewingLearner, setViewingLearner] = useState(null);
+  const [editingLearner, setEditingLearner] = useState(null);
 
   // New learner form state
   const [newName, setNewName] = useState("");
@@ -63,6 +73,13 @@ export default function Learners() {
     if (window.confirm("Are you sure you want to delete this learner?")) {
       setLearners(learners.filter((l) => l.id !== id));
     }
+  };
+
+  const handleUpdateLearner = (e) => {
+    e.preventDefault();
+    if (!editingLearner || !editingLearner.name || !editingLearner.email) return;
+    setLearners(learners.map((l) => (l.id === editingLearner.id ? editingLearner : l)));
+    setEditingLearner(null);
   };
 
   const handleAddLearner = (e) => {
@@ -371,15 +388,21 @@ export default function Learners() {
                     </td>
                     <td className="px-2 py-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-1 text-slate-400 hover:text-primary transition-colors cursor-pointer hover:bg-slate-100 rounded-md">
+                        <button
+                          onClick={() => setViewingLearner(l)}
+                          className="p-1 text-slate-400 hover:text-primary transition-colors cursor-pointer hover:bg-slate-100 rounded-md animate-fadeIn"
+                        >
                           <Eye size={13} />
                         </button>
-                        <button className="p-1 text-slate-400 hover:text-primary transition-colors cursor-pointer hover:bg-slate-100 rounded-md">
+                        <button
+                          onClick={() => setEditingLearner({ ...l })}
+                          className="p-1 text-slate-400 hover:text-primary transition-colors cursor-pointer hover:bg-slate-100 rounded-md animate-fadeIn"
+                        >
                           <Edit size={13} />
                         </button>
                         <button
                           onClick={() => handleDelete(l.id)}
-                          className="p-1 text-slate-400 hover:text-red-500 transition-colors cursor-pointer hover:bg-red-50 rounded-md"
+                          className="p-1 text-slate-400 hover:text-red-500 transition-colors cursor-pointer hover:bg-red-50 rounded-md animate-fadeIn"
                         >
                           <Trash2 size={13} />
                         </button>
@@ -392,6 +415,171 @@ export default function Learners() {
           </div>
         </div>
       </div>
+
+      {/* View Learner Dialog */}
+      <Dialog open={!!viewingLearner} onOpenChange={() => setViewingLearner(null)}>
+        <DialogContent className="max-w-[480px] rounded-xl shadow-xl bg-white border border-slate-200 p-6 text-left">
+          <DialogHeader className="border-b border-slate-50 pb-4">
+            <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center shrink-0">
+                <Users size={16} />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="leading-tight">Learner Profile</span>
+                <span className="text-[11px] text-slate-400 font-medium mt-0.5 normal-case">
+                  Detailed registration and progress record.
+                </span>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          {viewingLearner && (
+            <div className="py-4 space-y-4 animate-fadeIn">
+              <div className="flex items-center gap-3">
+                {viewingLearner.avatar ? (
+                  <img className="w-12 h-12 rounded-full border border-slate-200 object-cover flex-shrink-0" src={viewingLearner.avatar} alt={viewingLearner.name} />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 text-sm flex-shrink-0">
+                    {viewingLearner.name.split(" ").map(n => n[0]).join("")}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-bold text-slate-850 text-sm truncate">{viewingLearner.name}</h3>
+                  <p className="text-[11px] text-slate-400 truncate">{viewingLearner.email}</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div className="space-y-1">
+                  <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]">Department</span>
+                  <span className="text-slate-700 font-bold">{viewingLearner.department}</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]">Status</span>
+                  <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase border inline-block ${
+                    viewingLearner.status === "Active"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                      : viewingLearner.status === "Pending"
+                      ? "bg-amber-50 text-amber-700 border-amber-100"
+                      : "bg-slate-50 text-slate-500 border-slate-100"
+                  }`}>
+                    {viewingLearner.status}
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]">Courses Enrolled</span>
+                  <span className="text-slate-700 font-bold">{viewingLearner.courses.join(", ")}</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]">Overall Progress</span>
+                  <span className="text-slate-700 font-bold">{viewingLearner.progress}%</span>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="pt-3 border-t border-slate-50 flex items-center justify-end">
+            <Button
+              type="button"
+              onClick={() => setViewingLearner(null)}
+              className="text-[12.5px] font-semibold cursor-pointer border border-slate-200 text-slate-750 bg-white hover:bg-slate-50"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Learner Dialog */}
+      <Dialog open={!!editingLearner} onOpenChange={() => setEditingLearner(null)}>
+        <DialogContent className="max-w-[480px] rounded-xl shadow-xl bg-white border border-slate-200 p-6 text-left">
+          <DialogHeader className="border-b border-slate-50 pb-4">
+            <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center shrink-0">
+                <Edit size={16} />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="leading-tight">Edit Learner Records</span>
+                <span className="text-[11px] text-slate-400 font-medium mt-0.5 normal-case">
+                  Update credentials, department, or enrollment status.
+                </span>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          {editingLearner && (
+            <form onSubmit={handleUpdateLearner} className="py-4 space-y-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={editingLearner.name}
+                  onChange={(e) => setEditingLearner({ ...editingLearner, name: e.target.value })}
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[13px] focus:outline-none focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F] transition-colors"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={editingLearner.email}
+                  onChange={(e) => setEditingLearner({ ...editingLearner, email: e.target.value })}
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[13px] focus:outline-none focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F] transition-colors"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Department</label>
+                <Select
+                  value={editingLearner.department}
+                  onValueChange={(val) => setEditingLearner({ ...editingLearner, department: val })}
+                >
+                  <SelectTrigger className="w-full bg-white border border-slate-200 rounded-lg text-[13px] h-[36px] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                    <SelectValue placeholder="Select Department" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-slate-250 shadow-md">
+                    <SelectItem value="Cloud Architecture">Cloud Architecture</SelectItem>
+                    <SelectItem value="Data Science">Data Science</SelectItem>
+                    <SelectItem value="Product Management">Product Management</SelectItem>
+                    <SelectItem value="Legal & Compliance">Legal & Compliance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Status</label>
+                <Select
+                  value={editingLearner.status}
+                  onValueChange={(val) => setEditingLearner({ ...editingLearner, status: val })}
+                >
+                  <SelectTrigger className="w-full bg-white border border-slate-200 rounded-lg text-[13px] h-[36px] focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-slate-250 shadow-md">
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="Inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex gap-3 justify-end pt-3 border-t border-slate-50">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditingLearner(null)}
+                  className="text-[12.5px] font-semibold cursor-pointer border border-slate-200 text-slate-750 bg-white hover:bg-slate-50"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="text-[12.5px] font-bold bg-[#6C1D5F] text-white hover:bg-[#521347] cursor-pointer border-none"
+                >
+                  Save Changes
+                </Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }

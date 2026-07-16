@@ -61,6 +61,23 @@ export default function useCurriculumBuilder() {
   const [treeSearch, setTreeSearch] = useState("");
   const [showNavBanner, setShowNavBanner] = useState(!!fromModuleManagement);
   const [saveStatus, setSaveStatus] = useState("saved"); // "saved" | "saving" | "unsaved"
+  const [subModuleStatuses, setSubModuleStatuses] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("lms-submodule-statuses")) || {};
+    } catch {
+      return {};
+    }
+  });
+
+  const toggleSubModuleStatus = (subModuleId) => {
+    setSubModuleStatuses(prev => {
+      const nextStatus = prev[subModuleId] === "Published" ? "Draft" : "Published";
+      const next = { ...prev, [subModuleId]: nextStatus };
+      localStorage.setItem("lms-submodule-statuses", JSON.stringify(next));
+      showToast(`Sub-module status changed to ${nextStatus}!`);
+      return next;
+    });
+  };
   const [activeRightTab, setActiveRightTab] = useState("submodule"); // "submodule" | "block"
   const [selectedBlockType, setSelectedBlockType] = useState(null);
   const [blockPickerOpen, setBlockPickerOpen] = useState(false);
@@ -862,6 +879,21 @@ export default function useCurriculumBuilder() {
     }
   };
 
+  const handleSaveDraft = async () => {
+    if (!course) return;
+    setSaveStatus("saving");
+    try {
+      await courseService.updateCourse(course.id, { ...course, status: "Draft" });
+      showToast("Draft saved successfully!");
+      await reloadAllLoadedCourses();
+      setSaveStatus("saved");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to save draft.", "error");
+      setSaveStatus("unsaved");
+    }
+  };
+
   const handleDuplicateCourse = async (c) => {
     try {
       showToast("Duplicating course...");
@@ -1192,5 +1224,8 @@ export default function useCurriculumBuilder() {
     setActiveCourseId: changeActiveCourseId,
     expandedCourses,
     setExpandedCourses,
+    subModuleStatuses,
+    toggleSubModuleStatus,
+    handleSaveDraft,
   };
 }

@@ -33,6 +33,8 @@ export default function CoursesGridView({
   onBulkFeature,
   onBulkArchive,
   onBulkDelete,
+  onOpenAnalytics,
+  onDuplicate,
 }) {
   const navigate = useNavigate();
 
@@ -84,7 +86,7 @@ export default function CoursesGridView({
                   onCloseDropdown();
                 },
               },
-              { icon: Eye, label: "Preview", action: () => onCloseDropdown() },
+              { icon: Eye, label: "Preview", action: () => { window.open(`/student/courses/${course.id}`, "_blank"); onCloseDropdown(); } },
               {
                 icon: Layers,
                 label: "Curriculum",
@@ -93,8 +95,8 @@ export default function CoursesGridView({
                   onCloseDropdown();
                 },
               },
-              { icon: BarChart, label: "Analytics", action: () => onCloseDropdown() },
-              { icon: Copy, label: "Duplicate", action: () => onCloseDropdown() },
+              { icon: BarChart, label: "Analytics", action: () => { onOpenAnalytics(course); onCloseDropdown(); } },
+              { icon: Copy, label: "Duplicate", action: () => { onDuplicate(course.id); onCloseDropdown(); } },
               null,
               {
                 icon: Trash2,

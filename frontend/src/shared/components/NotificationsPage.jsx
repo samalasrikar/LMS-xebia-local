@@ -12,6 +12,13 @@ import {
 } from "lucide-react";
 import api from "@/shared/services/api";
 import { Spinner } from "@/shared/components/ui/spinner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/shared/components/ui/dialog";
 
 const getIconComponent = (iconName) => {
   switch (iconName) {
@@ -75,6 +82,7 @@ export default function NotificationsPage({ role, userId }) {
   const [activeFilter, setActiveFilter] = useState("all");
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedNotification, setSelectedNotification] = useState(null);
 
   const fetchNotifications = async () => {
     try {
@@ -127,28 +135,31 @@ export default function NotificationsPage({ role, userId }) {
       console.error("Failed to mark notification as read:", err);
     }
 
-    // Navigate to the target resource
+    // Navigate to the target resource if exists
     const { targetType, targetId } = notification;
-    if (!targetType || !targetId) return;
+    if (targetType && targetId) {
+      const role = notification.recipientRole;
+      const base = role === "trainer" ? "/trainer" : role === "admin" ? "/admin" : "/student";
 
-    const role = notification.recipientRole;
-    const base = role === "trainer" ? "/trainer" : role === "admin" ? "/admin" : "/student";
-
-    switch (targetType.toLowerCase()) {
-      case "assignment":
-        navigate(`${base}/assignments/${targetId}`);
-        break;
-      case "course":
-        navigate(`${base}/courses/${targetId}`);
-        break;
-      case "event":
-        navigate(`${base}/events/${targetId}`);
-        break;
-      case "assessment":
-        navigate(`${base}/assessments/${targetId}`);
-        break;
-      default:
-        break;
+      switch (targetType.toLowerCase()) {
+        case "assignment":
+          navigate(`${base}/assignments/${targetId}`);
+          break;
+        case "course":
+          navigate(`${base}/courses/${targetId}`);
+          break;
+        case "event":
+          navigate(`${base}/events/${targetId}`);
+          break;
+        case "assessment":
+          navigate(`${base}/assessments/${targetId}`);
+          break;
+        default:
+          setSelectedNotification(notification);
+          break;
+      }
+    } else {
+      setSelectedNotification(notification);
     }
   };
 
@@ -273,6 +284,40 @@ export default function NotificationsPage({ role, userId }) {
           </div>
         </div>
       )}
+
+      {/* ── Detailed Dialog Modal ── */}
+      <Dialog open={selectedNotification !== null} onOpenChange={(open) => !open && setSelectedNotification(null)}>
+        <DialogContent className="max-w-md bg-white p-6 rounded-2xl shadow-xl border border-slate-200">
+          {selectedNotification && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] font-black uppercase text-[#84117C] tracking-wider px-2 py-0.5 bg-[#6C1D5F]/10 rounded-full">
+                    {getIconStyles(selectedNotification.category).label}
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-semibold">
+                    {new Date(selectedNotification.createdAt).toLocaleString()}
+                  </span>
+                </div>
+                <DialogTitle className="text-[17px] font-extrabold text-slate-800 leading-snug">
+                  {selectedNotification.title}
+                </DialogTitle>
+              </DialogHeader>
+              <DialogDescription className="text-[13px] text-slate-600 leading-relaxed mt-3 whitespace-pre-line">
+                {selectedNotification.description}
+              </DialogDescription>
+              <div className="flex justify-end gap-2 mt-6">
+                <button
+                  onClick={() => setSelectedNotification(null)}
+                  className="px-4 py-2 text-[12px] font-bold text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200 cursor-pointer outline-none"
+                >
+                  Close
+                </button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

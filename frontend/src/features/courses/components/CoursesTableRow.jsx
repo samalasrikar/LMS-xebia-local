@@ -22,6 +22,8 @@ export default function CoursesTableRow({
   onOpenDropdown,
   onCloseDropdown,
   onDeleteTarget,
+  onOpenAnalytics,
+  onDuplicate,
 }) {
   const navigate = useNavigate();
   const statusKey = course.status.toLowerCase();
@@ -31,10 +33,10 @@ export default function CoursesTableRow({
 
   const menuItems = [
     { icon: Pencil,   label: "Edit Course",  action: () => { navigate(`/courses/${course.id}/edit`); onCloseDropdown(); } },
-    { icon: Eye,      label: "Preview",      action: () => onCloseDropdown() },
+    { icon: Eye,      label: "Preview",      action: () => { window.open(`/student/courses/${course.id}`, "_blank"); onCloseDropdown(); } },
     { icon: Layers,   label: "Curriculum",   action: () => { navigate(`/courses/${course.id}/curriculum`); onCloseDropdown(); } },
-    { icon: BarChart, label: "Analytics",    action: () => onCloseDropdown() },
-    { icon: Copy,     label: "Duplicate",    action: () => onCloseDropdown() },
+    { icon: BarChart, label: "Analytics",    action: () => { onOpenAnalytics(course); onCloseDropdown(); } },
+    { icon: Copy,     label: "Duplicate",    action: () => { onDuplicate(course.id); onCloseDropdown(); } },
     null,
     { icon: Trash2,   label: "Delete",       danger: true, action: () => { onDeleteTarget(course); onCloseDropdown(); } },
   ];

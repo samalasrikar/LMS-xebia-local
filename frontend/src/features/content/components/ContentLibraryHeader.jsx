@@ -78,7 +78,7 @@ export default function ContentLibraryHeader({
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 max-h-60 overflow-y-auto">
               <DropdownMenuRadioGroup value={String(selectedCourseId)} onValueChange={setSelectedCourseId}>
-                <DropdownMenuRadioItem value="">All Courses</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="All">All Courses</DropdownMenuRadioItem>
                 {courses.map(c => (
                   <DropdownMenuRadioItem key={c.id} value={String(c.id)}>{c.title}</DropdownMenuRadioItem>
                 ))}
@@ -89,14 +89,14 @@ export default function ContentLibraryHeader({
           {/* Module filter */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2 text-[13px] h-10 border-slate-200 text-slate-600 cursor-pointer" disabled={!selectedCourseId}>
+              <Button variant="outline" className="gap-2 text-[13px] h-10 border-slate-200 text-slate-600 cursor-pointer" disabled={!selectedCourseId || selectedCourseId === "All"}>
                 <Filter size={13} />
                 Module: {modules.find(m => String(m.id) === String(selectedModuleId))?.title || "All Modules"}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 max-h-60 overflow-y-auto">
               <DropdownMenuRadioGroup value={String(selectedModuleId)} onValueChange={setSelectedModuleId}>
-                <DropdownMenuRadioItem value="">All Modules</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="All">All Modules</DropdownMenuRadioItem>
                 {modules
                   .filter(m => String(m.courseId) === String(selectedCourseId))
                   .map(m => (
@@ -111,12 +111,12 @@ export default function ContentLibraryHeader({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="gap-2 text-[13px] h-10 border-slate-200 text-slate-600 cursor-pointer">
                 <Filter size={13} />
-                Type: {selectedType || "All Types"}
+                Type: {selectedType && selectedType !== "All" ? selectedType : "All Types"}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-44">
               <DropdownMenuRadioGroup value={selectedType} onValueChange={setSelectedType}>
-                <DropdownMenuRadioItem value="">All Types</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="All">All Types</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="Video">Video</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="PDF">PDF</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="Text">Article</DropdownMenuRadioItem>

@@ -9,10 +9,19 @@ import ModulesPane from "@/features/modules/components/ModulesPane";
 import SubModulesPane from "@/features/submodules/components/SubModulesPane";
 import ModulesDialogs from "@/features/modules/components/ModulesDialogs";
 import EmptyState from "@/shared/components/EmptyState";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
 
 export default function Modules() {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isCourseSelectDialogOpen, setIsCourseSelectDialogOpen] = useState(false);
   const {
     courses,
     selectedCourseId,
@@ -75,7 +84,7 @@ export default function Modules() {
             description="Select an existing course or create a new one to start managing modules and curriculum."
             primaryAction={{
               label: "Select Course",
-              onClick: () => setIsDropdownOpen(true),
+              onClick: () => setIsCourseSelectDialogOpen(true),
             }}
             secondaryAction={{
               label: "Create New Course",
@@ -130,6 +139,54 @@ export default function Modules() {
         selectedCourseId={selectedCourseId}
         handleConfirmOpenContentLibrary={handleConfirmOpenContentLibrary}
       />
+
+      {/* Course Selector Dialog */}
+      <Dialog open={isCourseSelectDialogOpen} onOpenChange={setIsCourseSelectDialogOpen}>
+        <DialogContent className="max-w-[480px] rounded-xl shadow-xl bg-white border border-slate-200 p-6 text-left">
+          <DialogHeader className="border-b border-slate-50 pb-4">
+            <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-[#6C1D5F]/5 text-[#6C1D5F] flex items-center justify-center shrink-0">
+                <BookOpen size={16} />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="leading-tight">Select Course</span>
+                <span className="text-[11px] text-slate-400 font-medium mt-0.5 normal-case">
+                  Choose a course from the list below to manage its modules.
+                </span>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-2 max-h-64 overflow-y-auto pr-1">
+            {courses.length === 0 ? (
+              <p className="text-center text-xs text-slate-400 py-4">No courses available.</p>
+            ) : (
+              courses.map((c) => (
+                <div
+                  key={c.id}
+                  onClick={() => {
+                    setSelectedCourseId(c.id);
+                    setIsCourseSelectDialogOpen(false);
+                  }}
+                  className="flex items-center justify-between p-3 border border-slate-100 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  <span className="text-slate-700 text-xs font-semibold">{c.title}</span>
+                  <span className="text-[10px] text-slate-400 font-mono">ID: {c.id}</span>
+                </div>
+              ))
+            )}
+          </div>
+          <DialogFooter className="pt-3 border-t border-slate-50 flex items-center justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsCourseSelectDialogOpen(false)}
+              className="text-[12.5px] font-semibold cursor-pointer"
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Toast Notification */}
       {toast && (

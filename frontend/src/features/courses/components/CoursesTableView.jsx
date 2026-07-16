@@ -41,6 +41,8 @@ export default function CoursesTableView({
   onBulkArchive,
   onBulkFeature,
   onBulkDelete,
+  onOpenAnalytics,
+  onDuplicate,
 }) {
   const navigate = useNavigate();
   return (
@@ -131,6 +133,8 @@ export default function CoursesTableView({
                   onOpenDropdown={onOpenDropdown}
                   onCloseDropdown={onCloseDropdown}
                   onDeleteTarget={onDeleteTarget}
+                  onOpenAnalytics={onOpenAnalytics}
+                  onDuplicate={onDuplicate}
                 />
               ))
             )}
