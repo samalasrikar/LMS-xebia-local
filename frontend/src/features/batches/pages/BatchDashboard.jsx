@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Search, Plus, Layers, Users, Calendar, TrendingUp,
-  Edit2, Trash2, Download, ChevronLeft, ChevronRight, SlidersHorizontal
+  Edit2, Trash2, Download, ChevronLeft, ChevronRight, SlidersHorizontal, X
 } from "lucide-react";
 import AppLayout from "@/app/layouts/AppLayout";
 import DeleteDialog from "@/shared/components/DeleteDialog";
@@ -37,6 +37,16 @@ export default function BatchDashboard() {
   const [courseFilter, setCourseFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState(null);
+
+  // More Filters state
+  const [showMoreFilters, setShowMoreFilters] = useState(false);
+  const [instructorFilter, setInstructorFilter] = useState("");
+  const [startDateFrom, setStartDateFrom] = useState("");
+  const [endDateBefore, setEndDateBefore] = useState("");
+
+  // Export state
+  const [isExporting, setIsExporting] = useState(false);
+
   const ROWS_PER_PAGE = 8;
 
   const fetchBatches = useCallback(() => {
@@ -59,9 +69,13 @@ export default function BatchDashboard() {
         b.id?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchStatus = statusFilter === "All" || b.status === statusFilter;
       const matchCourse = courseFilter === "All" || b.course === courseFilter;
-      return matchSearch && matchStatus && matchCourse;
+      const matchInstructor = !instructorFilter.trim() ||
+        b.instructor?.toLowerCase().includes(instructorFilter.toLowerCase());
+      const matchStartFrom = !startDateFrom || (b.startDate && b.startDate >= startDateFrom);
+      const matchEndBefore = !endDateBefore || (b.endDate && b.endDate <= endDateBefore);
+      return matchSearch && matchStatus && matchCourse && matchInstructor && matchStartFrom && matchEndBefore;
     });
-  }, [batches, searchTerm, statusFilter, courseFilter]);
+  }, [batches, searchTerm, statusFilter, courseFilter, instructorFilter, startDateFrom, endDateBefore]);
 
   const totalPages = Math.max(1, Math.ceil(filteredBatches.length / ROWS_PER_PAGE));
   const paginatedBatches = filteredBatches.slice(
@@ -74,6 +88,49 @@ export default function BatchDashboard() {
       await batchService.deleteBatch(deleteTarget.id);
       setDeleteTarget(null);
       fetchBatches();
+    }
+  };
+
+  const hasMoreFiltersActive = instructorFilter.trim() || startDateFrom || endDateBefore;
+
+  const clearMoreFilters = () => {
+    setInstructorFilter("");
+    setStartDateFrom("");
+    setEndDateBefore("");
+    setCurrentPage(1);
+  };
+
+  const handleExport = () => {
+    setIsExporting(true);
+    try {
+      const headers = ["ID", "Name", "Course", "Instructor", "Start Date", "End Date", "Enrolled", "Capacity", "Status"];
+      const rows = filteredBatches.map(b => [
+        b.id || "",
+        b.name || "",
+        b.course || "",
+        b.instructor || "",
+        b.startDate || "",
+        b.endDate || "",
+        b.enrolled ?? "",
+        b.capacity ?? "",
+        b.status || "",
+      ]);
+
+      const csvContent = [headers, ...rows]
+        .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `batches_export_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -164,7 +221,7 @@ export default function BatchDashboard() {
         {/* ── Table Card ── */}
         <div className="bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden">
 
-          {/* Filters */}
+          {/* Filters toolbar */}
           <div className="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3 flex-1 min-w-[260px]">
               <div className="relative flex-1 max-w-sm group">
@@ -177,7 +234,7 @@ export default function BatchDashboard() {
                   onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                 />
               </div>
-              
+
               <Select value={statusFilter} onValueChange={val => { setStatusFilter(val); setCurrentPage(1); }}>
                 <SelectTrigger className="bg-slate-50 border-none text-xs font-bold rounded-lg h-8 text-slate-650 w-[120px]">
                   <SelectValue placeholder="Status: All" />
@@ -200,17 +257,80 @@ export default function BatchDashboard() {
                 </SelectContent>
               </Select>
             </div>
+
             <div className="flex items-center gap-2">
-              <Button variant="outline" className="flex items-center gap-1.5 px-3 text-xs font-bold text-slate-500 rounded-lg h-8 cursor-pointer">
+              <Button
+                variant="outline"
+                className={`flex items-center gap-1.5 px-3 text-xs font-bold rounded-lg h-8 cursor-pointer transition-colors ${
+                  showMoreFilters || hasMoreFiltersActive
+                    ? "bg-[#6C1D5F]/10 border-[#6C1D5F]/30 text-[#6C1D5F]"
+                    : "text-slate-500"
+                }`}
+                onClick={() => setShowMoreFilters(v => !v)}
+              >
                 <SlidersHorizontal size={13} />
                 <span>More Filters</span>
+                {hasMoreFiltersActive && (
+                  <span className="ml-1 w-4 h-4 bg-[#6C1D5F] text-white rounded-full text-[9px] flex items-center justify-center font-black">
+                    {[instructorFilter, startDateFrom, endDateBefore].filter(Boolean).length}
+                  </span>
+                )}
               </Button>
-              <Button variant="outline" className="flex items-center gap-1.5 px-3 text-xs font-bold text-slate-500 rounded-lg h-8 cursor-pointer">
-                <Download size={13} />
-                <span>Export</span>
+              <Button
+                variant="outline"
+                className="flex items-center gap-1.5 px-3 text-xs font-bold text-slate-500 rounded-lg h-8 cursor-pointer"
+                onClick={handleExport}
+                disabled={isExporting}
+              >
+                <Download size={13} className={isExporting ? "animate-bounce" : ""} />
+                <span>{isExporting ? "Exporting…" : "Export"}</span>
               </Button>
             </div>
           </div>
+
+          {/* ── More Filters Panel ── */}
+          {showMoreFilters && (
+            <div className="px-4 py-3 bg-slate-50/60 border-b border-slate-100 flex flex-wrap items-end gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Instructor</label>
+                <Input
+                  type="text"
+                  placeholder="Filter by instructor..."
+                  className="h-8 text-xs font-semibold bg-white border-slate-200 rounded-lg w-48"
+                  value={instructorFilter}
+                  onChange={e => { setInstructorFilter(e.target.value); setCurrentPage(1); }}
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Start Date From</label>
+                <Input
+                  type="date"
+                  className="h-8 text-xs font-semibold bg-white border-slate-200 rounded-lg w-40 cursor-pointer"
+                  value={startDateFrom}
+                  onChange={e => { setStartDateFrom(e.target.value); setCurrentPage(1); }}
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">End Date Before</label>
+                <Input
+                  type="date"
+                  className="h-8 text-xs font-semibold bg-white border-slate-200 rounded-lg w-40 cursor-pointer"
+                  value={endDateBefore}
+                  onChange={e => { setEndDateBefore(e.target.value); setCurrentPage(1); }}
+                />
+              </div>
+              {hasMoreFiltersActive && (
+                <Button
+                  variant="ghost"
+                  className="h-8 text-xs font-bold text-rose-500 hover:text-rose-600 hover:bg-rose-50 px-3 rounded-lg flex items-center gap-1.5 cursor-pointer"
+                  onClick={clearMoreFilters}
+                >
+                  <X size={12} />
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+          )}
 
           {/* Table */}
           <div className="overflow-x-auto">

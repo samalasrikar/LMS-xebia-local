@@ -25,4 +25,8 @@ public class Notification {
     
     private boolean isRead;
     private LocalDateTime createdAt;
+
+    // Navigation target — nullable; used by frontend to route on click
+    private String targetType; // e.g. "assignment", "course", "event", "assessment"
+    private String targetId;   // the ID of the target resource
 }

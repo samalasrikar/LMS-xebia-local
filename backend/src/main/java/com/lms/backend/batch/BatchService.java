@@ -62,7 +62,16 @@ public class BatchService {
         return batchRepository.findById(id);
     }
 
+    private void validateDateRange(String startDate, String endDate) {
+        if (startDate != null && endDate != null && !startDate.isBlank() && !endDate.isBlank()) {
+            if (endDate.compareTo(startDate) < 0) {
+                throw new IllegalArgumentException("End date cannot be before start date");
+            }
+        }
+    }
+
     public Batch createBatch(Batch batch) {
+        validateDateRange(batch.getStartDate(), batch.getEndDate());
         if (batch.getId() == null || batch.getId().trim().isEmpty()) {
             batch.setId("BT-" + (1000 + (int)(Math.random() * 9000)));
         }
@@ -74,7 +83,12 @@ public class BatchService {
     }
 
     public Optional<Batch> updateBatch(String id, Batch updatedBatch) {
+        // Resolve final dates for validation (use existing values if not being updated)
         return batchRepository.findById(id).map(existing -> {
+            String resolvedStart = updatedBatch.getStartDate() != null ? updatedBatch.getStartDate() : existing.getStartDate();
+            String resolvedEnd   = updatedBatch.getEndDate()   != null ? updatedBatch.getEndDate()   : existing.getEndDate();
+            validateDateRange(resolvedStart, resolvedEnd);
+
             if (updatedBatch.getName() != null) existing.setName(updatedBatch.getName());
             if (updatedBatch.getCourse() != null) existing.setCourse(updatedBatch.getCourse());
             if (updatedBatch.getCapacity() != null) existing.setCapacity(updatedBatch.getCapacity());
