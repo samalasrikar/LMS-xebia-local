@@ -1,113 +1,49 @@
 package com.lms.backend.student;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity(name = "SubStudent")
-@Table(name = "student")
+@Entity
+@Table(name = "students")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Student {
+
     @Id
     private String id;
+
+    @Column(nullable = false, length = 100)
     private String name;
+
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
+
+    @Column(length = 255)
+    private String avatar;
+
+    @Column(length = 100)
+    private String department;
+
+    @Column(name = "academic_year", length = 30)
+    private String academicYear;
+
+    @Column(nullable = false)
+    private double gpa;
+
+    @Column(name = "study_streak", nullable = false)
+    private int studyStreak;
+
     private String batch;
     private String status;
-    private String email;
-    private String dept;
     private String course;
     private Integer progress;
     private String hours;
-
-    public Student() {}
-
-    public Student(String id, String name, String batch, String status) {
-        this.id = id;
-        this.name = name;
-        this.batch = batch;
-        this.status = status;
-    }
-
-    public Student(String id, String name, String batch, String status, String email, String dept, String course, Integer progress, String hours) {
-        this.id = id;
-        this.name = name;
-        this.batch = batch;
-        this.status = status;
-        this.email = email;
-        this.dept = dept;
-        this.course = course;
-        this.progress = progress;
-        this.hours = hours;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getBatch() {
-        return batch;
-    }
-
-    public void setBatch(String batch) {
-        this.batch = batch;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getDept() {
-        return dept;
-    }
-
-    public void setDept(String dept) {
-        this.dept = dept;
-    }
-
-    public String getCourse() {
-        return course;
-    }
-
-    public void setCourse(String course) {
-        this.course = course;
-    }
-
-    public Integer getProgress() {
-        return progress;
-    }
-
-    public void setProgress(Integer progress) {
-        this.progress = progress;
-    }
-
-    public String getHours() {
-        return hours;
-    }
-
-    public void setHours(String hours) {
-        this.hours = hours;
-    }
 }

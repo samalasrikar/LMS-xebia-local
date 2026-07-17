@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ExternalLink, Video } from "lucide-react";
-import { getEmbedInfo } from "@/features/courses/utils/curriculumHelpers";
+import { getEmbedInfo, resolveUploadUrl } from "@/features/courses/utils/curriculumHelpers";
 
 /**
  * Renders video embeds with a fallback when iframes are blocked by extensions.
@@ -54,8 +54,9 @@ export default function SafeMediaEmbed({ url, title = "Video preview" }) {
   }
 
   return (
-    <video controls src={embedInfo.url} className="w-full h-full object-contain" title={title}>
+    <video controls src={resolveUploadUrl(embedInfo.url)} className="w-full h-full object-contain" title={title}>
       <track kind="captions" />
     </video>
   );
 }
+

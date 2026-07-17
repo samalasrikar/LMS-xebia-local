@@ -21,7 +21,7 @@ export default function TrainersManagement() {
       if (response.data && response.data.data) {
         setStats(response.data.data);
       }
-    }).catch(() => {});
+    }).catch(() => { });
   }, [showAddModal]);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function TrainersManagement() {
         setTotalElements(pageData.totalElements || 0);
         setTrainers(pageData.content || []);
       }
-    }).catch(() => {});
+    }).catch(() => { });
   }, [searchQuery, statusFilter, currentPage, showAddModal]);
 
   const [newTrainer, setNewTrainer] = useState({ name: "", email: "", role: "", dept: "", courses: 1, learners: 0, rating: 5.0, status: "Active" });
@@ -65,7 +65,7 @@ export default function TrainersManagement() {
     api.post("/trainers", trainerData).then(() => {
       setShowAddModal(false);
       setNewTrainer({ name: "", email: "", role: "", dept: "", courses: 1, learners: 0, rating: 5.0, status: "Active" });
-    }).catch(() => {});
+    }).catch(() => { });
   };
 
   return (
@@ -79,7 +79,7 @@ export default function TrainersManagement() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button 
+          <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-[#6c0f66] text-white rounded-lg text-[13px] font-semibold transition-all shadow-sm cursor-pointer"
           >

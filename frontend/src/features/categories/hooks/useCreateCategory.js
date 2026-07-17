@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import categoryService from "@/features/categories/services/categoryService";
 
 export default function useCreateCategory() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const location = useLocation();
+  const searchId = new URLSearchParams(location.search).get("id");
+  const categoryId = id || searchId;
 
   const [currentStep, setCurrentStep] = useState(1); // start from Basic Info (step 1)
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
@@ -47,6 +53,58 @@ export default function useCreateCategory() {
     tags: [],
   });
 
+  useEffect(() => {
+    if (!categoryId) return;
+    async function loadCategory() {
+      setLoading(true);
+      setError("");
+      setNotFound(false);
+      try {
+        const cat = await categoryService.getCategoryById(categoryId);
+        if (cat) {
+          setForm({
+            name: cat.name || "",
+            slug: cat.slug || "",
+            parentCat: cat.parentCat || "",
+            emoji: cat.emoji || "",
+            accentColor: cat.accentColor || "",
+            hexInput: cat.accentColor || "",
+            shortDesc: cat.description || "",
+            longDesc: cat.longDesc || "",
+            status: cat.publishState || "Published",
+            visibleCatalog: cat.visibleCatalog !== false,
+            featured: !!cat.featured,
+            allowEnroll: cat.allowEnroll !== false,
+            showNav: !!cat.showNav,
+            metaTitle: cat.metaTitle || "",
+            metaDesc: cat.metaDesc || "",
+            focusKeyword: cat.focusKeyword || "",
+            tags: cat.tags || [],
+          });
+          if (cat.image) {
+            // Set image preview from base64 response or absolute URL
+            const isBase64 = cat.image.startsWith("data:image/") || !cat.image.includes("/");
+            const previewUrl = isBase64 && !cat.image.startsWith("data:image/") 
+              ? `data:image/png;base64,${cat.image}`
+              : cat.image;
+            setImagePreview(previewUrl);
+          } else {
+            setImagePreview("");
+          }
+        } else {
+          setNotFound(true);
+        }
+      } catch (err) {
+        console.error("Error loading category:", err);
+        setError("Category not found.");
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadCategory();
+  }, [categoryId]);
+
   const update = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
 
   const removeTag = (tag) => update("tags", form.tags.filter(t => t !== tag));
@@ -67,7 +125,7 @@ export default function useCreateCategory() {
         fd.append("name", nameToSubmit);
         fd.append("description", form.shortDesc);
         fd.append("publishState", form.status);
-        fd.append("status",form.status === "Published" ? "Active" : "Inactive");
+        fd.append("status", form.status === "Published" ? "Active" : "Inactive");
         if (imageFile) {
           fd.append("image", imageFile);
         }
@@ -85,16 +143,23 @@ export default function useCreateCategory() {
         fd.append("focusKeyword", form.focusKeyword || "");
         if (form.tags && form.tags.length > 0) {
           form.tags.forEach(tag => fd.append("tags", tag));
+        } else {
+          fd.append("tags", "");
         }
-        await categoryService.createCategory(fd);
+
+        if (categoryId) {
+          await categoryService.updateCategory(categoryId, fd);
+        } else {
+          await categoryService.createCategory(fd);
+        }
         success = true;
       } catch (err) {
         const msg = err?.response?.data?.message || "";
-        if (msg.toLowerCase().includes("exist") && attempts < 2) {
+        if (!categoryId && msg.toLowerCase().includes("exist") && attempts < 2) {
           nameToSubmit = `${form.name.trim()} ${Math.floor(Math.random() * 900 + 100)}`;
           attempts++;
         } else {
-          setError(msg || "Failed to create category.");
+          setError(msg || `Failed to ${categoryId ? "update" : "create"} category.`);
           setSubmitting(false);
           return;
         }
@@ -113,6 +178,9 @@ export default function useCreateCategory() {
     currentStep,
     setCurrentStep,
     submitting,
+    loading,
+    notFound,
+    isEditMode: !!categoryId,
     error,
     setError,
     imageFile,

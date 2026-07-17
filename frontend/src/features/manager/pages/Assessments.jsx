@@ -25,7 +25,7 @@ export default function Assessments() {
       if (res.data && res.data.data) {
         setStats(res.data.data);
       }
-    }).catch(() => {});
+    }).catch(() => { });
   };
 
   const fetchAssessments = () => {
@@ -41,7 +41,7 @@ export default function Assessments() {
         setTotalPages(res.data.data.totalPages || 1);
         setTotalElements(res.data.data.totalElements || 0);
       }
-    }).catch(() => {});
+    }).catch(() => { });
   };
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function Assessments() {
       fetchAssessments();
       setShowCreateModal(false);
       setNewAssessment({ name: "", course: "", questions: 20, duration: "45 mins", passScore: "75%", status: "Active" });
-    }).catch(() => {});
+    }).catch(() => { });
   };
 
   const filteredAssessments = allAssessments;

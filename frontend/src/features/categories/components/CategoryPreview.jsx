@@ -1,5 +1,6 @@
 import React from "react";
 import { Eye, CheckCircle } from "lucide-react";
+import CategoryIcon from "@/shared/components/CategoryIcon";
 
 export default function CategoryPreview({
   form,
@@ -21,7 +22,7 @@ export default function CategoryPreview({
           <div className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
             <div className="h-1" style={{ background: form.accentColor || "#6C1D5F" }} />
             <div className="p-4">
-              <div className="w-13 h-13 rounded-xl flex items-center justify-center text-2xl mb-3 bg-white border border-slate-100 w-[52px] h-[52px]">{form.emoji || "📁"}</div>
+              <div className="rounded-xl flex items-center justify-center mb-3 bg-white border border-slate-100 w-[52px] h-[52px] text-[#6C1D5F]"><CategoryIcon name={form.emoji || "Folder"} size={24} /></div>
               <div className="text-[14px] font-bold text-slate-900 mb-0.5">{form.name || "Category Name"}</div>
               <div className="text-[11px] text-slate-400 font-mono mb-2">xebia.com/categories/{form.slug || "slug"}</div>
               <div className="text-[12px] text-slate-600 leading-snug mb-3 line-clamp-2">{form.shortDesc || "Short description will appear here."}</div>

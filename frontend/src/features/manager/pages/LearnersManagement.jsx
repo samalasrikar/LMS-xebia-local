@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Users, Activity, CheckCircle, Clock, Search, Filter, Plus, Download, Upload, CheckCircle2 } from "lucide-react";
-import assignmentService from "@/features/assignments/services/assignmentService";
+import assignmentService from "@/features/assessments/assignments/services/assignmentService";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 
@@ -20,7 +20,7 @@ export default function LearnersManagement() {
       if (res && res.data) {
         setStats(res.data);
       }
-    }).catch(() => {});
+    }).catch(() => { });
   }, [showAddModal]);
 
   useEffect(() => {

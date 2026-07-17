@@ -179,9 +179,9 @@ export default function StudentDashboard() {
       </section>
 
       {/* ── Bento Grid: Course Progress & Timeline ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Course Progress */}
-        <Card className="lg:col-span-2 bg-white border-slate-200/70 shadow-sm p-6 flex flex-col justify-between space-y-6">
+        <Card className="lg:col-span-2 bg-white border-slate-200/70 shadow-sm p-6 flex flex-col space-y-6">
           <div className="flex justify-between items-center w-full">
             <div>
               <h3 className="text-[16px] font-bold text-slate-800">Course Progress</h3>

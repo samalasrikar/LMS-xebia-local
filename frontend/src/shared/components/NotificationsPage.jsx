@@ -62,7 +62,7 @@ const formatRelativeTime = (dateString) => {
     const diffMs = now - date;
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
-    
+
     if (diffMins < 60) {
       return diffMins <= 0 ? "Just now" : `${diffMins}m ago`;
     } else if (diffHours < 24) {
@@ -97,8 +97,8 @@ export default function NotificationsPage({ role, userId }) {
         }
       });
       if (res.data && res.data.data) {
-        const content = Array.isArray(res.data.data) 
-          ? res.data.data 
+        const content = Array.isArray(res.data.data)
+          ? res.data.data
           : (res.data.data.content || []);
         setNotifications(content);
       }
@@ -202,11 +202,10 @@ export default function NotificationsPage({ role, userId }) {
           <button
             key={f.id}
             onClick={() => setActiveFilter(f.id)}
-            className={`px-4 py-1.5 rounded-full text-[11.5px] font-bold border transition-all cursor-pointer outline-none ${
-              activeFilter === f.id
+            className={`px-4 py-1.5 rounded-full text-[11.5px] font-bold border transition-all cursor-pointer outline-none ${activeFilter === f.id
                 ? "bg-[#6C1D5F] text-white border-[#6C1D5F]"
                 : "bg-white text-slate-500 border-slate-200 hover:border-slate-350"
-            }`}
+              }`}
           >
             {f.label}
           </button>
@@ -228,11 +227,10 @@ export default function NotificationsPage({ role, userId }) {
               <div
                 key={n.id}
                 onClick={() => handleNotificationClick(n)}
-                className={`group relative border rounded-2xl p-5 flex gap-4 transition-all duration-200 cursor-pointer shadow-sm ${
-                  !n.read
+                className={`group relative border rounded-2xl p-5 flex gap-4 transition-all duration-200 cursor-pointer shadow-sm ${!n.read
                     ? "bg-white border-[#6C1D5F]/20 hover:bg-[#6C1D5F]/5"
                     : "bg-white/80 border-slate-200 hover:bg-slate-50/50 opacity-80"
-                }`}
+                  }`}
               >
                 {/* Highlight line on the left side of unread items */}
                 {!n.read && (

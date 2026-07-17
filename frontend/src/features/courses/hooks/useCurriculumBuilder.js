@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import courseService from "@/features/courses/services/courseService";
-import moduleService from "@/features/modules/services/moduleService";
-import subModuleService from "@/features/submodules/services/subModuleService";
-import contentService from "@/features/content/services/contentService";
+import moduleService from "@/features/courses/services/moduleService";
+import subModuleService from "@/features/courses/services/subModuleService";
+import contentService from "@/features/content-library/services/contentService";
 import categoryService from "@/features/categories/services/categoryService";
 
 export default function useCurriculumBuilder() {
@@ -712,6 +712,10 @@ export default function useCurriculumBuilder() {
         } catch {
           setAssignmentInstructions(c.content || "");
         }
+      } else if (bt === "video") {
+        setBlockConfigType("video");
+        setVideoUrl(c.videoUrl || "");
+        if (c.videoUrl) setUploadedFileName(c.videoUrl.split("/").pop());
       } else if (c.pdfUrl) {
         setBlockConfigType("pdf");
         setPdfUrl(c.pdfUrl);
@@ -719,6 +723,7 @@ export default function useCurriculumBuilder() {
       } else if (c.videoUrl) {
         setBlockConfigType("video");
         setVideoUrl(c.videoUrl);
+        if (c.videoUrl) setUploadedFileName(c.videoUrl.split("/").pop());
       } else {
         setBlockConfigType("text");
         setTextContent(c.content || "");

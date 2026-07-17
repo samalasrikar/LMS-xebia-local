@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, Clock } from "lucide-react";
 import { Badge } from "@/shared/components/ui/badge";
+import CategoryIcon from "@/shared/components/CategoryIcon";
 
 export default function CategoryDetailHero({
   cat,
@@ -14,8 +15,8 @@ export default function CategoryDetailHero({
       <div className="h-1" style={{ background: currentAccent }} />
       <div className="p-5 flex items-start gap-4">
         {/* Emoji box */}
-        <div className="w-14 h-14 rounded-xl bg-purple-50 flex items-center justify-center text-3xl flex-shrink-0 select-none">
-          {cat.emoji || "📁"}
+        <div className="w-14 h-14 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0 select-none">
+          <CategoryIcon name={cat.emoji || "Folder"} size={28} className="text-[#6C1D5F]" />
         </div>
 
         {/* Body */}

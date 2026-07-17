@@ -1,5 +1,5 @@
 export { default as StudentDashboard } from "./StudentDashboard";
-export { default as StudentCourses } from "./StudentCourses";
+export { default as StudentCourses } from "@/features/courses/pages/student/StudentCourses";
 export { default as StudentCalendar } from "./StudentCalendar";
 export { default as StudentAssessments } from "./StudentAssessments";
 export { default as StudentGrades } from "./StudentGrades";
@@ -9,7 +9,7 @@ export { default as StudentSettings } from "./StudentSettings";
 export { default as StudentDownloads } from "./StudentDownloads";
 export { default as StudentAssistant } from "./StudentAssistant";
 export { default as StudentNotifications } from "./StudentNotifications";
-export { default as StudentCourseOverview } from "./StudentCourseOverview";
-export { default as StudentModuleDetail } from "./StudentModuleDetail";
-export { default as StudentLessonDetail } from "./StudentLessonDetail";
-export { default as StudentCourseCompletion } from "./StudentCourseCompletion";
+export { default as StudentCourseOverview } from "@/features/courses/pages/student/StudentCourseOverview";
+export { default as StudentModuleDetail } from "@/features/courses/pages/student/StudentModuleDetail";
+export { default as StudentLessonDetail } from "@/features/courses/pages/student/StudentLessonDetail";
+export { default as StudentCourseCompletion } from "@/features/courses/pages/student/StudentCourseCompletion";

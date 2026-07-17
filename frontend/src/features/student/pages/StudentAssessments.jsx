@@ -18,8 +18,8 @@ import {
   Star
 } from "lucide-react";
 
-import assignmentService from "../../assignments/services/assignmentService";
-import quizService from "../../quizzes/services/quizService";
+import assignmentService from "@/features/assessments/assignments/services/assignmentService";
+import quizService from "@/features/assessments/quizzes/services/quizService";
 
 import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";

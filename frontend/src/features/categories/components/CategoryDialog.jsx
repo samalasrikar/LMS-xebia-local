@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Upload, ImageOff, ChevronDown, FolderOpen, Trash2, Info, Palette, Search } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import EmojiPicker from "@/shared/components/EmojiPicker";
+import IconPicker from "@/shared/components/IconPicker";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -119,11 +119,10 @@ export default function CategoryDialog({
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-4 py-2 border-b-2 text-[12.5px] font-medium transition-all cursor-pointer ${
-                  isActive
+                className={`flex items-center gap-1.5 px-4 py-2 border-b-2 text-[12.5px] font-medium transition-all cursor-pointer ${isActive
                     ? "border-[#6C1D5F] text-[#6C1D5F] font-bold"
                     : "border-transparent text-slate-400 hover:text-slate-600"
-                }`}
+                  }`}
               >
                 <Icon size={14} />
                 {tab.label}
@@ -335,7 +334,7 @@ export default function CategoryDialog({
                   </div>
                   {showEmojiPicker && (
                     <div className="absolute z-50 bottom-12 left-0 shadow-2xl">
-                      <EmojiPicker
+                      <IconPicker
                         onSelect={(val) => {
                           onEmojiChange(val);
                           setShowEmojiPicker(false);

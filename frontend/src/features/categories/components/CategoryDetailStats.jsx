@@ -1,23 +1,24 @@
 import React from "react";
-import { BookOpen, Users, CheckCheck, FileEdit, Star } from "lucide-react";
+import { BookOpen, Layers, CheckCheck, FileEdit, Award } from "lucide-react";
 import { Card } from "@/shared/components/ui/card";
 
 export default function CategoryDetailStats({
   coursesCount,
-  totalLearners,
+  totalModules,
+  totalSubModules,
   published,
   drafts,
 }) {
   return (
-    <div className="grid grid-cols-5 gap-3 text-left">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-left">
       {[
         { icon: BookOpen,  iconCls: "bg-purple-50 text-purple-600",  val: coursesCount,      lbl: "Total Courses"  },
-        { icon: Users,     iconCls: "bg-teal-50 text-teal-600",      val: totalLearners,       lbl: "Total Learners" },
-        { icon: CheckCheck,iconCls: "bg-orange-50 text-orange-500",  val: published,           lbl: "Published"      },
-        { icon: FileEdit,  iconCls: "bg-indigo-50 text-indigo-500",  val: drafts,              lbl: "Drafts"         },
-        { icon: Star,      iconCls: "bg-rose-50 text-rose-500",      val: coursesCount ? "4.5" : "—", lbl: "Avg. Rating"    },
+        { icon: Layers,    iconCls: "bg-teal-50 text-teal-600",      val: totalModules,      lbl: "Total Modules"  },
+        { icon: Award,     iconCls: "bg-rose-50 text-rose-500",      val: totalSubModules,   lbl: "Sub-modules"    },
+        { icon: CheckCheck,iconCls: "bg-emerald-50 text-emerald-600",val: published,         lbl: "Published"      },
+        { icon: FileEdit,  iconCls: "bg-amber-50 text-amber-600",    val: drafts,            lbl: "Drafts"         },
       ].map((s) => (
-        <Card key={s.lbl} className="flex flex-row items-center gap-3 p-4 border-slate-200">
+        <Card key={s.lbl} className="flex flex-row items-center gap-3 p-4 border-slate-200 bg-white">
           <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${s.iconCls}`}>
             <s.icon size={16} />
           </div>

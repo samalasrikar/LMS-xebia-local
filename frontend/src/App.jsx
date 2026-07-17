@@ -24,14 +24,14 @@ const Login = lazy(() => import("@/features/auth/pages/Login"));
 const ManagerLayout = lazy(() => import("@/app/layouts/ManagerLayout"));
 const ManagerDashboard = lazy(() => import("@/features/manager/pages/ManagerDashboard"));
 const LearningDashboard = lazy(() => import("@/features/manager/pages/LearningDashboard"));
-const CoursesManagement = lazy(() => import("@/features/manager/pages/CoursesManagement"));
-const ReportsAnalytics = lazy(() => import("@/features/manager/pages/ReportsAnalytics"));
-const CategoriesManagement = lazy(() => import("@/features/manager/pages/CategoriesManagement"));
+const CoursesManagement = lazy(() => import("@/features/courses/pages/CoursesManagement"));
+const ReportsAnalytics = lazy(() => import("@/features/analytics/pages/ReportsAnalytics"));
+const CategoriesManagement = lazy(() => import("@/features/categories/pages/CategoriesManagement"));
 const TrainersManagement = lazy(() => import("@/features/manager/pages/TrainersManagement"));
 const LearnersManagement = lazy(() => import("@/features/manager/pages/LearnersManagement"));
 const Assessments = lazy(() => import("@/features/manager/pages/Assessments"));
 const ManagerSettings = lazy(() => import("@/features/manager/pages/Settings"));
-const BatchManagement = lazy(() => import("@/features/manager/pages/BatchManagement"));
+const BatchManagement = lazy(() => import("@/features/batches/pages/manager/BatchManagement"));
 const ApprovalCenter = lazy(() => import("@/features/manager/pages/ApprovalCenter"));
 const ManagerNotifications = lazy(() => import("@/features/manager/pages/ManagerNotifications"));
 
@@ -52,25 +52,25 @@ const CreateCourse = lazy(() => import("@/features/courses/pages/CreateCourse"))
 const CurriculumBuilder = lazy(() => import("@/features/courses/pages/CurriculumBuilder"));
 
 // Modules / Content
-const ModuleManagement = lazy(() => import("@/features/modules/pages/Modules"));
-const ContentLibrary = lazy(() => import("@/features/content/pages/ContentLibrary"));
+const ModuleManagement = lazy(() => import("@/features/courses/pages/Modules"));
+const ContentLibrary = lazy(() => import("@/features/content-library/pages/ContentLibrary"));
 
 // Assignments
-const ManagerAssignmentDashboard = lazy(() => import("@/features/assignments/pages/ManagerAssignmentDashboard"));
-const CreateAssignment = lazy(() => import("@/features/assignments/pages/CreateAssignment"));
-const SubmissionReview = lazy(() => import("@/features/assignments/pages/SubmissionReview"));
-const Gradebook = lazy(() => import("@/features/assignments/pages/Gradebook"));
-const StudentAssignmentDashboard = lazy(() => import("@/features/assignments/pages/StudentAssignmentDashboard"));
-const StudentAssignmentDetails = lazy(() => import("@/features/assignments/pages/StudentAssignmentDetails"));
-const StudentMySubmissions = lazy(() => import("@/features/assignments/pages/StudentMySubmissions"));
-const StudentAssignmentResult = lazy(() => import("@/features/assignments/pages/StudentAssignmentResult"));
+const ManagerAssignmentDashboard = lazy(() => import("@/features/assessments/assignments/pages/trainer/ManagerAssignmentDashboard"));
+const CreateAssignment = lazy(() => import("@/features/assessments/assignments/pages/trainer/CreateAssignment"));
+const SubmissionReview = lazy(() => import("@/features/assessments/assignments/pages/trainer/SubmissionReview"));
+const Gradebook = lazy(() => import("@/features/assessments/assignments/pages/trainer/Gradebook"));
+const StudentAssignmentDashboard = lazy(() => import("@/features/assessments/assignments/pages/student/StudentAssignmentDashboard"));
+const StudentAssignmentDetails = lazy(() => import("@/features/assessments/assignments/pages/student/StudentAssignmentDetails"));
+const StudentMySubmissions = lazy(() => import("@/features/assessments/assignments/pages/student/StudentMySubmissions"));
+const StudentAssignmentResult = lazy(() => import("@/features/assessments/assignments/pages/student/StudentAssignmentResult"));
 
 // Quizzes
-const QuizDashboard = lazy(() => import("@/features/quizzes/pages/QuizDashboard"));
-const ImportQuiz = lazy(() => import("@/features/quizzes/pages/ImportQuiz"));
-const StudentQuizDashboard = lazy(() => import("@/features/quizzes/pages/StudentQuizDashboard"));
-const StudentQuizPlayer = lazy(() => import("@/features/quizzes/pages/StudentQuizPlayer"));
-const StudentQuizResult = lazy(() => import("@/features/quizzes/pages/StudentQuizResult"));
+const QuizDashboard = lazy(() => import("@/features/assessments/quizzes/pages/trainer/QuizDashboard"));
+const ImportQuiz = lazy(() => import("@/features/assessments/quizzes/pages/trainer/ImportQuiz"));
+const StudentQuizDashboard = lazy(() => import("@/features/assessments/quizzes/pages/student/StudentQuizDashboard"));
+const StudentQuizPlayer = lazy(() => import("@/features/assessments/quizzes/pages/student/StudentQuizPlayer"));
+const StudentQuizResult = lazy(() => import("@/features/assessments/quizzes/pages/student/StudentQuizResult"));
 
 // Batches
 const BatchDashboard = lazy(() => import("@/features/batches/pages/BatchDashboard"));
@@ -107,7 +107,7 @@ const LearningChampions = lazy(() => import("@/features/analytics/pages/Learning
 // Student portal
 const StudentLayout = lazy(() => import("@/app/layouts/StudentLayout"));
 const StudentDashboard = lazy(() => import("@/features/student/pages/StudentDashboard"));
-const StudentCourses = lazy(() => import("@/features/student/pages/StudentCourses"));
+const StudentCourses = lazy(() => import("@/features/courses/pages/student/StudentCourses"));
 const StudentCalendar = lazy(() => import("@/features/student/pages/StudentCalendar"));
 const StudentAssessments = lazy(() => import("@/features/student/pages/StudentAssessments"));
 const StudentGrades = lazy(() => import("@/features/student/pages/StudentGrades"));
@@ -117,10 +117,10 @@ const StudentSettings = lazy(() => import("@/features/student/pages/StudentSetti
 const StudentDownloads = lazy(() => import("@/features/student/pages/StudentDownloads"));
 const StudentAssistant = lazy(() => import("@/features/student/pages/StudentAssistant"));
 const StudentNotifications = lazy(() => import("@/features/student/pages/StudentNotifications"));
-const StudentCourseOverview = lazy(() => import("@/features/student/pages/StudentCourseOverview"));
-const StudentModuleDetail = lazy(() => import("@/features/student/pages/StudentModuleDetail"));
-const StudentLessonDetail = lazy(() => import("@/features/student/pages/StudentLessonDetail"));
-const StudentCourseCompletion = lazy(() => import("@/features/student/pages/StudentCourseCompletion"));
+const StudentCourseOverview = lazy(() => import("@/features/courses/pages/student/StudentCourseOverview"));
+const StudentModuleDetail = lazy(() => import("@/features/courses/pages/student/StudentModuleDetail"));
+const StudentLessonDetail = lazy(() => import("@/features/courses/pages/student/StudentLessonDetail"));
+const StudentCourseCompletion = lazy(() => import("@/features/courses/pages/student/StudentCourseCompletion"));
 
 // ── App ──────────────────────────────────────────────────────────────────────
 function App() {
@@ -164,6 +164,8 @@ function App() {
           {/* Categories */}
           <Route path="/categories" element={<Categories />} />
           <Route path="/categories/create" element={<CreateCategory />} />
+          <Route path="/categories/edit/:id" element={<CreateCategory />} />
+          <Route path="/categories/:id/edit" element={<CreateCategory />} />
           <Route path="/categories/:id" element={<CategoryDetail />} />
 
           {/* Courses */}
@@ -224,9 +226,7 @@ function App() {
           <Route path="/student/quizzes/:id/play" element={<StudentQuizPlayer />} />
 
           {/* Backward Compatibility */}
-          <Route path="/modules" element={<ModuleManagement />} />
           <Route path="/curriculum" element={<CurriculumBuilder />} />
-          <Route path="/content-builder" element={<ContentLibrary />} />
 
           {/* ── Analytics Explorer Wrapper ── */}
           <Route path="/analytics" element={<AnalyticsExplorerLayout />}>
@@ -246,41 +246,9 @@ function App() {
             <Route path="flagship-programs" element={<FlagshipPrograms />} />
             <Route path="learning-champions" element={<LearningChampions />} />
           </Route>
-
-          {/* Legacy Redirects for Backwards Compatibility */}
-          <Route path="/executive-summary" element={<Navigate to="/analytics/executive-summary" replace />} />
-          <Route path="/training-effectiveness" element={<Navigate to="/analytics/training-effectiveness" replace />} />
-          <Route path="/project-learning-investment" element={<Navigate to="/analytics/project-learning-investment" replace />} />
-          <Route path="/fresher-journey" element={<Navigate to="/analytics/fresher-journey" replace />} />
-          <Route path="/skill-gap" element={<Navigate to="/analytics/skill-gap" replace />} />
-          <Route path="/predictive-analytics" element={<Navigate to="/analytics/predictive-analytics" replace />} />
-          <Route path="/learning/coverage" element={<Navigate to="/analytics/learning/coverage" replace />} />
-          <Route path="/learning/hours" element={<Navigate to="/analytics/learning/hours" replace />} />
-          <Route path="/learning/categories" element={<Navigate to="/analytics/learning/categories" replace />} />
-          <Route path="/learning/trends" element={<Navigate to="/analytics/learning/trends" replace />} />
-          <Route path="/ai-transformation" element={<Navigate to="/analytics/ai-transformation" replace />} />
-          <Route path="/certifications" element={<Navigate to="/analytics/certifications" replace />} />
-          <Route path="/flagship-programs" element={<Navigate to="/analytics/flagship-programs" replace />} />
-          <Route path="/learning-champions" element={<Navigate to="/analytics/learning-champions" replace />} />
         </Routes>
       </Suspense>
     </TooltipProvider>
-  );
-}
-
-/* ─── Placeholder for sub-pages that don't exist yet ─── */
-function PlaceholderPage({ title, description }) {
-  return (
-    <div className="flex items-center justify-center min-h-[70vh]">
-      <div className="text-center max-w-[400px] mx-auto px-6">
-        <div className="w-14 h-14 rounded-2xl bg-[#6C1D5F]/5 border border-[#6C1D5F]/10 flex items-center justify-center mx-auto mb-5">
-          <span className="text-2xl">🚧</span>
-        </div>
-        <h2 className="text-[18px] font-bold text-slate-800 mb-1.5">{title}</h2>
-        <p className="text-[13px] text-slate-400 leading-relaxed">{description}</p>
-        <p className="text-[11px] text-slate-300 mt-4 font-medium">Coming soon</p>
-      </div>
-    </div>
   );
 }
 

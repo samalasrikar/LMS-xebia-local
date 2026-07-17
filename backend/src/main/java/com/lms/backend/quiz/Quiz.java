@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "quiz")
+@Table(name = "quizzes")
 public class Quiz {
     @Id
     private String id;
@@ -34,7 +34,7 @@ public class Quiz {
     private String submodule;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "quiz_questions", joinColumns = @JoinColumn(name = "quiz_id"))
+    @CollectionTable(name = "quizzes_questions", joinColumns = @JoinColumn(name = "quiz_id"))
     private List<QuizQuestion> questions = new ArrayList<>();
 
     @Transient

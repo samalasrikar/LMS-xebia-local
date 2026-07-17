@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "quiz_attempt")
+@Table(name = "quiz_attempts")
 public class QuizAttempt {
     @Id
     private String id;
@@ -33,7 +33,7 @@ public class QuizAttempt {
     private String status;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "quiz_attempt_answers", joinColumns = @JoinColumn(name = "attempt_id"))
+    @CollectionTable(name = "quiz_attempts_answers", joinColumns = @JoinColumn(name = "attempt_id"))
     private List<QuizAttemptAnswer> answers = new ArrayList<>();
 
     public QuizAttempt() {}

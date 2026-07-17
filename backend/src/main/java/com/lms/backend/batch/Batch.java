@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "batch")
+@Table(name = "batches")
 public class Batch {
     @Id
     private String id;
@@ -25,7 +25,7 @@ public class Batch {
     private String instructor;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "batch_student_ids", joinColumns = @JoinColumn(name = "batch_id"))
+    @CollectionTable(name = "batches_student_ids", joinColumns = @JoinColumn(name = "batch_id"))
     private List<String> studentIds = new ArrayList<>();
 
     public Batch() {}

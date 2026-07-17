@@ -16,8 +16,8 @@ import {
   UserCheck
 } from "lucide-react";
 import AppLayout from "@/app/layouts/AppLayout";
-import assignmentService from "@/features/assignments/services/assignmentService";
-import quizService from "@/features/quizzes/services/quizService";
+import assignmentService from "@/features/assessments/assignments/services/assignmentService";
+import quizService from "@/features/assessments/quizzes/services/quizService";
 
 export default function TrainerDashboard() {
   const navigate = useNavigate();

@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Entity
-@Table(name = "assignment")
+@Table(name = "assignments")
 public class Assignment {
 
     @Id
@@ -53,7 +53,7 @@ public class Assignment {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name = "assignment_attachments",
+            name = "assignments_attachments",
             joinColumns = @JoinColumn(name = "assignment_id")
     )
     private List<AssignmentAttachment> attachments =
