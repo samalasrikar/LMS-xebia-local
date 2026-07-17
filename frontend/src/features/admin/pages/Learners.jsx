@@ -375,13 +375,12 @@ export default function Learners() {
                     </td>
                     <td className="px-2 py-4 whitespace-nowrap">
                       <span
-                        className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase border inline-block ${
-                          l.status === "Active"
+                        className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase border inline-block ${l.status === "Active"
                             ? "bg-emerald-50 text-emerald-700 border-emerald-100"
                             : l.status === "Pending"
-                            ? "bg-amber-50 text-amber-700 border-amber-100"
-                            : "bg-slate-50 text-slate-500 border-slate-100"
-                        }`}
+                              ? "bg-amber-50 text-amber-700 border-amber-100"
+                              : "bg-slate-50 text-slate-500 border-slate-100"
+                          }`}
                       >
                         {l.status}
                       </span>
@@ -447,7 +446,7 @@ export default function Learners() {
                   <p className="text-[11px] text-slate-400 truncate">{viewingLearner.email}</p>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4 text-xs">
                 <div className="space-y-1">
                   <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]">Department</span>
@@ -455,13 +454,12 @@ export default function Learners() {
                 </div>
                 <div className="space-y-1">
                   <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]">Status</span>
-                  <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase border inline-block ${
-                    viewingLearner.status === "Active"
+                  <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase border inline-block ${viewingLearner.status === "Active"
                       ? "bg-emerald-50 text-emerald-700 border-emerald-100"
                       : viewingLearner.status === "Pending"
-                      ? "bg-amber-50 text-amber-700 border-amber-100"
-                      : "bg-slate-50 text-slate-500 border-slate-100"
-                  }`}>
+                        ? "bg-amber-50 text-amber-700 border-amber-100"
+                        : "bg-slate-50 text-slate-500 border-slate-100"
+                    }`}>
                     {viewingLearner.status}
                   </span>
                 </div>
@@ -559,7 +557,7 @@ export default function Learners() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="flex gap-3 justify-end pt-3 border-t border-slate-50">
                 <Button
                   type="button"

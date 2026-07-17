@@ -47,8 +47,20 @@ export const getContentIcon = (blockOrSub, size = 13) => {
   return React.createElement(BookOpen, { size });
 };
 
+export const resolveUploadUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("/uploads/")) {
+    const backendHost = import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:8080";
+    return `${backendHost}${url}`;
+  }
+  return url;
+};
+
 export const getEmbedInfo = (url) => {
   if (!url) return null;
+  if (url.startsWith("/uploads/") || url.startsWith("/") || url.startsWith("blob:") || url.startsWith("data:")) {
+    return { type: "direct", url };
+  }
   try {
     const parsedUrl = new URL(url);
     const host = parsedUrl.hostname.toLowerCase();
@@ -65,3 +77,4 @@ export const getEmbedInfo = (url) => {
     return null;
   }
 };
+

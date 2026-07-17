@@ -173,7 +173,7 @@ export default function FresherJourney() {
                   <p className="text-[11px] text-slate-450 font-mono truncate">Trainee ID: {viewingTrainee.id}</p>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4 text-xs">
                 <div className="space-y-1">
                   <span className="text-slate-450 font-semibold block uppercase tracking-wider text-[10px]">Department</span>

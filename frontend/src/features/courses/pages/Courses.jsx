@@ -10,11 +10,11 @@ import {
 } from "@/shared/components/ui/dialog";
 
 import CoursesPageHeader from "@/features/courses/components/CoursesPageHeader";
-import CoursesStatsBar   from "@/features/courses/components/CoursesStatsBar";
-import CoursesTabs       from "@/features/courses/components/CoursesTabs";
-import CoursesFilterBar  from "@/features/courses/components/CoursesFilterBar";
-import CoursesTableView  from "@/features/courses/components/CoursesTableView";
-import CoursesGridView   from "@/features/courses/components/CoursesGridView";
+import CoursesStatsBar from "@/features/courses/components/CoursesStatsBar";
+import CoursesTabs from "@/features/courses/components/CoursesTabs";
+import CoursesFilterBar from "@/features/courses/components/CoursesFilterBar";
+import CoursesTableView from "@/features/courses/components/CoursesTableView";
+import CoursesGridView from "@/features/courses/components/CoursesGridView";
 
 import useCourses from "@/features/courses/hooks/useCourses";
 
@@ -67,12 +67,12 @@ export default function Courses() {
   /* ─── Derived counts ─────────────────────────────────────────── */
   const counts = {
     published: courses.filter((c) => c.status === "published").length,
-    draft:     courses.filter((c) => c.status === "draft").length,
-    archived:  courses.filter((c) => c.status === "archived").length,
-    featured:  courses.filter((c) => c.featured).length,
+    draft: courses.filter((c) => c.status === "draft").length,
+    archived: courses.filter((c) => c.status === "archived").length,
+    featured: courses.filter((c) => c.featured).length,
   };
 
-  const allSelected  = filtered.length > 0 && selected.size === filtered.length;
+  const allSelected = filtered.length > 0 && selected.size === filtered.length;
   const someSelected = selected.size > 0 && selected.size < filtered.length;
 
   return (
@@ -222,9 +222,8 @@ export default function Courses() {
 
       {/* Toast Notification */}
       {toast && (
-        <div className={`fixed bottom-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 rounded-lg shadow-lg border animate-[slideIn_0.3s_ease-out] ${
-          toast.type === "error" ? "bg-red-50 border-red-200 text-red-700" : "bg-emerald-50 border-emerald-200 text-emerald-700"
-        }`}>
+        <div className={`fixed bottom-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 rounded-lg shadow-lg border animate-[slideIn_0.3s_ease-out] ${toast.type === "error" ? "bg-red-50 border-red-200 text-red-700" : "bg-emerald-50 border-emerald-200 text-emerald-700"
+          }`}>
           {toast.type === "error" ? (
             <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 animate-pulse" />
           ) : (

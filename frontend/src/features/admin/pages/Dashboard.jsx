@@ -2,13 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, BookOpen, FolderOpen, Calendar, UserPlus, Shield, ShieldAlert, Cpu, Heart, LifeBuoy } from "lucide-react";
 import AppLayout from "@/app/layouts/AppLayout";
-import StatsGrid from "@/features/dashboard/components/StatsGrid";
-import EnrollmentChart from "@/features/dashboard/components/EnrollmentChart";
-import RecentCoursesTable from "@/features/dashboard/components/RecentCoursesTable";
-import RecentActivity from "@/features/dashboard/components/RecentActivity";
-import SystemStatus from "@/features/dashboard/components/SystemStatus";
-import QuickActions from "@/features/dashboard/components/QuickActions";
-import TopCategories from "@/features/dashboard/components/TopCategories";
+import StatsGrid from "@/features/admin/components/dashboard/StatsGrid";
+import EnrollmentChart from "@/features/admin/components/dashboard/EnrollmentChart";
+import RecentCoursesTable from "@/features/admin/components/dashboard/RecentCoursesTable";
+import RecentActivity from "@/features/admin/components/dashboard/RecentActivity";
+import SystemStatus from "@/features/admin/components/dashboard/SystemStatus";
+import QuickActions from "@/features/admin/components/dashboard/QuickActions";
+import TopCategories from "@/features/admin/components/dashboard/TopCategories";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -85,11 +85,10 @@ export default function Dashboard() {
           {TABS.map((tab, i) => (
             <div
               key={tab}
-              className={`px-3.5 py-2.5 text-[13px] font-medium cursor-pointer border-b-2 -mb-px whitespace-nowrap transition-colors ${
-                i === 0
+              className={`px-3.5 py-2.5 text-[13px] font-medium cursor-pointer border-b-2 -mb-px whitespace-nowrap transition-colors ${i === 0
                   ? "text-[#6C1D5F] border-[#6C1D5F] font-semibold"
                   : "text-slate-400 border-transparent hover:text-slate-600"
-              }`}
+                }`}
             >
               {tab}
             </div>

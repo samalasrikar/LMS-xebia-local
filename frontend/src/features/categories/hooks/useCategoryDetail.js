@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import categoryService from "@/features/categories/services/categoryService";
 import courseService from "@/features/courses/services/courseService";
+import moduleService from "@/features/courses/services/moduleService";
+import subModuleService from "@/features/courses/services/subModuleService";
 
 export default function useCategoryDetail() {
   const { id } = useParams();
@@ -9,6 +11,7 @@ export default function useCategoryDetail() {
   const [category, setCategory]   = useState(null);
   const [courses, setCourses]     = useState([]);
   const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(null);
   const [courseSearch, setCourseSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [levelFilter, setLevelFilter]   = useState("All Levels");
@@ -22,29 +25,69 @@ export default function useCategoryDetail() {
 
   async function load() {
     setLoading(true);
+    setError(null);
     try {
-      const [cats, allCourses] = await Promise.all([
+      const [cats, allCourses, allModules, allSubModules] = await Promise.all([
         categoryService.getAllCategories(),
         courseService.getAllCourses(),
+        moduleService.getAllModules().catch(() => []),
+        subModuleService.getAllSubModules().catch(() => []),
       ]);
+
       const cat = cats?.find((c) => String(c.id) === String(id));
-      setCategory(cat || null);
-      const related = (allCourses || [])
-        .filter((c) => String(c.categoryId) === String(id))
-        .map((c) => ({
+      if (!cat) {
+        setError("Category not found.");
+        setCategory(null);
+        return;
+      }
+      setCategory(cat);
+
+      // Filter and map courses
+      const relatedCourses = (allCourses || []).filter(
+        (c) => String(c.categoryId) === String(id)
+      );
+
+      const structured = relatedCourses.map((c) => {
+        // Find modules belonging to this course
+        const courseModules = (allModules || [])
+          .filter((m) => String(m.courseId) === String(c.id))
+          .map((m) => {
+            // Find submodules belonging to this module
+            const moduleSubModules = (allSubModules || []).filter(
+              (sm) => String(sm.moduleId) === String(m.id)
+            );
+            return {
+              id: m.id,
+              title: m.title || "Untitled Module",
+              description: m.description || "",
+              subModules: moduleSubModules.map(sm => ({
+                id: sm.id,
+                title: sm.title || "Untitled Sub-module",
+                description: sm.description || "",
+                status: sm.status || "Active"
+              })),
+            };
+          });
+
+        return {
           id:         c.id,
-          title:      c.title,
-          subtitle:   c.description?.slice(0, 40) || "—",
+          title:      c.title || "Untitled Course",
+          subtitle:   c.description?.slice(0, 80) || "—",
+          description: c.description || "",
           level:      c.difficulty || "Intermediate",
           duration:   c.duration || "—",
-          learners:   Math.floor(Math.random() * 400) + 50,
+          learners:   c.learners || Math.floor(Math.random() * 400) + 50,
           status:     c.status || "Published",
-          updated:    "Jun 2025",
+          updated:    "Recently",
           thumbnail:  c.thumbnail || null,
-        }));
-      setCourses(related);
+          modules:    courseModules,
+        };
+      });
+
+      setCourses(structured);
     } catch (err) {
-      console.error(err);
+      console.error("Error loading category detail hierarchy:", err);
+      setError("Failed to load category details. Please verify your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -52,7 +95,10 @@ export default function useCategoryDetail() {
 
   /* ── Derived values ──────────────────────────────────────────────── */
   const filtered = courses.filter((c) => {
-    const matchSearch = c.title.toLowerCase().includes(courseSearch.toLowerCase());
+    const matchSearch = c.title.toLowerCase().includes(courseSearch.toLowerCase()) ||
+                        (c.description && c.description.toLowerCase().includes(courseSearch.toLowerCase())) ||
+                        c.modules.some(m => m.title.toLowerCase().includes(courseSearch.toLowerCase()) || 
+                          m.subModules.some(sm => sm.title.toLowerCase().includes(courseSearch.toLowerCase())));
     const matchStatus = statusFilter === "All Status" || c.status === statusFilter;
     const matchLevel  = levelFilter  === "All Levels"  || c.level  === levelFilter;
     return matchSearch && matchStatus && matchLevel;
@@ -64,6 +110,13 @@ export default function useCategoryDetail() {
   const drafts    = courses.filter((c) => c.status !== "Published").length;
   const totalLearners = courses.reduce((s, c) => s + c.learners, 0);
 
+  // Total hierarchy modules/submodules
+  const totalModules = courses.reduce((acc, c) => acc + (c.modules?.length || 0), 0);
+  const totalSubModules = courses.reduce(
+    (acc, c) => acc + (c.modules?.reduce((acc2, m) => acc2 + (m.subModules?.length || 0), 0) || 0),
+    0
+  );
+
   const enrollTop = [...courses]
     .sort((a, b) => b.learners - a.learners)
     .slice(0, 6);
@@ -74,6 +127,7 @@ export default function useCategoryDetail() {
     category,
     courses,
     loading,
+    error,
     courseSearch,
     setCourseSearch,
     statusFilter,
@@ -89,6 +143,8 @@ export default function useCategoryDetail() {
     published,
     drafts,
     totalLearners,
+    totalModules,
+    totalSubModules,
     enrollTop,
     maxEnroll,
     load,

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ChevronRight, Search, X, Info, CheckSquare, Calendar as CalendarIcon } from "lucide-react";
 import AppLayout from "@/app/layouts/AppLayout";
 import batchService from "../services/batchService";
-import assignmentService from "@/features/assignments/services/assignmentService";
+import assignmentService from "@/features/assessments/assignments/services/assignmentService";
 import { Calendar } from "@/shared/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover";
 import { format, parseISO } from "date-fns";

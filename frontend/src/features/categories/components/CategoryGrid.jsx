@@ -2,6 +2,7 @@ import { Layers, Edit, Trash2, BookOpen, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EmptyState from "@/shared/components/EmptyState";
 import { Spinner } from "@/shared/components/ui/spinner";
+import CategoryIcon from "@/shared/components/CategoryIcon";
 
 export default function CategoryGrid({
   categories,
@@ -110,7 +111,7 @@ export default function CategoryGrid({
           {/* Card Body */}
           <div className="p-5 flex-1 flex flex-col min-w-0">
             <h4 className="font-bold text-slate-800 text-[14.5px] truncate mb-1 flex items-center gap-1.5">
-              {cat.emoji && <span className="text-base shrink-0 select-none">{cat.emoji}</span>}
+              {cat.emoji && <CategoryIcon name={cat.emoji} size={16} className="shrink-0 text-[#6C1D5F]" />}
               <span className="truncate">{cat.name}</span>
             </h4>
             <p className="text-slate-400 text-[11.5px] font-medium uppercase tracking-wider mb-2">

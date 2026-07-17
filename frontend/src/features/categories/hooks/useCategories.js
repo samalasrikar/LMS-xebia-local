@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import categoryService from "@/features/categories/services/categoryService";
 import courseService from "@/features/courses/services/courseService";
 
 export default function useCategories() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterText, setFilterText] = useState("");
@@ -119,49 +121,11 @@ export default function useCategories() {
   };
 
   const openView = (cat) => {
-    setNewCatName(cat.name);
-    setNewCatDesc(cat.description || "");
-    setNewCatImageFile(null);
-    setNewCatImagePreview(cat.image || "");
-    setNewCatStatus(cat.status || "Active");
-    setNewCatEmoji(cat.emoji || "");
-    setNewCatAccentColor(cat.accentColor || "");
-    setNewCatTags(cat.tags || []);
-    setNewCatFeatured(cat.featured || false);
-    setNewCatMetaTitle(cat.metaTitle || "");
-    setNewCatMetaDesc(cat.metaDesc || "");
-    setNewCatFocusKeyword(cat.focusKeyword || "");
-    setNewCatLongDesc(cat.longDesc || "");
-    setNewCatPublishState(cat.publishState || "Published");
-    setNewCatSlug(cat.slug || "");
-    setNewCatParentCat(cat.parentCat || "");
-    setSelectedCatDbId(cat.dbId);
-    setModalMode("edit");
-    setErrorMsg("");
-    setShowModal(true);
+    navigate(`/categories/${cat.dbId}`);
   };
 
   const openEdit = (cat) => {
-    setNewCatName(cat.name);
-    setNewCatDesc(cat.description || "");
-    setNewCatImageFile(null);
-    setNewCatImagePreview(cat.image || "");
-    setNewCatStatus(cat.status || "Active");
-    setNewCatEmoji(cat.emoji || "");
-    setNewCatAccentColor(cat.accentColor || "");
-    setNewCatTags(cat.tags || []);
-    setNewCatFeatured(cat.featured || false);
-    setNewCatMetaTitle(cat.metaTitle || "");
-    setNewCatMetaDesc(cat.metaDesc || "");
-    setNewCatFocusKeyword(cat.focusKeyword || "");
-    setNewCatLongDesc(cat.longDesc || "");
-    setNewCatPublishState(cat.publishState || "Published");
-    setNewCatSlug(cat.slug || "");
-    setNewCatParentCat(cat.parentCat || "");
-    setSelectedCatDbId(cat.dbId);
-    setModalMode("edit");
-    setErrorMsg("");
-    setShowModal(true);
+    navigate(`/categories/${cat.dbId}/edit`);
   };
 
   const handleFormSubmit = async (e) => {

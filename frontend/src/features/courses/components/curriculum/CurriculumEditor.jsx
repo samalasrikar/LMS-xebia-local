@@ -30,7 +30,7 @@ import {
   HelpCircle,
   CheckSquare,
 } from "lucide-react";
-import { getContentIcon, getContentLabel, getContentType } from "@/features/courses/utils/curriculumHelpers";
+import { getContentIcon, getContentLabel, getContentType, resolveUploadUrl } from "@/features/courses/utils/curriculumHelpers";
 import EmptyState from "@/shared/components/EmptyState";
 import SafeMediaEmbed from "./SafeMediaEmbed";
 
@@ -109,6 +109,33 @@ export default function CurriculumEditor({
             {activeSubModule.blocks && activeSubModule.blocks.length > 0 ? (
               activeSubModule.blocks.map((c) => {
                 const bt = c.blockType || "";
+
+                // Video block
+                if (bt === "video") {
+                  const url = c.videoUrl || "";
+                  const title = c.content || "Video Content";
+                  return (
+                    <div key={c.id} className="group/block relative">
+                      <ContentBlock
+                        icon={<Video size={14} />}
+                        label="Video Block"
+                        badge="video"
+                        highlighted
+                        onEdit={() => openEditBlockDialog(activeSubModule, c)}
+                        onDelete={() => requestDelete("block", c)}
+                      >
+                        <div className="space-y-3">
+                          {url && (
+                            <div className="aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shadow-inner">
+                              <SafeMediaEmbed url={url} title={title} />
+                            </div>
+                          )}
+                        </div>
+                      </ContentBlock>
+                      <AddBlockDivider onClick={() => openEditBlockDialog(activeSubModule, null)} />
+                    </div>
+                  );
+                }
 
                 // Heading block
                 if (bt === "heading") {
@@ -189,7 +216,7 @@ export default function CurriculumEditor({
                         <div className="space-y-2">
                           {c.imageUrl && (
                             <div className="rounded-xl overflow-hidden border border-slate-200 shadow-md">
-                              <img src={c.imageUrl} alt={alt} className="w-full max-h-[400px] object-contain bg-slate-100" />
+                              <img src={resolveUploadUrl(c.imageUrl)} alt={alt} className="w-full max-h-[400px] object-contain bg-slate-100" />
                             </div>
                           )}
                           {caption && <p className="text-[12px] text-slate-500 text-center italic">{caption}</p>}
@@ -251,7 +278,7 @@ export default function CurriculumEditor({
                             </div>
                           </div>
                           {fileUrl && (
-                            <a href={fileUrl} target="_blank" rel="noreferrer"
+                            <a href={resolveUploadUrl(fileUrl)} target="_blank" rel="noreferrer"
                               className="flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 hover:border-[#6C1D5F] text-slate-600 hover:text-[#6C1D5F] rounded-lg text-[12px] font-bold shadow-sm transition-all shrink-0 cursor-pointer"
                             >
                               <Download size={13} /> Download
@@ -354,7 +381,7 @@ export default function CurriculumEditor({
                         <div className="space-y-3">
                           <p className="text-[13px] font-bold text-slate-700">{audioTitle}</p>
                           {audioUrl && (
-                            <audio controls className="w-full rounded-lg" src={audioUrl}>
+                            <audio controls className="w-full rounded-lg" src={resolveUploadUrl(audioUrl)}>
                               Your browser does not support the audio element.
                             </audio>
                           )}

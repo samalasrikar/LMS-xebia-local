@@ -3,7 +3,6 @@ import CategoryHeader from "@/features/categories/components/CategoryHeader";
 import CategoryToolbar from "@/features/categories/components/CategoryToolbar";
 import CategoryGrid from "@/features/categories/components/CategoryGrid";
 import CategoryStats from "@/features/categories/components/CategoryStats";
-import CategoryDialog from "@/features/categories/components/CategoryDialog";
 import DeleteDialog from "@/shared/components/DeleteDialog";
 
 import useCategories from "@/features/categories/hooks/useCategories";
@@ -84,44 +83,7 @@ export default function Categories() {
 
         <CategoryStats categories={categories} />
 
-        <CategoryDialog
-          show={showModal}
-          mode={modalMode}
-          name={newCatName}
-          desc={newCatDesc}
-          imagePreview={newCatImagePreview}
-          status={newCatStatus}
-          errorMsg={errorMsg}
-          submitting={submitting}
-          onNameChange={setNewCatName}
-          onDescChange={setNewCatDesc}
-          onImageFileChange={handleImageFileChange}
-          onStatusChange={setNewCatStatus}
-          onClose={() => setShowModal(false)}
-          onSubmit={handleFormSubmit}
-          emoji={newCatEmoji}
-          onEmojiChange={setNewCatEmoji}
-          accentColor={newCatAccentColor}
-          onAccentColorChange={setNewCatAccentColor}
-          tags={newCatTags}
-          onTagsChange={setNewCatTags}
-          featured={newCatFeatured}
-          onFeaturedChange={setNewCatFeatured}
-          metaTitle={newCatMetaTitle}
-          onMetaTitleChange={setNewCatMetaTitle}
-          metaDesc={newCatMetaDesc}
-          onMetaDescChange={setNewCatMetaDesc}
-          focusKeyword={newCatFocusKeyword}
-          onFocusKeywordChange={setNewCatFocusKeyword}
-          longDesc={newCatLongDesc}
-          onLongDescChange={setNewCatLongDesc}
-          publishState={newCatPublishState}
-          onPublishStateChange={setNewCatPublishState}
-          slug={newCatSlug}
-          onSlugChange={setNewCatSlug}
-          parentCat={newCatParentCat}
-          onParentCatChange={setNewCatParentCat}
-        />
+
 
         <DeleteDialog
           show={!!deleteTarget}

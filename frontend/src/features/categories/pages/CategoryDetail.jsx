@@ -7,6 +7,7 @@ import CategoryDetailHero from "@/features/categories/components/CategoryDetailH
 import CategoryDetailStats from "@/features/categories/components/CategoryDetailStats";
 import CategoryDetailCourses from "@/features/categories/components/CategoryDetailCourses";
 import CategoryDetailSidebar from "@/features/categories/components/CategoryDetailSidebar";
+import { Button } from "@/shared/components/ui/button";
 
 const ACCENT = "#6C1D5F";
 
@@ -18,6 +19,7 @@ export default function CategoryDetail() {
     category,
     courses,
     loading,
+    error,
     courseSearch,
     setCourseSearch,
     statusFilter,
@@ -33,6 +35,8 @@ export default function CategoryDetail() {
     published,
     drafts,
     totalLearners,
+    totalModules,
+    totalSubModules,
     enrollTop,
     maxEnroll,
   } = useCategoryDetail();
@@ -40,8 +44,33 @@ export default function CategoryDetail() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="max-w-[1300px] mx-auto text-center py-20 text-slate-400">
-          Loading category...
+        <div className="max-w-[1300px] mx-auto flex flex-col items-center justify-center py-32 text-slate-400 gap-3">
+          <div className="w-8 h-8 rounded-full border-3 border-slate-200 border-t-[#6C1D5F] animate-spin" />
+          <span className="text-[13px] font-semibold text-slate-500">Loading curriculum...</span>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AppLayout>
+        <div className="max-w-[1300px] mx-auto flex flex-col items-center justify-center py-24 text-slate-500 text-center gap-4">
+          <div className="p-4 bg-red-50 text-red-650 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-md font-bold text-slate-800">Something went wrong</h3>
+            <p className="text-xs text-slate-450 max-w-sm">{error}</p>
+          </div>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="bg-[#6C1D5F] text-white hover:bg-[#5A1850] text-xs font-semibold py-2 px-4 rounded-lg cursor-pointer"
+          >
+            Retry Loading
+          </Button>
         </div>
       </AppLayout>
     );
@@ -50,8 +79,13 @@ export default function CategoryDetail() {
   if (!category) {
     return (
       <AppLayout>
-        <div className="max-w-[1300px] mx-auto text-center py-20 text-slate-400">
-          Category not found.
+        <div className="max-w-[1300px] mx-auto flex flex-col items-center justify-center py-24 text-slate-450 gap-2">
+          <div className="text-4xl">🔍</div>
+          <div className="text-[14px] font-bold text-slate-700">Category not found</div>
+          <p className="text-xs text-slate-400">The requested category could not be resolved or was deleted.</p>
+          <Button onClick={() => navigate("/categories")} variant="outline" className="mt-2 text-xs font-medium cursor-pointer">
+            Back to Categories
+          </Button>
         </div>
       </AppLayout>
     );
@@ -63,7 +97,7 @@ export default function CategoryDetail() {
   const activities = courses.map((c, idx) => {
     const types = ["add", "edit", "pub"];
     const icons = [Plus, Pencil, TrendingUp];
-    const colors = ["bg-emerald-100 text-emerald-600", "bg-blue-100 text-blue-600", "bg-yellow-100 text-yellow-600"];
+    const colors = ["bg-emerald-100 text-emerald-655", "bg-blue-105 text-blue-650", "bg-yellow-105 text-yellow-650"];
     const typeIdx = idx % 3;
     return {
       type: types[typeIdx],
@@ -98,12 +132,13 @@ export default function CategoryDetail() {
 
         <CategoryDetailStats
           coursesCount={courses.length}
-          totalLearners={totalLearners}
+          totalModules={totalModules}
+          totalSubModules={totalSubModules}
           published={published}
           drafts={drafts}
         />
 
-        <div className="flex gap-4 items-start pt-2">
+        <div className="flex flex-col lg:flex-row gap-4 items-start pt-2">
           <CategoryDetailCourses
             courses={courses}
             courseSearch={courseSearch}
@@ -136,4 +171,3 @@ export default function CategoryDetail() {
     </AppLayout>
   );
 }
-

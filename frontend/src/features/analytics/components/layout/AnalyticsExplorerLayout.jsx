@@ -19,14 +19,14 @@ export default function AnalyticsExplorerLayout() {
   const [newReportTitle, setNewReportTitle] = useState("");
   const [newReportCategory, setNewReportCategory] = useState("executive-summary");
   const [newReportDesc, setNewReportDesc] = useState("");
-  
+
   // Custom toast notification state
   const [toastMessage, setToastMessage] = useState(null);
 
   const handleRefresh = () => {
     setLoading(true);
     setReloadTrigger((prev) => prev + 1);
-    
+
     // Simulate loading completion for the sidebar spinner
     setTimeout(() => {
       setLoading(false);
@@ -48,7 +48,7 @@ export default function AnalyticsExplorerLayout() {
     // Simulate creation
     setIsAddDialogOpen(false);
     showToast(`Custom report "${newReportTitle}" successfully added!`);
-    
+
     // Reset fields
     setNewReportTitle("");
     setNewReportCategory("executive-summary");

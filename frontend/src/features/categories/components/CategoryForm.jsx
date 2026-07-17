@@ -3,13 +3,14 @@ import {
   Info, Palette, AlignLeft, ToggleRight, Search as SearchIcon, CheckCircle, X, TrendingUp, Link, List, Code,
   Upload, Image as ImageIcon
 } from "lucide-react";
-import EmojiPicker from "@/shared/components/EmojiPicker";
+import IconPicker from "@/shared/components/IconPicker";
+import CategoryIcon from "@/shared/components/CategoryIcon";
 
 /* ─── Preset colors ──────────────────────────────────────────────── */
 const PRESET_COLORS = ["#6366f1", "#22c55e", "#7c3aed", "#f59e0b", "#2563eb", "#0891b2", "#e11d48", "#059669", "#d97706"];
 
 /* ─── Quick-pick emojis ──────────────────────────────────────────── */
-const EMOJIS = ["⚛️", "☁️", "🤖", "🔐", "📐", "🛠️", "📊", "📱", "🧪", "🏗️"];
+const EMOJIS = ["GraduationCap", "BookOpen", "Laptop", "Database", "Cpu", "Briefcase", "Palette", "Award", "Settings", "Activity"];
 
 export default function CategoryForm({
   form,
@@ -23,6 +24,20 @@ export default function CategoryForm({
   seoBarColor,
 }) {
   const [showPicker, setShowPicker] = useState(false);
+  const [tagInput, setTagInput] = useState("");
+
+  const handleTagKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const val = tagInput.trim().replace(/,/g, "");
+      if (val && !form.tags.includes(val)) {
+        update("tags", [...form.tags, val]);
+      }
+      setTagInput("");
+    } else if (e.key === "Backspace" && !tagInput && form.tags.length > 0) {
+      removeTag(form.tags[form.tags.length - 1]);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -54,19 +69,13 @@ export default function CategoryForm({
                 placeholder="e.g. Cloud & DevOps"
               />
             </FieldRow>
-            <FieldRow label="URL Slug" required hint="Auto-generated from category name. Click pencil to edit.">
-              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px]">
-                <span className="text-slate-400">xebia.com/categories/</span>
-                <span className="text-[#6C1D5F] font-semibold">{form.slug}</span>
-              </div>
-            </FieldRow>
           </div>
           <div className="pl-8 space-y-4">
-            <FieldRow label="Parent Category" hint="Leave empty to create a root-level category.">
-              <select className="field-select w-full" value={form.parentCat} onChange={e => update("parentCat", e.target.value)}>
-                <option value="">— None (Top-level) —</option>
-                <option>Engineering</option><option>Design</option><option>Business</option><option>Data Science</option>
-              </select>
+            <FieldRow label="URL Slug" required hint="Auto-generated from category name. Click pencil to edit.">
+              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px]">
+                <span className="text-slate-405 font-medium">xebia.com/categories/</span>
+                <span className="text-[#6C1D5F] font-semibold">{form.slug}</span>
+              </div>
             </FieldRow>
           </div>
         </div>
@@ -91,15 +100,14 @@ export default function CategoryForm({
         }
       >
         <div className="space-y-4 text-left">
-          {/* Emoji picker */}
           <FieldRow label="Category Icon / Emoji">
             <div className="flex items-center gap-3 relative">
               <button
                 type="button"
                 onClick={() => setShowPicker(!showPicker)}
-                className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-3xl cursor-pointer hover:border-[#6C1D5F] hover:bg-slate-100 transition-colors flex-shrink-0"
+                className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center cursor-pointer hover:border-[#6C1D5F] hover:bg-slate-100 transition-colors flex-shrink-0 text-[#6C1D5F]"
               >
-                {form.emoji || "📁"}
+                <CategoryIcon name={form.emoji || "Folder"} size={28} />
               </button>
               <div>
                 <div className="text-[12px] font-semibold text-slate-700 mb-2">Quick pick</div>
@@ -109,12 +117,12 @@ export default function CategoryForm({
                       key={e}
                       type="button"
                       onClick={() => update("emoji", e)}
-                      className={`w-9 h-9 rounded-md border flex items-center justify-center text-lg transition-all cursor-pointer ${form.emoji === e
-                        ? "border-[#6C1D5F] bg-[#eef2ff]"
-                        : "border-slate-200 bg-slate-50 hover:border-slate-300"
+                      className={`w-9 h-9 rounded-md border flex items-center justify-center transition-all cursor-pointer ${form.emoji === e
+                        ? "border-[#6C1D5F] bg-[#eef2ff] text-[#6C1D5F]"
+                        : "border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300 hover:text-slate-800"
                         }`}
                     >
-                      {e}
+                      <CategoryIcon name={e} size={16} />
                     </button>
                   ))}
                   <button
@@ -126,10 +134,9 @@ export default function CategoryForm({
                   </button>
                 </div>
               </div>
-
               {showPicker && (
                 <div className="absolute z-50 top-18 left-0 shadow-2xl">
-                  <EmojiPicker
+                  <IconPicker
                     onSelect={(val) => {
                       update("emoji", val);
                       setShowPicker(false);
@@ -141,7 +148,6 @@ export default function CategoryForm({
             </div>
           </FieldRow>
 
-          {/* Accent color */}
           <FieldRow label="Accent Color" required hint="Used for the top accent bar and background tint on the category card.">
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex gap-2 flex-wrap">
@@ -347,7 +353,13 @@ export default function CategoryForm({
                   <button type="button" onClick={() => removeTag(tag)} className="text-[#6366f1] ml-0.5 hover:text-[#4338ca]"><X size={10} /></button>
                 </span>
               ))}
-              <input className="border-none outline-none text-[12px] text-slate-700 bg-transparent min-w-[80px] flex-1" placeholder="Add tag…" />
+              <input
+                className="border-none outline-none text-[12px] text-slate-700 bg-transparent min-w-[80px] flex-1"
+                placeholder="Add tag…"
+                value={tagInput}
+                onChange={e => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+              />
             </div>
           </FieldRow>
         </div>
@@ -360,7 +372,7 @@ export default function CategoryForm({
 
 function FormCard({ icon, iconCls, title, subtitle, badge, children }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+    <div className="bg-white border border-slate-200 rounded-xl">
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
           <div className={`w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 ${iconCls}`}>{icon}</div>
