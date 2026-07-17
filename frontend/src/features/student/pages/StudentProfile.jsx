@@ -39,6 +39,7 @@ import {
   Trophy,
   Search
 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function StudentProfile() {
   const { pathname } = useLocation();
@@ -378,7 +379,9 @@ export default function StudentProfile() {
                 </div>
               </div>
               <div className="flex justify-end pt-4">
-                <button className="bg-[#6C1D5F] hover:bg-[#521347] text-white px-6 py-2.5 rounded-xl text-[12px] font-bold shadow-sm shadow-[#6C1D5F]/15 transition-all cursor-pointer border-none outline-none">
+                <button 
+                  onClick={() => toast.success("Profile changes saved successfully")}
+                  className="bg-[#6C1D5F] hover:bg-[#521347] text-white px-6 py-2.5 rounded-xl text-[12px] font-bold shadow-sm shadow-[#6C1D5F]/15 transition-all cursor-pointer border-none outline-none">
                   Save Changes
                 </button>
               </div>
@@ -472,7 +475,9 @@ export default function StudentProfile() {
                     <label className="text-[11.5px] font-black uppercase text-slate-400 tracking-wider">Confirm New Password</label>
                     <input type="password" placeholder="••••••••" className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-2.5 text-[13px] focus:outline-none focus:border-[#6C1D5F] focus:ring-1 focus:ring-[#6C1D5F]" />
                   </div>
-                  <button className="bg-[#6C1D5F] hover:bg-[#521347] text-white px-6 py-2.5 rounded-xl text-[12px] font-bold shadow-sm shadow-[#6C1D5F]/15 transition-all cursor-pointer border-none outline-none">
+                  <button 
+                    onClick={() => toast.success("Password updated successfully")}
+                    className="bg-[#6C1D5F] hover:bg-[#521347] text-white px-6 py-2.5 rounded-xl text-[12px] font-bold shadow-sm shadow-[#6C1D5F]/15 transition-all cursor-pointer border-none outline-none">
                     Update Password
                   </button>
                 </div>

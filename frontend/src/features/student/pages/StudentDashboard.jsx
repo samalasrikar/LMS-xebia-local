@@ -18,10 +18,12 @@ import { Badge } from "@/shared/components/ui/badge";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Progress } from "@/shared/components/ui/progress";
 import { Button } from "@/shared/components/ui/button";
+import api from "@/shared/services/api";
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
+  const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,8 +37,53 @@ export default function StudentDashboard() {
         setLoading(false);
       }
     };
+
+    const fetchActivities = async () => {
+      try {
+        const res = await api.get("/notifications", {
+          params: { role: "student", userId: "s4", page: 0, size: 4 }
+        });
+        if (res.data && res.data.data) {
+          const content = Array.isArray(res.data.data)
+            ? res.data.data
+            : (res.data.data.content || []);
+          setActivities(content);
+        }
+      } catch (err) {
+        console.error("Failed to load activity history:", err);
+      }
+    };
+
     fetchCourses();
+    fetchActivities();
   }, []);
+
+  const formatRelativeTime = (dateString) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      
+      if (diffMins < 60) return diffMins <= 0 ? "Just now" : `${diffMins}m ago`;
+      else if (diffHours < 24) return `${diffHours}h ago`;
+      else if (diffHours < 48) return "Yesterday";
+      else return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    } catch (e) {
+      return "";
+    }
+  };
+
+  const getActivityColor = (category) => {
+    switch (category) {
+      case "reminder": return "bg-[#6C1D5F]";
+      case "system": return "bg-amber-500";
+      case "community": return "bg-emerald-500";
+      default: return "bg-slate-400";
+    }
+  };
 
   return (
     <div className="max-w-[1000px] w-full mx-auto px-6 md:px-8 py-8 space-y-8 animate-fadeIn">
@@ -191,32 +238,22 @@ export default function StudentDashboard() {
           </div>
 
           <div className="relative border-l-2 border-slate-100 pl-4 ml-2 space-y-5 py-2 flex-1">
-            {/* Item 1 */}
-            <div className="relative space-y-0.5">
-              <div className="absolute w-3 h-3 bg-emerald-500 rounded-full -left-[22px] top-1.5 border-2 border-white shadow-sm" />
-              <span className="text-[10px] font-bold text-slate-400">2 hours ago</span>
-              <p className="text-[12px] font-bold text-slate-700">Assignment Submitted</p>
-              <p className="text-[11px] text-slate-400">AI Ethics Case Study</p>
-            </div>
-
-            {/* Item 2 */}
-            <div className="relative space-y-0.5">
-              <div className="absolute w-3 h-3 bg-[#6C1D5F] rounded-full -left-[22px] top-1.5 border-2 border-white shadow-sm" />
-              <span className="text-[10px] font-bold text-slate-400">Yesterday</span>
-              <p className="text-[12px] font-bold text-slate-700">New Grade Posted</p>
-              <p className="text-[11px] text-slate-400">Data Visualization (Score: A)</p>
-            </div>
-
-            {/* Item 3 */}
-            <div className="relative space-y-0.5">
-              <div className="absolute w-3 h-3 bg-amber-500 rounded-full -left-[22px] top-1.5 border-2 border-white shadow-sm" />
-              <span className="text-[10px] font-bold text-slate-400">Oct 22, 2023</span>
-              <p className="text-[12px] font-bold text-slate-700">Announcement</p>
-              <p className="text-[11px] text-slate-400">Mid-term exam results published next week</p>
-            </div>
+            {activities.length > 0 ? (
+              activities.map((activity, idx) => (
+                <div key={activity.id || idx} className="relative space-y-0.5">
+                  <div className={`absolute w-3 h-3 ${getActivityColor(activity.category)} rounded-full -left-[22px] top-1.5 border-2 border-white shadow-sm`} />
+                  <span className="text-[10px] font-bold text-slate-400">{formatRelativeTime(activity.createdAt)}</span>
+                  <p className="text-[12px] font-bold text-slate-700">{activity.title}</p>
+                  <p className="text-[11px] text-slate-400 line-clamp-1">{activity.description}</p>
+                </div>
+              ))
+            ) : (
+              <div className="text-[12px] text-slate-400 py-4">No recent activity found.</div>
+            )}
           </div>
 
           <Button
+            onClick={() => navigate("/student/notifications")}
             variant="outline"
             className="w-full py-2.5 border-slate-200 hover:border-[#6C1D5F] text-[#6C1D5F] hover:bg-[#6C1D5F]/5 rounded-xl text-[12px] font-bold transition-all cursor-pointer h-10"
           >

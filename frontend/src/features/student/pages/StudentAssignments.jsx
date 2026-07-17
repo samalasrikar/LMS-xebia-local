@@ -14,6 +14,7 @@ import {
   CheckCircle,
   MessageSquare,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function StudentAssignments() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -77,7 +78,12 @@ export default function StudentAssignments() {
     setSubmissionHistory([newAttempt, ...submissionHistory]);
     setIsSubmitted(true);
     setSelectedFile(null);
+    toast.success("Assignment submitted successfully!");
   };
+
+  // Determine overdue status
+  const dueDate = new Date("2026-07-15T23:59:00"); // A date in the past
+  const isOverdue = new Date() > dueDate;
 
   return (
     <div className="max-w-[1000px] w-full mx-auto px-6 md:px-8 py-8 space-y-6 animate-fadeIn">
@@ -96,9 +102,13 @@ export default function StudentAssignments() {
             <h1 className="text-2xl font-black text-slate-800 tracking-tight">Final Project: Capstone Analysis</h1>
             <p className="text-[13px] text-slate-400 mt-1">Upload your comprehensive strategic analysis report.</p>
           </div>
-          <div className="flex items-center gap-1.5 bg-rose-50 text-rose-700 px-4 py-2 rounded-xl text-[12px] font-black border border-rose-100 shrink-0">
-            <AlertTriangle size={14} className="animate-pulse" />
-            <span>Due in 2 days (Oct 24, 11:59 PM)</span>
+          <div className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[12px] font-black border shrink-0 ${
+            isOverdue 
+              ? "bg-rose-50 text-rose-700 border-rose-100" 
+              : "bg-amber-50 text-amber-700 border-amber-100"
+          }`}>
+            <AlertTriangle size={14} className={isOverdue ? "animate-pulse" : ""} />
+            <span>{isOverdue ? "Overdue" : "Due Soon"} (Oct 24, 11:59 PM)</span>
           </div>
         </div>
       </div>
@@ -127,7 +137,15 @@ export default function StudentAssignments() {
               <h3 className="text-[11px] font-black uppercase text-slate-450 tracking-wider">Attachments</h3>
               <div className="flex flex-wrap gap-3">
                 <a
-                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const el = document.createElement('a');
+                    el.href = "/Grading_Rubric_V2.pdf";
+                    el.download = "Grading_Rubric_V2.pdf";
+                    document.body.appendChild(el);
+                    el.click();
+                    document.body.removeChild(el);
+                  }}
                   className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:border-[#6C1D5F]/30 hover:bg-slate-50/50 transition-all group cursor-pointer"
                 >
                   <div className="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center transition-colors group-hover:bg-rose-500 group-hover:text-white">
@@ -143,7 +161,15 @@ export default function StudentAssignments() {
                 </a>
 
                 <a
-                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const el = document.createElement('a');
+                    el.href = "/Case_Study_Data.xlsx";
+                    el.download = "Case_Study_Data.xlsx";
+                    document.body.appendChild(el);
+                    el.click();
+                    document.body.removeChild(el);
+                  }}
                   className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:border-[#6C1D5F]/30 hover:bg-slate-50/50 transition-all group cursor-pointer"
                 >
                   <div className="w-10 h-10 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center transition-colors group-hover:bg-teal-500 group-hover:text-white">

@@ -13,6 +13,7 @@ import {
   ChevronRight,
   AlignLeft,
 } from "lucide-react";
+import { toast } from "sonner";
 
 /* ── Mock Data ─────────────────────────────────────────────────── */
 const LESSON = {
@@ -121,11 +122,19 @@ export default function StudentLessonDetail() {
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
-              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-[12px] font-bold hover:bg-slate-50 transition-all cursor-pointer outline-none">
+              <button 
+                onClick={() => setActiveTab("Notes")}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-[12px] font-bold hover:bg-slate-50 transition-all cursor-pointer outline-none"
+              >
                 <AlignLeft size={15} />
                 Take Notes
               </button>
-              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#6C1D5F] text-white text-[12px] font-bold hover:bg-[#521347] transition-all cursor-pointer border-none outline-none shadow-sm shadow-[#6C1D5F]/15">
+              <button 
+                onClick={() => {
+                  toast.success("Lesson marked as complete!");
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#6C1D5F] text-white text-[12px] font-bold hover:bg-[#521347] transition-all cursor-pointer border-none outline-none shadow-sm shadow-[#6C1D5F]/15"
+              >
                 <CheckCircle size={15} />
                 Mark Complete
               </button>
@@ -179,7 +188,10 @@ export default function StudentLessonDetail() {
               <div className="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-[16px] font-bold text-slate-800">AI Summary</h3>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6C1D5F] text-white text-[11px] font-bold hover:bg-[#521347] transition-all cursor-pointer border-none outline-none">
+                  <button 
+                    onClick={() => toast("Regenerating AI Summary...", { icon: '✨' })}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6C1D5F] text-white text-[11px] font-bold hover:bg-[#521347] transition-all cursor-pointer border-none outline-none"
+                  >
                     <Sparkles size={12} />
                     Regenerate
                   </button>
@@ -333,7 +345,10 @@ export default function StudentLessonDetail() {
           </div>
 
           {/* AI Assistant Floating Button */}
-          <button className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-slate-100 text-slate-700 text-[13px] font-bold hover:bg-slate-200 transition-all cursor-pointer border border-slate-200 outline-none">
+          <button 
+            onClick={() => navigate("/student/assistant")}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-slate-100 text-slate-700 text-[13px] font-bold hover:bg-slate-200 transition-all cursor-pointer border border-slate-200 outline-none"
+          >
             <MessageSquare size={16} />
             Ask AI Assistant
           </button>
